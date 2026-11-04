@@ -1,0 +1,76 @@
+{
+  "description": "Parse duplicate-MAC detection and deletion evidence only. Preserve message, timestamp, service and existing tags. Adds network_aiops fields; does not alter indexes, retention, or remediation.",
+  "filter": {
+    "query": "env:network-aiops tags:\"service:nokia-srlinux\" source:syslog \"duplicate MAC address\""
+  },
+  "id": "yBuQFTdGSKynltacXEGOwQ",
+  "isEnabled": true,
+  "isReadOnly": false,
+  "name": "[POC] Nokia SR Linux MAC Flapping Evidence",
+  "processors": [
+    {
+      "grok": {
+        "matchRules": "detected_interface bridgetable[|]%{integer:network_aiops.pid}[|]%{integer:network_aiops.thread_id}[|]%{integer:network_aiops.sequence}[|]N: A duplicate MAC address %{macaddr:network_aiops.mac} was detected on sub-interface %{notSpace:network_aiops.interface}[.]\ndetected_instance bridgetable[|]%{integer:network_aiops.pid}[|]%{integer:network_aiops.thread_id}[|]%{integer:network_aiops.sequence}[|]N: A duplicate MAC address %{macaddr:network_aiops.mac} was detected on %{notSpace:network_aiops.network_instance}[.]\ndeleted_interface bridgetable[|]%{integer:network_aiops.pid}[|]%{integer:network_aiops.thread_id}[|]%{integer:network_aiops.sequence}[|]N: A duplicate MAC address %{macaddr:network_aiops.mac} detected on sub-interface %{notSpace:network_aiops.interface} is now deleted[.]\ndeleted_instance bridgetable[|]%{integer:network_aiops.pid}[|]%{integer:network_aiops.thread_id}[|]%{integer:network_aiops.sequence}[|]N: A duplicate MAC address %{macaddr:network_aiops.mac} detected on %{notSpace:network_aiops.network_instance} is now deleted[.]",
+        "supportRules": "macaddr %{regex(\"[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}\")}"
+      },
+      "isEnabled": true,
+      "name": "Parse verified SR Linux duplicate-MAC messages",
+      "samples": [
+        "bridgetable|2162|2162|00040|N: A duplicate MAC address 02:00:00:00:00:AA was detected on sub-interface ethernet-1/2.1.",
+        "bridgetable|2162|2162|00039|N: A duplicate MAC address 02:00:00:00:00:AA was detected on mac-flap.",
+        "bridgetable|2162|2162|00041|N: A duplicate MAC address 02:00:00:00:00:AA detected on sub-interface ethernet-1/2.1 is now deleted.",
+        "bridgetable|2162|2162|00042|N: A duplicate MAC address 02:00:00:00:00:AA detected on mac-flap is now deleted.",
+        "<134>Nov 3 16:55:00 network-aiops-lab macflap-test: DATADOG_SYSLOG_TEST"
+      ],
+      "source": "message",
+      "type": "grok-parser"
+    },
+    {
+      "categories": [
+        {
+          "filter": {
+            "query": "@network_aiops.mac:* \"was detected\""
+          },
+          "name": "detected"
+        },
+        {
+          "filter": {
+            "query": "@network_aiops.mac:* \"is now deleted\""
+          },
+          "name": "deleted"
+        }
+      ],
+      "isEnabled": true,
+      "name": "Classify detection versus deletion",
+      "target": "network_aiops.event_action",
+      "type": "category-processor"
+    },
+    {
+      "categories": [
+        {
+          "filter": {
+            "query": "@network_aiops.interface:*"
+          },
+          "name": "sub-interface"
+        },
+        {
+          "filter": {
+            "query": "@network_aiops.network_instance:*"
+          },
+          "name": "mac-vrf"
+        }
+      ],
+      "isEnabled": true,
+      "name": "Classify target type",
+      "target": "network_aiops.target_type",
+      "type": "category-processor"
+    }
+  ],
+  "tags": [
+    "env:network-aiops",
+    "team:tps",
+    "project:berca-poc",
+    "scenario:mac-flapping"
+  ],
+  "type": "pipeline"
+}

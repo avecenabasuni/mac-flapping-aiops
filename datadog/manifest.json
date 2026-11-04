@@ -1,0 +1,25 @@
+{
+  "exported_at": "2026-11-04T08:33:26Z",
+  "source": {
+    "monitor_id": 340593559,
+    "investigation_workflow_id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
+    "scenario_controller_id": "45ac61cf-8a35-4e2d-bed3-370ffc6a8506",
+    "pipeline_id": "yBuQFTdGSKynltacXEGOwQ",
+    "bits_agent_id": "acbe08af-1288-4495-bdbe-705533fefafd",
+    "runbook_id": 16202843
+  },
+  "export_format": "Sanitized configuration snapshots. Adapt payloads to the target API/tool before import.",
+  "scenario_placeholders": [
+    "mac-flapping",
+    "reset-mac-flapping"
+  ],
+  "live_evidence": {
+    "instance_id": "1f909fed-cf5f-46dd-a4ab-a3217adf4f63",
+    "runtime_status": "SUCCEEDED",
+    "report_status": "COMPLETED",
+    "classification": "MAC_FLAPPING_EVIDENCE",
+    "slack_delivery_verified": true,
+    "all_four_message_variants_parsed": true,
+    "device_recovery_verified": false
+  }
+}

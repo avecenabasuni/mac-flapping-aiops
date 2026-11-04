@@ -1,0 +1,26 @@
+{
+  "name": "[POC] Network MAC Flapping Detected",
+  "type": "log alert",
+  "query": "logs(\"tags:\\\"service:nokia-srlinux\\\" env:network-aiops \\\"duplicate MAC address\\\" \\\"was detected\\\"\").index(\"*\").rollup(\"count\").last(\"5m\") > 0",
+  "message": "{{#is_alert}}\n━━━━━━━━━━━━━━━━━━━━\n:warning: *ROOT-CAUSE EVIDENCE · ACTIVE*\n*Network MAC Flapping Detected*\n━━━━━━━━━━━━━━━━━━━━\n\nDatadog observed one or more logs containing \"duplicate MAC address\" in the last 5 minutes.\n\n*Service:* `nokia-srlinux`\n*Environment:* `network-aiops`\n*Signal:* `duplicate MAC address log count over five minutes`\n*Current Value:* `{{value}}`\n*Critical Threshold:* `{{threshold}}`\n*Detected At:* `{{local_time 'last_triggered_at' 'Asia/Jakarta'}}`\n\n:jigsaw: *Investigation Evidence Only*\n\nThis monitor records evidence of potential MAC flapping. Correlate the matching device logs with MAC movement, interface state, topology, and actual network impact. No automatic remediation is triggered by this monitor.\n\n*Read-only investigation:* A Datadog workflow collects matching logs and asks Bits AI to summarize the evidence. It does not execute network changes or AAP.\n\n@workflow-network-mac-flapping-investigation-poc\n@slack-datadog-monitor\n{{/is_alert}}\n\n{{#is_recovery}}\n━━━━━━━━━━━━━━━━━━━━\n:large_green_circle: *EVIDENCE WINDOW · CLEARED*\n*No New Duplicate MAC Logs in the Evaluation Window*\n━━━━━━━━━━━━━━━━━━━━\n\nNo matching \"duplicate MAC address\" log was observed in the last 5 minutes. Five minutes without a new log does not prove recovery from MAC flapping. Confirm device state, log ingestion health, and network impact independently. No automatic remediation is triggered.\n\n*Service:* `nokia-srlinux`\n*Environment:* `network-aiops`\n*Current Value:* `{{value}}`\n*Window Cleared At:* `{{local_time 'last_resolved_at' 'Asia/Jakarta'}}`\n\n@slack-datadog-monitor\n{{/is_recovery}}\n\n*POC validation:* Real Nokia SR Linux duplicate-MAC detection logs triggered this monitor on 2026-11-04 at 11:24:19 UTC+7; the user confirmed Slack alert delivery. Generic `DATADOG_SYSLOG_TEST` logs and `is now deleted` messages are excluded from the detection condition. A monitor status of OK does not verify device recovery.\n\n[Runbook and test evidence](https://app.datadoghq.com/notebook/16202843)",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "service:nokia-srlinux",
+    "scenario:mac-flapping",
+    "monitor_role:evidence",
+    "team:tps"
+  ],
+  "options": {
+    "thresholds": {
+      "critical": 0
+    },
+    "enable_logs_sample": true,
+    "notify_no_data": false,
+    "include_tags": true,
+    "on_missing_data": "default",
+    "notify_audit": false,
+    "groupby_simple_monitor": false
+  }
+}
