@@ -12,3 +12,10 @@ all:
         ansible_httpapi_validate_certs: false
         ansible_httpapi_use_proxy: false
         # Set user/password in AAP Machine credential, never this public file.
+    lab_linux:
+      hosts:
+        ubuntu-host:
+          # Replace with Ubuntu VM management IP; AAP needs SSH access.
+          ansible_host: REPLACE_UBUNTU_VM_IP
+          ansible_connection: ssh
+          # Use separate AAP Machine credential for this Linux host.
