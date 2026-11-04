@@ -156,6 +156,7 @@ mac-flapping-aiops/
 | [v1 → v2 migration](lab-v2/docs/MIGRATE-FROM-V1.md) | Back up and preserve the old lab. |
 | [AAP integration](lab-v2/ansible/README.md) | Credentials, JSON-RPC, approval, device and forwarding verification. |
 | [Datadog integration](lab-v2/docs/DATADOG.md) | v2 Syslog forwarding and existing monitor reuse. |
+| [Switch and lab device monitoring](lab-v2/docs/DEVICE-MONITORING.md) | SNMP Agent/CLI templates, monitoring scope, and telemetry acceptance checks. |
 | [MAC flapping monitor](datadog/monitors/network-mac-flapping.json) | P3 query, thresholds and notification message. |
 | [Investigation workflow](datadog/workflows/investigate-network-mac-flapping.json) | Bounded log collection, Bits AI summary and Slack. |
 | [Scenario controller](datadog/workflows/operational-scenario-controller-v6-aap.json) | Existing AAP scenarios; MAC-flapping scenarios are placeholders. |

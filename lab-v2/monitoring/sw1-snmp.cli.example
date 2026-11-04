@@ -1,0 +1,9 @@
+# Example only: replace placeholders on the lab switch.
+# Use the management IP/source IP observed from the actual v2 network.
+enter candidate
+set / system snmp network-instance mgmt admin-state enable
+set / system snmp access-group datadog-readonly admin-state enable
+set / system snmp access-group datadog-readonly security-level no-auth-no-priv
+set / system snmp access-group datadog-readonly community-entry lab-reader community REPLACE_LAB_READONLY_COMMUNITY
+set / system snmp access-group datadog-readonly community-entry lab-reader prefix-list [ REPLACE_AGENT_SOURCE_IP/32 ]
+commit now

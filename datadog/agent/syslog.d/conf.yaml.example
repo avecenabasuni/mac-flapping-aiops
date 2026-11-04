@@ -1,0 +1,12 @@
+# Merge into the existing syslog listener; do not bind UDP 10514 twice.
+logs:
+  - type: udp
+    port: 10514
+    source: syslog
+    service: nokia-srlinux
+    tags:
+      - env:network-aiops
+      - service:nokia-srlinux
+      - project:berca-poc
+      - lab_id:macflap-v2
+      - usecase:mac-flapping

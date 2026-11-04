@@ -1,0 +1,23 @@
+# Merge this instance into /etc/datadog-agent/conf.d/snmp.d/conf.yaml.
+# Replace both placeholders on the Ubuntu VM before enabling.
+init_config:
+  loader: core
+  use_device_id_as_hostname: true
+
+instances:
+  - ip_address: REPLACE_SW1_MANAGEMENT_IP
+    port: 161
+    snmp_version: 2
+    community_string: 'REPLACE_LAB_READONLY_COMMUNITY'
+    namespace: network-aiops-lab-v2
+    profile: generic-device
+    timeout: 2
+    retries: 2
+    tags:
+      - project:berca-poc
+      - env:network-aiops
+      - lab_id:macflap-v2
+      - lab_device:sw1
+      - device_role:switch
+      - service:nokia-srlinux
+      - team:tps

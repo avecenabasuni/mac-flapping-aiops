@@ -1,0 +1,2 @@
+# Merge with /etc/datadog-agent/datadog.yaml; retain its API key/site/settings.
+logs_enabled: true
