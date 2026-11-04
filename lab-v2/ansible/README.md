@@ -12,13 +12,13 @@ ansible-galaxy collection install -r ansible/requirements.yml
 
 Copy `inventory.example.yml` to a local, gitignored inventory and replace the IP with the IP **reachable from AAP**, not blindly with Docker's management gateway. Give the AAP job a Machine credential with SR Linux JSON-RPC username/password. On this lab image, the Containerlab default configuration usually enables JSON-RPC, but validate access before running any change.
 
-Create three AAP Job Templates: **Collect Evidence**, **Isolate Host B**, **Verify**. Create a separate, manual-only **Restore Host B** template. Use an AAP **Workflow Job Template** with nodes:
+Create AAP Job Templates: **Collect Evidence** (switch), **Isolate Host B** (switch), **Verify Device** (switch), and **Verify Forwarding** (Linux Ubuntu VM). Create a separate, manual-only **Restore Host B** template. The Verify Forwarding playbook runs `docker exec` over SSH on Ubuntu with `become: true` and requires a separate Linux Machine credential. Configure the `lab_linux` inventory host using the real Ubuntu management IP. Use an AAP **Workflow Job Template** with nodes:
 
 1. Collect Evidence
 2. AI-assisted diagnosis (Datadog workflow; evidence and classification must be passed through an integration you actually verify)
 3. **Approval** node, requiring an operator
 4. Isolate Host B (only on approval)
-5. Verify device state and invoke independent Host C forwarding probe
+5. Verify Device (switch) and Verify Forwarding (Ubuntu SSH / Host C ICMP), confirming 0% packet loss over five probes. Because Nokia's hold-down may persist, Verify Forwarding retries up to 30 times with a 10-second delay. Do not equate success on a single probe with absence of MAC moves if the port was not disabled.
 
 For the isolation job, supply AAP extra-vars **after approval**:
 
