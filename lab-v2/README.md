@@ -45,7 +45,7 @@ If no duplicates yet, inspect the actual traffic and interface state before assu
 
 ## AAP
 
-See [Ansible](ansible/README.md) for playbooks, approval gate and device reachability. The isolation is disabled until an engineer **explicitly approves** it through AAP. A cloned GitHub repo does not create AAP jobs.
+See [Ansible](ansible/README.md) for playbooks, approval gate and device reachability. The additional `verify-forwarding.yml` job uses AAP SSH access to the Ubuntu Docker host for an automatic Host C→Host A reachability check (0% packet loss target, retries while Nokia hold-down expires). The isolation is disabled until an engineer **explicitly approves** it through AAP. A cloned GitHub repo does not create AAP jobs.
 
 ## Datadog
 
