@@ -19,3 +19,34 @@
     - name: Report evidence, do not equate quiet logs with recovery
       ansible.builtin.debug:
         var: verified.result
+
+    - name: Read exact administrative and operational state of all three lab ports
+      nokia.srlinux.get:
+        paths:
+          - path: /interface[name=ethernet-1/1]/admin-state
+            datastore: state
+          - path: /interface[name=ethernet-1/1]/oper-state
+            datastore: state
+          - path: /interface[name=ethernet-1/2]/admin-state
+            datastore: state
+          - path: /interface[name=ethernet-1/2]/oper-state
+            datastore: state
+          - path: /interface[name=ethernet-1/3]/admin-state
+            datastore: state
+          - path: /interface[name=ethernet-1/3]/oper-state
+            datastore: state
+      register: interface_state
+
+    - name: Require isolated ingress and healthy trusted and probe ports
+      ansible.builtin.assert:
+        that:
+          - >-
+            (interface_state.result | default([])) ==
+            ['enable', 'up', 'disable', 'down', 'enable', 'up']
+        fail_msg: >-
+          Device verification failed. Expected e1/1 enable/up,
+          e1/2 disable/down and e1/3 enable/up; observed ordered leaf values:
+          {{ interface_state.result | default([]) | to_json }}.
+        success_msg: >-
+          Device port checks passed. Verify Host C to Host A forwarding separately;
+          this result alone does not establish network recovery.
