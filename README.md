@@ -36,3 +36,7 @@ Uji live 4 November 2026 berhasil: empat log baru memiliki parsing yang benar, m
 Query menggunakan `tags:"service:nokia-srlinux"` karena reserved service pada log asli adalah `sr_l2_mac_mgr`. Frasa `"was detected"` memisahkan deteksi dari pesan `"is now deleted"`. Generic `DATADOG_SYSLOG_TEST` tidak memenuhi kondisi deteksi.
 
 Monitor OK, pesan deletion, atau lima menit tanpa deteksi tidak membuktikan pemulihan perangkat. Workflow investigasi ini tidak menjalankan remediasi otomatis dan tidak membuktikan loop fisik. Penghitungan workflow dibatasi sampel 100 log; rate limit monitor satu run per 60 detik, tanpa penyimpanan deduplikasi lintas run.
+
+## Lab v2: Continuous MAC Flapping and Controlled Recovery
+
+The runnable Nokia SR Linux / Containerlab v2 implementation is in [lab-v2](lab-v2/README.md), including the continuous fault generator, Host C connectivity probe, AAP-safe isolation playbooks, and a [v1 to v2 migration guide](lab-v2/docs/MIGRATE-FROM-V1.md). The existing Datadog exports remain in the datadog/ directory. The v2 runtime and AAP execution have not yet been validated on the user's lab host.
