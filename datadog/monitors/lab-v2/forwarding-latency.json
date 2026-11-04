@@ -1,0 +1,24 @@
+{
+  "type": "query alert",
+  "draft_status": "draft",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "lab_id:macflap-v2",
+    "monitor_role:health",
+    "team:tps"
+  ],
+  "name": "[POC] Lab Host C to Host A Latency High",
+  "query": "avg(last_5m):avg:network_aiops.lab.probe.rtt_avg_ms{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a} > 50",
+  "message": "{{#is_alert}}\nAverage observed RTT exceeded 50 ms. Tune this initial threshold against the healthy baseline.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+  "options": {
+    "thresholds": {
+      "critical": 50
+    },
+    "notify_no_data": false,
+    "no_data_timeframe": 10,
+    "require_full_window": false,
+    "include_tags": true
+  }
+}

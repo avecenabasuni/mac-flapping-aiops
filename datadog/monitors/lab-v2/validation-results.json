@@ -1,0 +1,84 @@
+{
+  "validated_on": "2026-11-04",
+  "method": "Datadog monitor definition validation API (read-only)",
+  "runtime_validated": false,
+  "deployed": false,
+  "results": [
+    {
+      "file": "ubuntu-cpu.json",
+      "is_valid": true
+    },
+    {
+      "file": "ubuntu-memory.json",
+      "is_valid": true
+    },
+    {
+      "file": "ubuntu-disk.json",
+      "is_valid": true
+    },
+    {
+      "file": "ubuntu-telemetry.json",
+      "is_valid": true
+    },
+    {
+      "file": "container-state.json",
+      "is_valid": true
+    },
+    {
+      "file": "container-cpu.json",
+      "is_valid": true
+    },
+    {
+      "file": "container-memory.json",
+      "is_valid": true
+    },
+    {
+      "file": "collector-heartbeat.json",
+      "is_valid": true
+    },
+    {
+      "file": "collector-status.json",
+      "is_valid": true
+    },
+    {
+      "file": "forwarding-status.json",
+      "is_valid": true
+    },
+    {
+      "file": "forwarding-latency.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-snmp.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-e1-1.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-e1-3.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-e1-2-unexpected.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-in-errors.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-out-errors.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-in-discards.json",
+      "is_valid": true
+    },
+    {
+      "file": "switch-out-discards.json",
+      "is_valid": true
+    }
+  ]
+}

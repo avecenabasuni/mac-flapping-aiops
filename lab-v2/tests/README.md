@@ -4,6 +4,8 @@ These offline tests load the conditions from the Ansible playbooks and evaluate
 them against fixtures using Jinja2 and Python regex matching. They do not contact
 Datadog, AAP, Docker, or SR Linux.
 
+The suite also tests the full-lab collector with a stub AgentCheck and fixture Docker/ping responses: missing/stopped/unhealthy containers, permission failures, incomplete stats, command timeout, partial/total loss and malformed probe output. No actual Docker or ping command is executed by these tests.
+
 From the repository root:
 
 ```bash

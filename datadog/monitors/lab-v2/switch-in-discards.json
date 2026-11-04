@@ -1,0 +1,24 @@
+{
+  "type": "query alert",
+  "draft_status": "draft",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "lab_id:macflap-v2",
+    "monitor_role:health",
+    "team:tps"
+  ],
+  "name": "[POC] Lab SW1 Interface in-discards Observed",
+  "query": "avg(last_5m):sum:snmp.ifInDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface} > 1",
+  "message": "{{#is_alert}}\nThe interface ifInDiscards rate exceeded 1 per second. Verify rate semantics for the Agent/profile version and tune this starting threshold.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+  "options": {
+    "thresholds": {
+      "critical": 1
+    },
+    "notify_no_data": false,
+    "no_data_timeframe": 10,
+    "require_full_window": false,
+    "include_tags": true
+  }
+}

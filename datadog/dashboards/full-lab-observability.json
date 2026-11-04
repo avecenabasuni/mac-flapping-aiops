@@ -1,0 +1,270 @@
+{
+  "title": "[POC] MAC Flapping Lab - Full Observability",
+  "description": "Configuration template. Deploy collectors before importing. Port isolation, probe success and monitor OK remain separate evidence.",
+  "layout_type": "ordered",
+  "reflow_type": "auto",
+  "widgets": [
+    {
+      "definition": {
+        "type": "note",
+        "content": "Coverage: Ubuntu VM, SW1 + Host A/B/C containers, switch interfaces/SNMP and independent C→A forwarding. e1/2 admin-disabled is expected during containment. No automatic remediation; review source freshness and recovery evidence."
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Ubuntu CPU idle (%)",
+        "requests": [
+          {
+            "q": "avg:system.cpu.idle{host:network-aiops-lab}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Ubuntu memory usable (%)",
+        "requests": [
+          {
+            "q": "avg:system.mem.pct_usable{host:network-aiops-lab} * 100",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Ubuntu disk usage (%)",
+        "requests": [
+          {
+            "q": "max:system.disk.in_use{host:network-aiops-lab} by {device} * 100",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Ubuntu uptime (seconds)",
+        "requests": [
+          {
+            "q": "max:system.uptime{host:network-aiops-lab}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Ubuntu network traffic",
+        "requests": [
+          {
+            "q": "sum:system.net.bytes_rcvd{host:network-aiops-lab} by {device}",
+            "display_type": "line"
+          },
+          {
+            "q": "sum:system.net.bytes_sent{host:network-aiops-lab} by {device}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Expected container running state (1=running)",
+        "requests": [
+          {
+            "q": "max:network_aiops.lab.container.up{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Container CPU (% of one core)",
+        "requests": [
+          {
+            "q": "avg:network_aiops.lab.container.cpu_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Container memory (%)",
+        "requests": [
+          {
+            "q": "avg:network_aiops.lab.container.memory_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Container used memory (bytes)",
+        "requests": [
+          {
+            "q": "avg:network_aiops.lab.container.memory_used_bytes{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Container restart counts",
+        "requests": [
+          {
+            "q": "max:network_aiops.lab.container.restart_count{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Container uptime (seconds)",
+        "requests": [
+          {
+            "q": "max:network_aiops.lab.container.uptime_seconds{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Container process count",
+        "requests": [
+          {
+            "q": "max:network_aiops.lab.container.pids{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Host C to Host A packet loss (%)",
+        "requests": [
+          {
+            "q": "max:network_aiops.lab.probe.loss_pct{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Host C to Host A average RTT (ms)",
+        "requests": [
+          {
+            "q": "avg:network_aiops.lab.probe.rtt_avg_ms{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Collector heartbeat",
+        "requests": [
+          {
+            "q": "max:network_aiops.lab.collector.heartbeat{env:network-aiops,lab_id:macflap-v2}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "SW1 interface admin state (1=up, 2=down)",
+        "requests": [
+          {
+            "q": "max:snmp.ifAdminStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "SW1 interface operational state (1=up)",
+        "requests": [
+          {
+            "q": "max:snmp.ifOperStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "SW1 inbound and outbound traffic",
+        "requests": [
+          {
+            "q": "sum:snmp.ifHCInOctets.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          },
+          {
+            "q": "sum:snmp.ifHCOutOctets.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "SW1 interface error rates",
+        "requests": [
+          {
+            "q": "sum:snmp.ifInErrors.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          },
+          {
+            "q": "sum:snmp.ifOutErrors.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "SW1 interface discard rates",
+        "requests": [
+          {
+            "q": "sum:snmp.ifInDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          },
+          {
+            "q": "sum:snmp.ifOutDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+            "display_type": "line"
+          }
+        ]
+      }
+    }
+  ]
+}

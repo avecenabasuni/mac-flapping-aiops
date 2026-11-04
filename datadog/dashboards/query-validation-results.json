@@ -1,0 +1,128 @@
+{
+  "validated_on": "2026-11-04",
+  "method": "Datadog timeseries query API, read-only",
+  "dashboard_imported": false,
+  "new_collectors_deployed": false,
+  "results": [
+    {
+      "query": "avg:system.cpu.idle{host:network-aiops-lab}",
+      "series": 1,
+      "status": "ok"
+    },
+    {
+      "query": "avg:system.mem.pct_usable{host:network-aiops-lab} * 100",
+      "series": 1,
+      "status": "ok"
+    },
+    {
+      "query": "max:system.disk.in_use{host:network-aiops-lab} by {device} * 100",
+      "series": 10,
+      "status": "ok"
+    },
+    {
+      "query": "max:system.uptime{host:network-aiops-lab}",
+      "series": 1,
+      "status": "ok"
+    },
+    {
+      "query": "sum:system.net.bytes_rcvd{host:network-aiops-lab} by {device}",
+      "series": 7,
+      "status": "ok"
+    },
+    {
+      "query": "sum:system.net.bytes_sent{host:network-aiops-lab} by {device}",
+      "series": 7,
+      "status": "ok"
+    },
+    {
+      "query": "max:network_aiops.lab.container.up{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "avg:network_aiops.lab.container.cpu_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "avg:network_aiops.lab.container.memory_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "avg:network_aiops.lab.container.memory_used_bytes{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:network_aiops.lab.container.restart_count{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:network_aiops.lab.container.uptime_seconds{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:network_aiops.lab.container.pids{env:network-aiops,lab_id:macflap-v2} by {lab_container}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:network_aiops.lab.probe.loss_pct{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "avg:network_aiops.lab.probe.rtt_avg_ms{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:network_aiops.lab.collector.heartbeat{env:network-aiops,lab_id:macflap-v2}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:snmp.ifAdminStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "max:snmp.ifOperStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "sum:snmp.ifHCInOctets.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "sum:snmp.ifHCOutOctets.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "sum:snmp.ifInErrors.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "sum:snmp.ifOutErrors.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "sum:snmp.ifInDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    },
+    {
+      "query": "sum:snmp.ifOutDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}",
+      "series": 0,
+      "status": "ok"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Monitoring switch dan perangkat lab v2
 
+Paket lengkap seluruh lab, termasuk collector container/probe, template monitor dan dashboard, tersedia di [FULL-LAB-MONITORING.md](FULL-LAB-MONITORING.md). Dokumen ini berfokus pada pemasangan SNMP.
+
 Status persiapan: template konfigurasi, belum dipasang pada VM/switch. Tidak ada monitor switch baru yang diklaim aktif.
 
 Pemeriksaan Datadog pada sesi persiapan menemukan metrik sistem dari host `network-aiops-lab`, inventori NDM kosong, dan pencarian metrik SNMP belum menemukan data. Syslog dan investigasi MAC flapping sebelumnya sudah teruji pada v1. Temuan ini tidak membuktikan v2 sudah mengirim telemetry.
@@ -10,9 +12,9 @@ Pemeriksaan Datadog pada sesi persiapan menemukan metrik sistem dari host `netwo
 | --- | --- | --- |
 | SW1 | Keberhasilan polling SNMP, uptime dan identitas | Perlu konfigurasi SNMP |
 | e1/1, e1/2, e1/3 | Admin/oper state, traffic, error/discard counters | Perlu validasi IF-MIB aktual |
-| Host A/B/C | Port switch dan status container masing-masing | Interface melalui SNMP; metrik Docker belum ditemukan |
+| Host A/B/C | Port switch dan status/resource container masing-masing | Interface melalui SNMP; collector Docker tersedia dalam paket full-lab, belum dipasang |
 | Ubuntu Containerlab | CPU, memory, disk, Agent health | Metrik CPU sudah terlihat; cakupan lain perlu dicocokkan dengan monitor existing |
-| Host C → Host A | Packet loss dan latency pada data plane | Probe/AAP verification tersedia; belum menjadi time series Datadog |
+| Host C → Host A | Packet loss dan latency pada data plane | Collector berkala tersedia dalam paket full-lab, belum dipasang |
 
 CPU/RAM switch, sensor dan hardware counters hanya ditambahkan jika benar-benar diekspos perangkat/profil. SW1 virtual tidak otomatis memiliki seluruh sensor switch fisik. Ping management/SNMP yang sukses tidak membuktikan forwarding Host C → A sehat.
 
@@ -56,7 +58,7 @@ Agent minimal mengikuti prasyarat NDM Datadog (7.32+). Gunakan Agent di Ubuntu y
 - Intentional isolation: e1/2 admin disabled merupakan state containment yang disengaja saat demo. Rekam pada dashboard/evidence; jangan memicu alert kerusakan yang sama dengan link putus saat admin enabled. Kondisi admin-disabled di luar demo tetap perlu peninjauan terpisah.
 - Traffic/errors/discards: gunakan counter/rate dan tags yang ditemukan setelah ingestion; tetapkan threshold setelah melihat baseline lab.
 - Endpoint/container availability: harus melihat status container yang diharapkan, bukan hanya jumlah seluruh container di host. Koneksi Docker Agent pada Ubuntu belum diverifikasi.
-- Host C → A: gunakan probe data plane independen. Script ping/hasil AAP tidak otomatis menjadi metric Datadog; perlu collector berkala terpisah bila ingin alert berkelanjutan. Tidak membuat metric palsu dari log monitor OK.
+- Host C → A: gunakan probe data plane independen dari collector full-lab. Script ping/hasil AAP sendiri tidak otomatis menjadi metric Datadog. Tidak membuat metric palsu dari log monitor OK.
 
 Pada tahap ini tidak ada perubahan pada placeholder job AAP `mac-flapping` / `reset-mac-flapping`, workflow investigasi, atau monitor MAC flapping existing.
 

@@ -1,0 +1,24 @@
+{
+  "type": "query alert",
+  "draft_status": "draft",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "lab_id:macflap-v2",
+    "monitor_role:health",
+    "team:tps"
+  ],
+  "name": "[POC] Lab Ubuntu Memory Low",
+  "query": "avg(last_5m):avg:system.mem.pct_usable{host:network-aiops-lab} < 0.1",
+  "message": "{{#is_alert}}\nAvailable memory stayed below 10%.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+  "options": {
+    "thresholds": {
+      "critical": 0.1
+    },
+    "notify_no_data": true,
+    "no_data_timeframe": 10,
+    "require_full_window": false,
+    "include_tags": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "service check",
+  "draft_status": "draft",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "lab_id:macflap-v2",
+    "monitor_role:health",
+    "team:tps"
+  ],
+  "name": "[POC] Lab Telemetry Collection Failed",
+  "query": "\"network_aiops.lab.collector\".over(\"env:network-aiops\",\"lab_id:macflap-v2\").by(\"host\").last(3).count_by_status()",
+  "message": "Docker inventory could not be read, or container stats/probe collection is incomplete. Distinguish collection errors from observed packet loss.\nNo automatic remediation. Collector UNKNOWN is not proof of device failure.\n@slack-datadog-monitor",
+  "options": {
+    "thresholds": {
+      "critical": 3,
+      "warning": 3,
+      "ok": 1
+    },
+    "notify_no_data": true,
+    "no_data_timeframe": 10,
+    "include_tags": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "query alert",
+  "draft_status": "draft",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "lab_id:macflap-v2",
+    "monitor_role:health",
+    "team:tps"
+  ],
+  "name": "[POC] Lab Container Memory High",
+  "query": "avg(last_5m):avg:network_aiops.lab.container.memory_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container} > 85",
+  "message": "{{#is_alert}}\nContainer memory use exceeded 85% of the Docker-reported memory limit.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+  "options": {
+    "thresholds": {
+      "critical": 85
+    },
+    "notify_no_data": true,
+    "no_data_timeframe": 10,
+    "require_full_window": false,
+    "include_tags": true
+  }
+}

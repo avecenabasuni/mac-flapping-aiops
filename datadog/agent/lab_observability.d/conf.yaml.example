@@ -1,0 +1,8 @@
+init_config: {}
+instances:
+  - min_collection_interval: 60
+    tags:
+      - project:berca-poc
+      - env:network-aiops
+      - lab_id:macflap-v2
+      - team:tps

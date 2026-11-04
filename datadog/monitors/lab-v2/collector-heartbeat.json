@@ -1,0 +1,24 @@
+{
+  "type": "query alert",
+  "draft_status": "draft",
+  "priority": 3,
+  "tags": [
+    "project:berca-poc",
+    "env:network-aiops",
+    "lab_id:macflap-v2",
+    "monitor_role:health",
+    "team:tps"
+  ],
+  "name": "[POC] Lab Collector Heartbeat Missing",
+  "query": "avg(last_5m):avg:network_aiops.lab.collector.heartbeat{env:network-aiops,lab_id:macflap-v2} < 1",
+  "message": "{{#is_alert}}\nCollector heartbeat is absent. A heartbeat means the check ran; use the collector service check to assess collection success.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+  "options": {
+    "thresholds": {
+      "critical": 1
+    },
+    "notify_no_data": true,
+    "no_data_timeframe": 10,
+    "require_full_window": false,
+    "include_tags": true
+  }
+}
