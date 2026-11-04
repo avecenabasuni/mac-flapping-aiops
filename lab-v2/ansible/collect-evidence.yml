@@ -1,0 +1,21 @@
+---
+- name: Read-only MAC flapping evidence collection
+  hosts: lab_srlinux
+  gather_facts: false
+  tasks:
+    - name: Gather MAC-VRF bridge-table state and interface states
+      nokia.srlinux.get:
+        paths:
+          - path: /network-instance[name=mac-flap]/bridge-table
+            datastore: state
+          - path: /interface[name=ethernet-1/1]
+            datastore: state
+          - path: /interface[name=ethernet-1/2]
+            datastore: state
+          - path: /interface[name=ethernet-1/3]
+            datastore: state
+      register: observed
+
+    - name: Report raw evidence for AI correlation
+      ansible.builtin.debug:
+        var: observed.result

@@ -1,0 +1,48 @@
+---
+- name: Isolate approved lab duplicate-source port only
+  hosts: lab_srlinux
+  gather_facts: false
+  vars:
+    approved_device: sw1
+    approved_interface: ethernet-1/2
+  tasks:
+    - name: Fail closed unless the exact laboratory target is approved
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname == approved_device
+          - (lab_id | default('')) == 'macflap-v2'
+          - (target_interface | default('')) == approved_interface
+          - (change_approved | default(false) | bool)
+        fail_msg: "Refused: requires AAP approval and lab_id=macflap-v2 target_interface=ethernet-1/2"
+      run_once: false
+
+    - name: Read interface before modification
+      nokia.srlinux.get:
+        paths:
+          - path: /interface[name=ethernet-1/2]
+            datastore: state
+      register: before
+
+    - name: Show pre-change evidence
+      ansible.builtin.debug:
+        var: before.result
+
+    - name: Disable only ethernet-1/2 (never trusted or probe ports)
+      nokia.srlinux.config:
+        update:
+          - path: /interface[name=ethernet-1/2]/admin-state
+            value: disable
+      register: change
+
+    - name: Read back interface state
+      nokia.srlinux.get:
+        paths:
+          - path: /interface[name=ethernet-1/2]
+            datastore: state
+      register: after
+
+    - name: Show actual after state (must verify externally)
+      ansible.builtin.debug:
+        msg:
+          - "Config change={{ change.changed }}"
+          - "{{ after.result }}"

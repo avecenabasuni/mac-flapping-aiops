@@ -1,0 +1,24 @@
+---
+- name: Restore lab duplicate-source port after the demonstration
+  hosts: lab_srlinux
+  gather_facts: false
+  tasks:
+    - name: Require explicit authorized rollback
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname == 'sw1'
+          - (lab_id | default('')) == 'macflap-v2'
+          - (target_interface | default('')) == 'ethernet-1/2'
+          - (change_approved | default(false) | bool)
+        fail_msg: "Refused: require explicit approved lab rollback"
+
+    - name: Enable only ethernet-1/2
+      nokia.srlinux.config:
+        update:
+          - path: /interface[name=ethernet-1/2]/admin-state
+            value: enable
+      register: restore
+
+    - name: Report result
+      ansible.builtin.debug:
+        var: restore

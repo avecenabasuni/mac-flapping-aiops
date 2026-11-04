@@ -1,0 +1,38 @@
+# Moving from v1 to v2 safely
+
+The older v1 project remains under `~/mac-flapping-lab`, with topology name `macflap` and containers `clab-macflap-*`. v2 uses **different directory, topology name and container names**.
+
+1. Preserve v1:
+   ```bash
+   cd ~/mac-flapping-lab
+   sudo containerlab save -t macflap.clab.yml
+   tar czf ~/macflap-v1-backup.tgz --exclude='clab-*' .
+   ```
+2. Stop the v1 traffic generator with Ctrl+C. Confirm no background loop is running.
+3. **If RAM is limited**, destroy only v1 (not the OSPF topology):
+   ```bash
+   sudo containerlab destroy -t macflap.clab.yml
+   ```
+   Do **not** use `--cleanup`. The v1 project and backup remain untouched.
+4. Clone v2 into a **different** directory:
+   ```bash
+   cd ~
+   git clone https://github.com/avecenabasuni/mac-flapping-aiops.git
+   cd mac-flapping-aiops/lab-v2
+   ```
+5. Build image, deploy, test a baseline (see README).
+
+If you want to switch back, destroy v2 with `sudo containerlab destroy -t macflap-v2.clab.yml`, then redeploy v1 from its original directory.
+
+## Important differences
+
+| Topic | v1 | v2 |
+| --- | --- | --- |
+| Topology name | macflap | macflap-v2 |
+| Linux endpoints | A and B | A, B and C |
+| Fault injection | fixed number of iterations | ongoing until Ctrl+C or 10m cap |
+| Service verification | MAC duplication entries only | MAC entries + independent Host C probe |
+| AAP | no dedicated isolated-port playbook | read-only, approval-gated e1/2 isolation, verification and rollback |
+| Datadog | previously tested log ingestion | reuses existing repo Datadog exports; needs actual v2 device Syslog validation |
+
+v2 is not auto-migrated into the running Datadog or AAP account by cloning this repo.

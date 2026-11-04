@@ -1,0 +1,14 @@
+all:
+  children:
+    lab_srlinux:
+      hosts:
+        sw1:
+          # Replace with management IP reachable FROM AAP execution environment.
+          ansible_host: 172.20.20.4
+      vars:
+        ansible_connection: ansible.netcommon.httpapi
+        ansible_network_os: nokia.srlinux.srlinux
+        ansible_httpapi_use_ssl: true
+        ansible_httpapi_validate_certs: false
+        ansible_httpapi_use_proxy: false
+        # Set user/password in AAP Machine credential, never this public file.

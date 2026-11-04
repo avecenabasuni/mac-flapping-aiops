@@ -1,0 +1,38 @@
+name: macflap-v2
+
+topology:
+  nodes:
+    sw1:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux:25.3.1
+      startup-config: sw1.cfg
+
+    host-a:
+      kind: linux
+      image: macflap-endpoint:v2
+      exec:
+        - ip link set dev eth1 address 02:00:00:00:00:aa
+        - ip addr replace 198.18.0.11/24 dev eth1
+        - ip link set dev eth1 up
+        - ip neigh replace 198.18.0.13 lladdr 02:00:00:00:00:cc dev eth1 nud permanent
+
+    host-b:
+      kind: linux
+      image: macflap-endpoint:v2
+      exec:
+        - ip link set dev eth1 address 02:00:00:00:00:bb
+        - ip link set dev eth1 up
+
+    host-c:
+      kind: linux
+      image: macflap-endpoint:v2
+      exec:
+        - ip link set dev eth1 address 02:00:00:00:00:cc
+        - ip addr replace 198.18.0.13/24 dev eth1
+        - ip link set dev eth1 up
+        - ip neigh replace 198.18.0.11 lladdr 02:00:00:00:00:aa dev eth1 nud permanent
+
+  links:
+    - endpoints: ["sw1:e1-1", "host-a:eth1"]
+    - endpoints: ["sw1:e1-2", "host-b:eth1"]
+    - endpoints: ["sw1:e1-3", "host-c:eth1"]
