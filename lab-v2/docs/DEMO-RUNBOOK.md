@@ -16,7 +16,7 @@
 3. **Detect** — show Nokia duplicate-MAC log and Datadog alert / Bits AI read-only investigation. A MAC duplication is not by itself proof of an L2 loop.
 4. **Investigate** — AAP Collect Evidence playbook reads MAC-VRF and interface state. Correlate with log, source MAC, port e1/1/e1/2 and connectivity probe `./scripts/probe.sh 20`.
 5. **Approve and contain** — engineer approves isolation of **e1/2 only**. Run AAP Isolate Host B template.
-6. **Verify** — show e1/2 administratively disabled, generator *still running*, Host C→Host A probe restored, and no further moved MAC evidence after Nokia's hold-down/aging behavior is understood. Use device table, not just a green monitor.
+6. **Verify** — run the AAP Verify Device job and the AAP Verify Forwarding job (SSH to Ubuntu VM, `docker exec` Host C ping). Show e1/2 administratively disabled, generator *still running*, Host C→Host A probe successful, and inspect MAC table/hold-down state. The forwarding check retries while Nokia's hold-down finishes. Use device table, not just a green monitor.
 7. **Close** — AAP and Datadog provide audit trail: detected, diagnosed, approved, isolated, verified.
 
 ## Fail-safe / demo contingencies
