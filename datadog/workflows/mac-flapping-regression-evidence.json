@@ -1,313 +1,40 @@
 {
-  "date": "2026-11-06",
-  "workflow_id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
-  "published": true,
-  "native": {
-    "id": "39841fa9-9a61-43b8-8b7b-08a2ce1196d5",
-    "status": "conclusive",
-    "url": "https://app.datadoghq.com/bits-ai/investigations/39841fa9-9a61-43b8-8b7b-08a2ce1196d5"
-  },
-  "timeline_regression": {
-    "instanceId": "fd2f331b-99d9-4d5e-a488-f8723500573d",
-    "url": "https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=fd2f331b-99d9-4d5e-a488-f8723500573d",
-    "workflowId": "beb71b61-bff9-460d-ad37-853ae9cc778e",
-    "result": {
-      "classification": "MAC_FLAPPING_EVIDENCE",
-      "expected": "UNVERIFIED",
-      "notification_sent": false,
-      "recovery": "UNVERIFIED",
-      "report_status": "COMPLETED",
-      "status": {
-        "detailsKind": "SUCCEEDED",
-        "displayName": "Success"
-      },
-      "summary": "Dalam sampel log tervalidasi terdapat 2 entri deteksi 'duplicate MAC address ... was detected' untuk MAC 02:00:00:00:00:aa pada host sw1 (mac-vrf mac-flap dan sub-interface ethernet-1/2.1) pada 06:54:58Z, serta 2 entri penghapusan lebih awal pada 06:50:43Z. Penghapusan tersebut lebih lama dari deteksi terbaru sehingga tidak membersihkannya; status pemulihan UNVERIFIED. Bukti ini tidak membuktikan loop fisik, dampak pelanggan, atau target isolasi.",
-      "timeline": {
-        "latest_deletion_at": "2026-11-06T06:50:43.785Z",
-        "latest_detection_at": "2026-11-06T06:54:58.546Z",
-        "unmatched_detection_targets": 2
-      }
-    }
-  },
-  "native_connector": {
-    "instanceId": "4dd72962-945e-427e-af14-4686ae6fb3a5",
-    "url": "https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=4dd72962-945e-427e-af14-4686ae6fb3a5",
-    "workflowId": "beb71b61-bff9-460d-ad37-853ae9cc778e",
-    "result": {
-      "classification": "MAC_FLAPPING_EVIDENCE",
-      "end": "2026-11-06T07:07:05.239309Z",
-      "native": {
-        "investigation_id": "39841fa9-9a61-43b8-8b7b-08a2ce1196d5",
-        "reason": "Native investigation started asynchronously; findings are not yet claimed.",
-        "status": "STARTED",
-        "url": "https://app.datadoghq.com/bits-ai/investigations/39841fa9-9a61-43b8-8b7b-08a2ce1196d5"
-      },
-      "notification_sent": false,
-      "recovery": "UNVERIFIED",
-      "report_status": "COMPLETED",
-      "start": "2026-11-06T07:06:35.074162Z",
-      "status": {
-        "detailsKind": "SUCCEEDED",
-        "displayName": "Success"
-      },
-      "steps": [
-        {
-          "name": "Normalize_Context",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Investigate",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Start_Native",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Search_Native_Investigation",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Select_Native_Investigation",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Create_Native",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Trigger_Native_Investigation",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Native_Started",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Get_Monitor",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Search_Incident_Logs",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Extract_Evidence",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Build_Agent_Prompt",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Run_Agent",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Finalize_Report",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Report",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Notify",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Send_Summary",
-          "state": "DISABLED"
-        },
-        {
-          "name": "Complete",
-          "state": "SUCCEEDED"
-        }
-      ]
-    }
-  },
-  "native_reuse": {
-    "instanceId": "e5304793-e32e-464c-ba85-868dd7be02fb",
-    "url": "https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=e5304793-e32e-464c-ba85-868dd7be02fb",
-    "workflowId": "beb71b61-bff9-460d-ad37-853ae9cc778e",
-    "result": {
-      "native": {
-        "investigation_id": "39841fa9-9a61-43b8-8b7b-08a2ce1196d5",
-        "native_status": "in progress",
-        "reason": "Existing investigation for this monitor event reused.",
-        "should_create": false,
-        "status": "EXISTING",
-        "url": "https://app.datadoghq.com/bits-ai/investigations/39841fa9-9a61-43b8-8b7b-08a2ce1196d5"
-      },
-      "notification_sent": false,
-      "report_status": "COMPLETED",
-      "status": {
-        "detailsKind": "SUCCEEDED",
-        "displayName": "Success"
-      },
-      "steps": [
-        {
-          "name": "Normalize_Context",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Investigate",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Start_Native",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Search_Native_Investigation",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Select_Native_Investigation",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Create_Native",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Get_Monitor",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Search_Incident_Logs",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Extract_Evidence",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Build_Agent_Prompt",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Run_Agent",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Finalize_Report",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Report",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Notify",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Send_Summary",
-          "state": "DISABLED"
-        },
-        {
-          "name": "Complete",
-          "state": "SUCCEEDED"
-        }
-      ]
-    }
-  },
-  "native_failure_simulation": {
-    "instanceId": "a2f62051-5c2b-48a6-a644-4a0fad13ae75",
-    "url": "https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=a2f62051-5c2b-48a6-a644-4a0fad13ae75",
-    "workflowId": "beb71b61-bff9-460d-ad37-853ae9cc778e",
-    "result": {
-      "classification": "MAC_FLAPPING_EVIDENCE",
-      "native": {
-        "investigation_id": null,
-        "reason": "Native Bits Investigation request failed. Inspect Search_Native_Investigation or Trigger_Native_Investigation; the bounded evidence summary remains available.",
-        "status": "UNAVAILABLE",
-        "url": null
-      },
-      "notification_sent": false,
-      "recovery": "UNVERIFIED",
-      "report_status": "COMPLETED",
-      "status": {
-        "detailsKind": "SUCCEEDED",
-        "displayName": "Success"
-      },
-      "steps": [
-        {
-          "name": "Normalize_Context",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Investigate",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Start_Native",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Search_Native_Investigation",
-          "state": "EXECUTION_FAILED"
-        },
-        {
-          "name": "Native_Unavailable",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Get_Monitor",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Search_Incident_Logs",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Extract_Evidence",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Build_Agent_Prompt",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Run_Agent",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Finalize_Report",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Report",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Should_Notify",
-          "state": "SUCCEEDED"
-        },
-        {
-          "name": "Send_Summary",
-          "state": "DISABLED"
-        },
-        {
-          "name": "Complete",
-          "state": "SUCCEEDED"
-        }
-      ]
-    }
-  },
-  "local_node_tests": {
-    "passed": 11,
-    "failed": 0
-  },
-  "live_readback": {
-    "checked_at": "2026-11-06T07:14:06Z",
-    "description": "Native Bits Investigation per monitor Alert with same-event reuse, plus bounded Nokia SR Linux evidence and a timeline-aware summary. Slack includes native status/link. No AAP, device changes, or automatic remediation.",
-    "native_trigger": true,
+  "current_architecture": "custom_bits_agent_only",
+  "verified_live": {
+    "nativeActions": 0,
+    "pocFormat": true,
     "published": true,
-    "step_count": 23,
-    "timeline_aware": true
+    "steps": 16,
+    "updatedAt": "2026-11-06T08:03:56.992Z"
   },
-  "test_slack_sent": false,
-  "remediation_executed": false
+  "local_tests": {
+    "passed": 13
+  },
+  "runtime_tests": [
+    {
+      "instance_id": "159501cf-38d1-4c05-9990-e91656070276",
+      "kind": "real_log_replay",
+      "report_status": "COMPLETED",
+      "classification": "MAC_FLAPPING_EVIDENCE",
+      "recovery_status": "UNVERIFIED",
+      "notification_sent": false
+    },
+    {
+      "instance_id": "8f7cabeb-5f55-4f37-9f23-7ba98c60fa27",
+      "kind": "pinned_monitor_source",
+      "report_status": "COMPLETED",
+      "classification": "MAC_FLAPPING_EVIDENCE",
+      "recovery_status": "UNVERIFIED",
+      "notification_sent": false
+    },
+    {
+      "instance_id": "748f414f-8ab7-4a14-bab4-6cd3bbe45b1b",
+      "kind": "controlled_agent_failure",
+      "report_status": "AI_ANALYSIS_FAILED",
+      "classification": "UNKNOWN",
+      "recovery_status": "UNVERIFIED",
+      "notification_sent": false
+    }
+  ],
+  "fresh_automatic_alert_after_publication_verified": false
 }

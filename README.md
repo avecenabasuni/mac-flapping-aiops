@@ -54,8 +54,6 @@ flowchart TD
     AGENT --> PIPE["Nokia log parsing pipeline"]
     PIPE --> MON["P3 Log Monitor<br/>duplicate MAC address / was detected"]
     MON --> INVEST["Datadog Investigation Workflow"]
-    INVEST --> NATIVE["Native Bits Investigation"]
-    NATIVE -.->|"Status and investigation link"| SLACK
     INVEST --> FETCH["Collect bounded device log evidence"]
     FETCH --> AI["Bits AI evidence analysis"]
     AI --> SLACK["Slack summary and incident evidence"]
@@ -69,7 +67,7 @@ The query matches **detection events** and excludes generic `DATADOG_SYSLOG_TEST
 
 [Datadog workflow run](https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=1f909fed-cf5f-46dd-a4ab-a3217adf4f63) · [Datadog runbook](https://app.datadoghq.com/notebook/16202843)
 
-**Nov 6 update:** the published workflow now starts/reuses native Bits Investigation per monitor event, alongside the quick custom-agent evidence summary. The timeline validator now distinguishes old deletion logs from newer detections. Native findings are viewed through the investigation link; they are not automatically executed or reposted to Slack. See [native integration and regression evidence](lab-v2/docs/BITS-INVESTIGATION.md).
+**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md).
 
 ## 3. Target architecture: investigation, approval, remediation and verification
 
@@ -164,7 +162,7 @@ mac-flapping-aiops/
 | [Full lab monitoring package](lab-v2/docs/FULL-LAB-MONITORING.md) | Ubuntu + four containers + switch interfaces + forwarding probe, 19 draft monitors and dashboard JSON. |
 | [MAC flapping monitor](datadog/monitors/network-mac-flapping.json) | P3 query, thresholds and notification message. |
 | [Investigation workflow](datadog/workflows/investigate-network-mac-flapping.json) | Bounded log collection, Bits AI summary and Slack. |
-| [Native Bits Investigation and timeline validation](lab-v2/docs/BITS-INVESTIGATION.md) | Native per-alert RCA, same-event reuse, chronological clear-event checks, and verified regression runs. |
+| [Bits agent workflow and timeline validation](lab-v2/docs/BITS-INVESTIGATION.md) | Bounded custom-agent analysis, chronological clear-event checks, POC Slack messages, and verification evidence. |
 | [Scenario controller](datadog/workflows/operational-scenario-controller-v6-aap.json) | Existing AAP scenarios; MAC-flapping scenarios are placeholders. |
 | [Sanitized export manifest](datadog/manifest.json) | Deployed source IDs and stored validation results. |
 

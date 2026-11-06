@@ -103,16 +103,36 @@ test("unsafe recovery status and invented citations are rejected", () => {
   bad.finalResponse.evidence_log_ids.push("invented");
   assert.equal(report(e, bad).status, "AI_ANALYSIS_FAILED");
 });
-test("native lookup reuses an existing investigation and fails closed if incomplete", () => {
-  const select = script("Select_Native_Investigation");
-  const context = (items, total) => ({Steps: {
-    Normalize_Context: {data: {event_id: "8886644925620491741", event_ts_ms: 1793948119000}},
-    Search_Native_Investigation: {investigations: items, metadata: {total_results: total}}
+test("agent-only graph has no native actions or dangling edges", () => {
+  const names = new Set(spec.steps.map(s => s.name));
+  assert.equal(spec.steps.length, 16);
+  for (const s of spec.steps) {
+    assert.ok(!s.actionId.includes("bitsai.sre"));
+    for (const edge of s.outboundEdges || []) assert.ok(names.has(edge.nextStepName));
+  }
+});
+function message(result, notify = true) {
+  return script("Report")({WorkflowId: "workflow", InstanceId: "instance", Steps: {
+    Normalize_Context: {data: {query: "scoped-query", notify_slack: notify,
+      window: {from: "2026-11-06T06:00:00Z", to: "2026-11-06T07:00:00Z"}}},
+    Finalize_Report: {data: result}
   }});
-  const id = "39841fa9-9a61-43b8-8b7b-08a2ce1196d5";
-  assert.equal(select(context([{id, status: "in progress"}], 1)).investigation_id, id);
-  assert.equal(select(context([{id}], 1)).should_create, false);
-  assert.equal(select(context([], 0)).should_create, true);
-  assert.equal(select(context([], 1)).should_create, false);
-  assert.equal(select(context([{id: "invalid"}], 1)).should_create, false);
+}
+test("POC message reports evidence and neutralizes injected Slack mentions", () => {
+  const e = evidence([log("detected", "20")]);
+  const r = report(e); r.summary = "<@channel> @here";
+  const out = message(r);
+  assert.match(out.slack_text, /INCIDENT RESPONSE · EVIDENCE REVIEWED/);
+  assert.match(out.slack_text, /No Automatic Remediation/);
+  assert.ok(!out.slack_text.includes("<@channel>"));
+  assert.ok(!out.slack_text.includes("@here"));
+  assert.ok(!out.slack_text.includes("Native Bits Investigation"));
+  assert.equal(out.notify_slack, true);
+});
+test("failed or skipped reports never claim successful investigation", () => {
+  const failed = message({status: "COLLECTION_FAILED", classification: "UNKNOWN"});
+  assert.match(failed.slack_text, /INVESTIGATION FAILED/);
+  assert.ok(!failed.slack_text.includes("Analysis Completed"));
+  assert.equal(message({status: "SKIPPED"}).notify_slack, false);
+  assert.equal(message({status: "COMPLETED"}, false).notify_slack, false);
 });

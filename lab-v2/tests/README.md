@@ -25,7 +25,7 @@ A successful device check is still separate from Host C to Host A forwarding and
 MAC duplication/hold-down inspection. Actual AAP/SR Linux execution remains a
 required integration test.
 
-Workflow chronology and native-investigation lookup fixtures use Node.js separately:
+Workflow chronology and POC message fixtures use Node.js separately:
 
 ~~~bash
 node --test lab-v2/tests/test_workflow_timeline.cjs
