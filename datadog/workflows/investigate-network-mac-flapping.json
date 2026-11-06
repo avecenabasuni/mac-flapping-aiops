@@ -1,6 +1,6 @@
 {
   "name": "[POC] Investigate Network MAC Flapping",
-  "description": "Bounded Nokia SR Linux evidence analysis with a custom Bits agent, per-target chronological clear validation, and POC incident-response Slack formatting. Read-only; no native Investigation, AAP, or automatic remediation.",
+  "description": "Custom Bits agent reviews bounded Nokia MAC-flapping evidence. Fresh validated lab detections request Slack approve/reject. Approval records JOB_NOT_CONFIGURED until AAP is integrated; rejection or timeout stops. No device changes or automatic remediation.",
   "published": true,
   "tags": [
     "automation:bits-agent",
@@ -452,7 +452,7 @@
         "outboundEdges": [
           {
             "branchName": "main",
-            "nextStepName": "Complete"
+            "nextStepName": "Evaluate_Approval_Eligibility"
           }
         ],
         "parameters": [
@@ -500,12 +500,229 @@
         "parameters": [
           {
             "name": "script",
-            "value": "return {report: $.Steps.Report.data, notification_sent: Boolean($.Steps.Send_Summary?.ts), notification_ts: $.Steps.Send_Summary?.ts || null, notification_error: $.Steps.Notification_Failed?.data?.notification_error || \"\"};"
+            "value": "const decision=$.Steps.Format_Decision_Result?.data||null;return {report:$.Steps.Report.data,workflow_result:decision?.workflow_result||$.Steps.Report.data.status,approval:decision||{approval_status:\"NOT_REQUESTED\",reason:$.Steps.Evaluate_Approval_Eligibility?.data?.reason||\"Investigation did not enter approval.\",remediation_executed:false},notification_sent:Boolean($.Steps.Send_Summary?.ts),notification_ts:$.Steps.Send_Summary?.ts||null,decision_notification_sent:Boolean($.Steps.Notify_Decision_Result?.ts),notification_error:$.Steps.Notification_Failed?.data?.notification_error||$.Steps.Decision_Notification_Failed?.data?.notification_error||\"\",remediation_executed:false};"
           }
         ],
         "readinessGate": {
           "thresholdType": "ANY"
         }
+      },
+      {
+        "name": "Evaluate_Approval_Eligibility",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst r=$.Steps.Report.data,c=$.Steps.Normalize_Context.data,e=r.evidence||{};\nconst reasons=[];\nif(c.mode!==\"monitor_alert\"||!c.notify_slack)reasons.push(\"Only automatic monitor alerts request approval.\");\nif(r.status!==\"COMPLETED\"||r.classification!==\"MAC_FLAPPING_EVIDENCE\")reasons.push(\"Validated MAC-flapping analysis is required.\");\nif(![\"MEDIUM\",\"HIGH\"].includes(r.confidence))reasons.push(\"Analysis confidence is insufficient.\");\nif(!e.sample_complete||e.counts_in_returned_sample?.unparsed!==0||e.warnings?.length)reasons.push(\"Evidence is incomplete.\");\nif(e.hosts?.length!==1||e.hosts[0]!==\"sw1\"||e.macs?.length!==1||e.macs[0]!==\"02:00:00:00:00:aa\")reasons.push(\"Evidence is outside the fixed lab host/MAC.\");\nif(!(e.counts_in_returned_sample?.detections>0)||e.expected_recovery_status!==\"UNVERIFIED\")reasons.push(\"No uncleared detection evidence.\");\nconst age=Date.now()-Date.parse(e.timeline?.latest_detection_at);\nif(!Number.isFinite(age)||age<0||age>15*60*1000)reasons.push(\"Detection evidence is stale.\");\nreturn {eligible:reasons.length===0,reason:reasons.join(\" \")||\"Eligible for a placeholder approval decision only.\",target_host:\"sw1\",target_interface:\"ethernet-1/2\",job_template_id:\"\",execution_enabled:false,remediation_allowed:false};\n"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Should_Request_Approval"
+          }
+        ]
+      },
+      {
+        "name": "Should_Request_Approval",
+        "actionId": "com.datadoghq.core.if",
+        "parameters": [
+          {
+            "name": "conditions",
+            "value": [
+              {
+                "comparisonOperator": "eq",
+                "leftValue": "{{ Steps.Evaluate_Approval_Eligibility.data.eligible }}",
+                "rightValue": true
+              }
+            ]
+          },
+          {
+            "name": "joinOperator",
+            "value": "and"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "true",
+            "nextStepName": "Slack_Approval_Request"
+          },
+          {
+            "branchName": "false",
+            "nextStepName": "Complete"
+          }
+        ]
+      },
+      {
+        "actionId": "com.datadoghq.slack.send_interactive_message",
+        "name": "Slack_Approval_Request",
+        "outboundEdges": [
+          {
+            "branchName": "approve",
+            "nextStepName": "Record_Approval_Decision"
+          },
+          {
+            "branchName": "reject",
+            "nextStepName": "Record_Approval_Decision"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "channel",
+            "value": "#datadog-automation"
+          },
+          {
+            "name": "teamId",
+            "value": "REPLACE_WITH_SLACK_TEAM_ID"
+          },
+          {
+            "name": "promptText",
+            "value": "━━━━━━━━━━━━━━━━━━━━\n:mag: *INCIDENT RESPONSE · 2/3*\n*MAC Flapping — Approval Decision*\n━━━━━━━━━━━━━━━━━━━━\n\n*Classification:* {{ Steps.Report.data.classification }}\n*Confidence:* {{ Steps.Report.data.confidence }}\n*Environment:* network-aiops\n*Fixed lab target:* sw1 · ethernet-1/2 (Host B)\n*AAP Job Template:* NOT_CONFIGURED\n*Execution:* DISABLED — placeholder only\n\nDatadog found duplicate-MAC evidence for the fixed lab MAC. The planned future response is isolation of Host B; logs alone do not establish a safe shutdown target or a physical loop.\n\nApprove to record the proposed response, or reject to stop. Approve currently launches no job and changes no port. A new approval and fresh device checks will be required when AAP is connected.\n\n*Monitor:* <https://app.datadoghq.com/monitors/340593559|View in Datadog>\n*Evidence:* <{{ Steps.Report.data.links.workflow }}|Workflow run>\n\n:shield: *No automatic remediation. No recovery claim.*\n_Expires after 1 hour; no response stops this decision._"
+          },
+          {
+            "name": "actionChoices",
+            "value": [
+              {
+                "displayName": "Approve Response (AAP Placeholder)",
+                "outboundBranch": "approve"
+              },
+              {
+                "displayName": "Reject Remediation",
+                "outboundBranch": "reject"
+              }
+            ]
+          },
+          {
+            "name": "timeoutHours",
+            "value": 1
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Approval_Unavailable",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Record_Approval_Decision",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst a=$.Steps.Slack_Approval_Request||{},validActor=typeof a.responder?.id===\"string\"&&a.responder.id.length>0;\nconst mapped={approve:\"approve\",reject:\"reject\",\"Approve Response (AAP Placeholder)\":\"approve\",\"Reject Remediation\":\"reject\"}[a.decision];\nconst choice=validActor&&mapped?mapped:\"unavailable\";\nreturn {workflow_result:choice===\"approve\"?\"JOB_NOT_CONFIGURED\":choice===\"reject\"?\"REMEDIATION_REJECTED\":\"APPROVAL_UNAVAILABLE\",approval_status:choice===\"approve\"?\"APPROVED\":choice===\"reject\"?\"REJECTED\":\"UNAVAILABLE\",responder:validActor?a.responder:null,approval_ts:a.ts||null,recorded_at:new Date().toISOString(),target_host:\"sw1\",target_interface:\"ethernet-1/2\",aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",remediation_executed:false,remediation_allowed:false,recovery_verified:false};\n"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Format_Decision_Result"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "name": "Approval_Unavailable",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "return {workflow_result:\"APPROVAL_UNAVAILABLE\",approval_status:\"UNAVAILABLE\",responder:null,aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",remediation_executed:false,remediation_allowed:false,recovery_verified:false};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Format_Decision_Result"
+          }
+        ]
+      },
+      {
+        "name": "Format_Decision_Result",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst d=$.Steps.Record_Approval_Decision?.data||$.Steps.Approval_Unavailable?.data;\nif(!d)throw new Error(\"Missing approval outcome\");\nconst approved=d.approval_status===\"APPROVED\",rejected=d.approval_status===\"REJECTED\";\nconst text=[\"━━━━━━━━━━━━━━━━━━━━\",approved?\":warning: *INCIDENT RESPONSE · JOB NOT CONFIGURED*\":rejected?\":no_entry: *INCIDENT RESPONSE · STOPPED*\":\":hourglass_flowing_sand: *INCIDENT RESPONSE · APPROVAL UNAVAILABLE*\",approved?\"*Approval Recorded — AAP Placeholder*\":rejected?\"*MAC Flapping Remediation Rejected*\":\"*MAC Flapping Decision Did Not Complete*\",\"━━━━━━━━━━━━━━━━━━━━\",\"\",\"*Decision:* \"+d.approval_status,\"*Result:* \"+d.workflow_result,\"*Environment:* network-aiops\",\"*Planned target:* sw1 · ethernet-1/2\",\"*AAP Job Template:* NOT_CONFIGURED\",\"*AAP Job ID:* none\",\"\",approved?\"Approval was recorded, but the AAP job is not configured. No job was launched and no port was changed.\":rejected?\"The proposed response was rejected. No job was launched and no port was changed.\":\"The approval request failed, timed out, or returned no valid decision. No action was executed.\",\"\",\":shield: *No remediation executed. Device recovery is not verified.*\",\"_Next → Configure and verify AAP inventory, credentials, read-only preflight and the fixed isolation Job Template. A new approval is required after integration._\",\"\",\"<https://app.datadoghq.com/monitors/340593559|Monitor> · <https://app.datadoghq.com/workflow/\"+String($.WorkflowId)+\"?instance=\"+String($.InstanceId)+\"|Workflow evidence>\"].join(\"\\n\");\nreturn {...d,slack_text:text};\n"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Notify_Decision_Result"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "name": "Notify_Decision_Result",
+        "actionId": "com.datadoghq.slack.send_simple_message",
+        "parameters": [
+          {
+            "name": "teamId",
+            "value": "REPLACE_WITH_SLACK_TEAM_ID"
+          },
+          {
+            "name": "channel",
+            "value": "#datadog-automation"
+          },
+          {
+            "name": "text",
+            "value": "{{ Steps.Format_Decision_Result.data.slack_text }}"
+          },
+          {
+            "name": "unfurlLinks",
+            "value": false
+          },
+          {
+            "name": "unfurlMedia",
+            "value": false
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Complete"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Decision_Notification_Failed",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Decision_Notification_Failed",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "return {notification_error:\"Decision result notification failed; inspect Notify_Decision_Result.\"};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Complete"
+          }
+        ]
       }
     ],
     "triggers": [

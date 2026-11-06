@@ -45,7 +45,7 @@ Implementation: [lab-v2 topology and scripts](lab-v2/README.md) · [Migration fr
 
 ## 2. Current Datadog architecture: detection and investigation
 
-This is the **existing, tested read-only path** in Datadog. The actual **v2** device still needs a fresh end-to-end ingestion check.
+The v2 syslog, parser, monitor, Bits agent summary and Slack delivery were verified on Nov 6. The workflow now adds an approval decision with an inactive AAP placeholder; no device action is connected.
 
 ```mermaid
 flowchart TD
@@ -59,6 +59,10 @@ flowchart TD
     AI --> SLACK["Slack summary and incident evidence"]
     MON --> SLACK
     SLACK --> HUMAN["Engineer reviews findings"]
+    HUMAN --> GATE["Fresh validated lab detection"]
+    GATE --> DECISION["Slack Approve / Reject"]
+    DECISION -->|Approve| PLACEHOLDER["JOB_NOT_CONFIGURED<br/>No AAP execution"]
+    DECISION -->|Reject or unavailable| STOP["Stop without device changes"]
 ```
 
 The query matches **detection events** and excludes generic `DATADOG_SYSLOG_TEST` entries and `is now deleted` messages. Nokia's `sr_l2_mac_mgr` may be the reserved `service`, while `service:nokia-srlinux` appears in log tags. See the exported monitor rather than replacing it with a broad `service:` search.
@@ -67,7 +71,7 @@ The query matches **detection events** and excludes generic `DATADOG_SYSLOG_TEST
 
 [Datadog workflow run](https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=1f909fed-cf5f-46dd-a4ab-a3217adf4f63) · [Datadog runbook](https://app.datadoghq.com/notebook/16202843)
 
-**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md).
+**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md). Fresh validated monitor detections now request Approve/Reject in #datadog-automation. Approve records JOB_NOT_CONFIGURED; no AAP job or device action runs.
 
 ## 3. Target architecture: investigation, approval, remediation and verification
 

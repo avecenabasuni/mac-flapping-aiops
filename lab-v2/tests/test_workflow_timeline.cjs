@@ -105,7 +105,7 @@ test("unsafe recovery status and invented citations are rejected", () => {
 });
 test("agent-only graph has no native actions or dangling edges", () => {
   const names = new Set(spec.steps.map(s => s.name));
-  assert.equal(spec.steps.length, 16);
+  assert.equal(spec.steps.length, 24);
   for (const s of spec.steps) {
     assert.ok(!s.actionId.includes("bitsai.sre"));
     for (const edge of s.outboundEdges || []) assert.ok(names.has(edge.nextStepName));

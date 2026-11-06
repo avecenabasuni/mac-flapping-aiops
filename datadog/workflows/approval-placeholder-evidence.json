@@ -1,0 +1,131 @@
+{
+  "published": {
+    "aap_actions": 0,
+    "approval": {
+      "actionId": "com.datadoghq.slack.send_interactive_message",
+      "errorHandlers": [
+        {
+          "fallbackStepName": "Approval_Unavailable",
+          "retryStrategy": {
+            "kind": "RETRY_STRATEGY_LINEAR",
+            "linear": {
+              "interval": "5s",
+              "maxRetries": 0
+            }
+          }
+        }
+      ],
+      "name": "Slack_Approval_Request",
+      "outboundEdges": [
+        {
+          "branchName": "approve",
+          "nextStepName": "Record_Approval_Decision"
+        },
+        {
+          "branchName": "reject",
+          "nextStepName": "Record_Approval_Decision"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "channel",
+          "value": "#datadog-automation"
+        },
+        {
+          "name": "teamId",
+          "value": "REPLACE_WITH_SLACK_TEAM_ID"
+        },
+        {
+          "name": "promptText",
+          "value": "━━━━━━━━━━━━━━━━━━━━\n:mag: *INCIDENT RESPONSE · 2/3*\n*MAC Flapping — Approval Decision*\n━━━━━━━━━━━━━━━━━━━━\n\n*Classification:* {{ Steps.Report.data.classification }}\n*Confidence:* {{ Steps.Report.data.confidence }}\n*Environment:* network-aiops\n*Fixed lab target:* sw1 · ethernet-1/2 (Host B)\n*AAP Job Template:* NOT_CONFIGURED\n*Execution:* DISABLED — placeholder only\n\nDatadog found duplicate-MAC evidence for the fixed lab MAC. The planned future response is isolation of Host B; logs alone do not establish a safe shutdown target or a physical loop.\n\nApprove to record the proposed response, or reject to stop. Approve currently launches no job and changes no port. A new approval and fresh device checks will be required when AAP is connected.\n\n*Monitor:* <https://app.datadoghq.com/monitors/340593559|View in Datadog>\n*Evidence:* <{{ Steps.Report.data.links.workflow }}|Workflow run>\n\n:shield: *No automatic remediation. No recovery claim.*\n_Expires after 1 hour; no response stops this decision._"
+        },
+        {
+          "name": "actionChoices",
+          "value": [
+            {
+              "displayName": "Approve Response (AAP Placeholder)",
+              "outboundBranch": "approve"
+            },
+            {
+              "displayName": "Reject Remediation",
+              "outboundBranch": "reject"
+            }
+          ]
+        },
+        {
+          "name": "timeoutHours",
+          "value": 1
+        }
+      ]
+    },
+    "published": true,
+    "steps": 24,
+    "tags": [
+      "automation:bits-agent",
+      "domain:network",
+      "env:network-aiops",
+      "project:berca-poc",
+      "scenario:mac-flapping",
+      "service:nokia-srlinux",
+      "team:tps",
+      "use_case:mac-flapping",
+      "workflow_role:investigation"
+    ],
+    "updatedAt": "2026-11-06T08:43:36.990Z"
+  },
+  "local_tests": 18,
+  "runtime_tests": [
+    {
+      "approval_status": "APPROVED",
+      "choice": "approve",
+      "instanceId": "e602573a-bf72-4362-bc10-87281b92720f",
+      "remediation_executed": false,
+      "result": "JOB_NOT_CONFIGURED",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      }
+    },
+    {
+      "approval_status": "REJECTED",
+      "choice": "reject",
+      "instanceId": "f5056c96-90ee-413a-9b37-6eb1d53a10cf",
+      "remediation_executed": false,
+      "result": "REMEDIATION_REJECTED",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      }
+    },
+    {
+      "approval_status": "UNAVAILABLE",
+      "choice": "error",
+      "instanceId": "bddf8414-b042-44a2-8088-d8b1251753d8",
+      "remediation_executed": false,
+      "result": "APPROVAL_UNAVAILABLE",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      }
+    },
+    {
+      "approval_status": "NOT_REQUESTED",
+      "choice": "ineligible",
+      "instanceId": "31f5f494-e984-4032-9b01-ceaeedf2d139",
+      "remediation_executed": false,
+      "result": "COMPLETED",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      }
+    }
+  ],
+  "slack_actions_overridden_in_tests": true,
+  "real_slack_button_interaction_verified": false,
+  "real_timeout_verified": false,
+  "aap_placeholder": {
+    "job_template_id": "",
+    "job_id": "",
+    "execution_enabled": false
+  }
+}
