@@ -24,3 +24,11 @@ https://learn.srlinux.dev/ansible/collection/get/#result
 A successful device check is still separate from Host C to Host A forwarding and
 MAC duplication/hold-down inspection. Actual AAP/SR Linux execution remains a
 required integration test.
+
+Workflow chronology and native-investigation lookup fixtures use Node.js separately:
+
+~~~bash
+node --test lab-v2/tests/test_workflow_timeline.cjs
+~~~
+
+These tests execute the scripts from the exported workflow JSON, with fixture log/agent inputs. They do not contact Datadog or create investigations.

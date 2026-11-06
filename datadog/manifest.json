@@ -21,5 +21,14 @@
     "slack_delivery_verified": true,
     "all_four_message_variants_parsed": true,
     "device_recovery_verified": false
+  },
+  "investigation_workflow_updated_at": "2026-11-06T07:11:27.81185Z",
+  "investigation_workflow_features": {
+    "native_bits_investigation_per_monitor_alert": true,
+    "same_event_lookup_and_reuse": true,
+    "per_target_chronological_clear_validation": true,
+    "native_failure_preserves_evidence_summary": true,
+    "automatic_remediation": false,
+    "native_conclusions_auto_posted_to_slack": false
   }
 }
