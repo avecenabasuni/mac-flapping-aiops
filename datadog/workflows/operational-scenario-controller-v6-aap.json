@@ -4,11 +4,14 @@
   "published": true,
   "tags": [
     "automation:aap",
+    "domain:application",
     "env:poc",
-    "scenario:memory-hot-add",
+    "project:berca-poc",
     "service:berca-backend",
     "service:berca-storefront",
-    "team:tps"
+    "team:tps",
+    "use_case:operational-scenarios",
+    "workflow_role:scenario-controller"
   ],
   "spec": {
     "connectionEnvs": [

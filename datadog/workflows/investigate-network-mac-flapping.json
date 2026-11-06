@@ -3,11 +3,15 @@
   "description": "Bounded Nokia SR Linux evidence analysis with a custom Bits agent, per-target chronological clear validation, and POC incident-response Slack formatting. Read-only; no native Investigation, AAP, or automatic remediation.",
   "published": true,
   "tags": [
+    "automation:bits-agent",
+    "domain:network",
     "env:network-aiops",
-    "monitor_role:investigation",
     "project:berca-poc",
     "scenario:mac-flapping",
-    "team:tps"
+    "service:nokia-srlinux",
+    "team:tps",
+    "use_case:mac-flapping",
+    "workflow_role:investigation"
   ],
   "spec": {
     "handle": "network-mac-flapping-investigation-poc",

@@ -1,0 +1,148 @@
+{
+  "standard": {
+    "project": "project:berca-poc",
+    "team": "team:tps",
+    "required_keys": [
+      "project",
+      "team",
+      "env",
+      "domain",
+      "workflow_role",
+      "use_case"
+    ],
+    "workflow_role": [
+      "scenario-controller",
+      "incident-response",
+      "investigation"
+    ],
+    "domain": [
+      "application",
+      "network",
+      "security"
+    ],
+    "notes": [
+      "Preserve environment and service scope.",
+      "Use scenario only for workflows dedicated to one scenario; shared workflows use use_case.",
+      "Use workflow_role for workflows, monitor_role for monitors.",
+      "Inactive workflows remain unpublished; tags do not change publication or execution."
+    ]
+  },
+  "workflows": [
+    {
+      "id": "ed1da6f5-fa2c-42fb-be5f-e07be63c9869",
+      "name": "[POC] Investigate and Remediate Backend Degradation",
+      "tags": [
+        "domain:application",
+        "env:poc",
+        "project:berca-poc",
+        "service:berca-checkout",
+        "service:berca-storefront",
+        "team:tps",
+        "use_case:operational-conditions",
+        "workflow_role:incident-response"
+      ],
+      "published": false,
+      "updated": true
+    },
+    {
+      "id": "f3041229-4fc9-4ae5-8c2e-4ef7deb48b0a",
+      "name": "[POC] Investigate and Remediate Operational Conditions v7 - AAP",
+      "tags": [
+        "automation:aap",
+        "domain:application",
+        "env:poc",
+        "project:berca-poc",
+        "service:berca-backend",
+        "service:berca-storefront",
+        "team:tps",
+        "use_case:operational-conditions",
+        "workflow_role:incident-response"
+      ],
+      "published": true,
+      "updated": true
+    },
+    {
+      "id": "41d820de-3514-43c3-842a-ef56437848e8",
+      "name": "[POC] Investigate and Remediate Operational Conditions v7 - AAP (copy)",
+      "tags": [
+        "automation:aap",
+        "env:poc",
+        "scenario:memory-hot-add",
+        "service:berca-backend",
+        "service:berca-storefront"
+      ],
+      "published": false,
+      "updated": false,
+      "blocked_reason": "Datadog permission edit denied for connected user; original tags preserved."
+    },
+    {
+      "id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
+      "name": "[POC] Investigate Network MAC Flapping",
+      "tags": [
+        "automation:bits-agent",
+        "domain:network",
+        "env:network-aiops",
+        "project:berca-poc",
+        "scenario:mac-flapping",
+        "service:nokia-srlinux",
+        "team:tps",
+        "use_case:mac-flapping",
+        "workflow_role:investigation"
+      ],
+      "published": true,
+      "updated": true
+    },
+    {
+      "id": "45ac61cf-8a35-4e2d-bed3-370ffc6a8506",
+      "name": "[POC] Operational Scenario Controller v6 - AAP",
+      "tags": [
+        "automation:aap",
+        "domain:application",
+        "env:poc",
+        "project:berca-poc",
+        "service:berca-backend",
+        "service:berca-storefront",
+        "team:tps",
+        "use_case:operational-scenarios",
+        "workflow_role:scenario-controller"
+      ],
+      "published": true,
+      "updated": true
+    },
+    {
+      "id": "8c53e448-c013-4f3e-b4a2-e44eefcf2300",
+      "name": "[POC] RHEL CVE Approval-Gated Remediation",
+      "tags": [
+        "automation:aap",
+        "domain:security",
+        "env:poc",
+        "project:berca-poc",
+        "service:rhel-vulnerability-remediation",
+        "team:tps",
+        "use_case:security-remediation",
+        "workflow_role:incident-response"
+      ],
+      "published": true,
+      "updated": true
+    },
+    {
+      "id": "38132336-f070-4491-864c-5b7bdcb2ec26",
+      "name": "[POC] Scenario Controller",
+      "tags": [
+        "domain:application",
+        "env:poc",
+        "project:berca-poc",
+        "team:tps",
+        "use_case:operational-scenarios",
+        "workflow_role:scenario-controller"
+      ],
+      "published": false,
+      "updated": true
+    }
+  ],
+  "verified": {
+    "specs_unchanged": true,
+    "publication_unchanged": true,
+    "run_as_unchanged": true
+  }
+}
