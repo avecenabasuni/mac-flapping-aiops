@@ -12,7 +12,17 @@ ansible-galaxy collection install -r ansible/requirements.yml
 
 Copy `inventory.example.yml` to a local, gitignored inventory and replace the IP with the IP **reachable from AAP**, not blindly with Docker's management gateway. Give the AAP job a Machine credential with SR Linux JSON-RPC username/password. On this lab image, the Containerlab default configuration usually enables JSON-RPC, but validate access before running any change.
 
-Create AAP Job Templates: **Collect Evidence** (switch), **Isolate Host B** (switch), **Verify Device** (switch), and **Verify Forwarding** (Linux Ubuntu VM). Create a separate, manual-only **Restore Host B** template. The Verify Forwarding playbook runs `docker exec` over SSH on Ubuntu with `become: true` and requires a separate Linux Machine credential. Configure the `lab_linux` inventory host using the real Ubuntu management IP. Use an AAP **Workflow Job Template** with nodes:
+Create AAP Job Templates: **Collect Evidence** (switch), **Isolate Host B** (switch), **Verify Device** (switch), and **Verify Forwarding** (Linux Ubuntu VM). Create a separate, manual-only **Restore Host B** template. The Verify Forwarding playbook runs `docker exec` over SSH on Ubuntu with `become: true` and requires a separate Linux Machine credential. Configure the `lab_linux` inventory host using the real Ubuntu management IP.
+
+| Job Template Name | Playbook | AAP Job Template ID | Launch URL (`POST`) | Required `extra_vars` |
+| --- | --- | :---: | --- | --- |
+| **Collect Evidence** | `lab-v2/ansible/collect-evidence.yml` | **38** | `https://192.168.2.66/api/controller/v2/job_templates/38/launch/` | `{}` |
+| **Isolate Host B** | `lab-v2/ansible/isolate-b.yml` | **39** | `https://192.168.2.66/api/controller/v2/job_templates/39/launch/` | `{"lab_id": "macflap-v2", "target_interface": "ethernet-1/2", "change_approved": true}` |
+| **Verify Device** | `lab-v2/ansible/verify.yml` | **40** | `https://192.168.2.66/api/controller/v2/job_templates/40/launch/` | `{}` |
+| **Verify Forwarding** | `lab-v2/ansible/verify-forwarding.yml` | **41** | `https://192.168.2.66/api/controller/v2/job_templates/41/launch/` | `{}` |
+| **Restore Host B** | `lab-v2/ansible/restore-b.yml` | **42** | `https://192.168.2.66/api/controller/v2/job_templates/42/launch/` | `{"lab_id": "macflap-v2", "target_interface": "ethernet-1/2", "change_approved": true}` |
+
+Use an AAP **Workflow Job Template** with nodes:
 
 1. Collect Evidence
 2. AI-assisted diagnosis (Datadog workflow; evidence and classification must be passed through an integration you actually verify)
