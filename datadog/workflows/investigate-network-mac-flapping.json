@@ -1,6 +1,6 @@
 {
   "name": "[POC] Investigate Network MAC Flapping",
-  "description": "Custom Bits agent reviews bounded Nokia MAC-flapping evidence. Fresh validated lab detections request Slack approve/reject. Approval records JOB_NOT_CONFIGURED until AAP is integrated; rejection or timeout stops. No device changes or automatic remediation.",
+  "description": "Observe, investigate and request Slack approval for MAC flapping. Approve enters inactive AAP Execute and read-only Verify. Missing execution/device evidence stops and escalates recovery-not-verified to Slack. No AAP/device action or automatic retry.",
   "published": true,
   "tags": [
     "automation:bits-agent",
@@ -500,7 +500,7 @@
         "parameters": [
           {
             "name": "script",
-            "value": "const decision=$.Steps.Format_Decision_Result?.data||null;return {report:$.Steps.Report.data,workflow_result:decision?.workflow_result||$.Steps.Report.data.status,approval:decision||{approval_status:\"NOT_REQUESTED\",reason:$.Steps.Evaluate_Approval_Eligibility?.data?.reason||\"Investigation did not enter approval.\",remediation_executed:false},notification_sent:Boolean($.Steps.Send_Summary?.ts),notification_ts:$.Steps.Send_Summary?.ts||null,decision_notification_sent:Boolean($.Steps.Notify_Decision_Result?.ts),notification_error:$.Steps.Notification_Failed?.data?.notification_error||$.Steps.Decision_Notification_Failed?.data?.notification_error||\"\",remediation_executed:false};"
+            "value": "\nconst steps=$.Steps,decision=steps.Format_Decision_Result?.data||steps.Record_Approval_Decision?.data||null,recovery=steps.Stop_And_Escalate?.data||null,deliveryFailure=steps.Escalation_Delivery_Failed?.data;\nreturn {report:steps.Report.data,workflow_result:deliveryFailure?.workflow_result||recovery?.workflow_result||decision?.workflow_result||steps.Report.data.status,approval:decision||{approval_status:\"NOT_REQUESTED\",reason:steps.Evaluate_Approval_Eligibility?.data?.reason||\"Investigation did not enter approval.\"},execution:steps.Execute_AAP_Placeholder?.data||{status:\"NOT_REQUESTED\",job_launched:false},verification:steps.Evaluate_Recovery?.data||{status:\"NOT_REQUESTED\",recovery_verified:false},recovery,notification_sent:Boolean(steps.Send_Summary?.ts),notification_ts:steps.Send_Summary?.ts||null,decision_notification_sent:Boolean(steps.Notify_Decision_Result?.ts),escalation_sent:Boolean(steps.Slack_Escalate_Recovery?.ts),escalation_required:Boolean(recovery),notification_error:steps.Notification_Failed?.data?.notification_error||steps.Decision_Notification_Failed?.data?.notification_error||deliveryFailure?.reason||\"\",remediation_executed:false,recovery_verified:false,automatic_retry:false};\n"
           }
         ],
         "readinessGate": {
@@ -508,24 +508,34 @@
         }
       },
       {
-        "name": "Evaluate_Approval_Eligibility",
         "actionId": "com.datadoghq.datatransformation.func",
-        "parameters": [
-          {
-            "name": "script",
-            "value": "\nconst r=$.Steps.Report.data,c=$.Steps.Normalize_Context.data,e=r.evidence||{};\nconst reasons=[];\nif(c.mode!==\"monitor_alert\"||!c.notify_slack)reasons.push(\"Only automatic monitor alerts request approval.\");\nif(r.status!==\"COMPLETED\"||r.classification!==\"MAC_FLAPPING_EVIDENCE\")reasons.push(\"Validated MAC-flapping analysis is required.\");\nif(![\"MEDIUM\",\"HIGH\"].includes(r.confidence))reasons.push(\"Analysis confidence is insufficient.\");\nif(!e.sample_complete||e.counts_in_returned_sample?.unparsed!==0||e.warnings?.length)reasons.push(\"Evidence is incomplete.\");\nif(e.hosts?.length!==1||e.hosts[0]!==\"sw1\"||e.macs?.length!==1||e.macs[0]!==\"02:00:00:00:00:aa\")reasons.push(\"Evidence is outside the fixed lab host/MAC.\");\nif(!(e.counts_in_returned_sample?.detections>0)||e.expected_recovery_status!==\"UNVERIFIED\")reasons.push(\"No uncleared detection evidence.\");\nconst age=Date.now()-Date.parse(e.timeline?.latest_detection_at);\nif(!Number.isFinite(age)||age<0||age>15*60*1000)reasons.push(\"Detection evidence is stale.\");\nreturn {eligible:reasons.length===0,reason:reasons.join(\" \")||\"Eligible for a placeholder approval decision only.\",target_host:\"sw1\",target_interface:\"ethernet-1/2\",job_template_id:\"\",execution_enabled:false,remediation_allowed:false};\n"
-          }
-        ],
+        "name": "Evaluate_Approval_Eligibility",
         "outboundEdges": [
           {
             "branchName": "main",
             "nextStepName": "Should_Request_Approval"
           }
+        ],
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst r=$.Steps.Report.data,c=$.Steps.Normalize_Context.data,e=r.evidence||{};\nconst reasons=[];\nif(c.mode!==\"monitor_alert\"||!c.notify_slack)reasons.push(\"Only automatic monitor alerts request approval.\");\nif(r.status!==\"COMPLETED\"||r.classification!==\"MAC_FLAPPING_EVIDENCE\")reasons.push(\"Validated MAC-flapping analysis is required.\");\nif(![\"MEDIUM\",\"HIGH\"].includes(r.confidence))reasons.push(\"Analysis confidence is insufficient.\");\nif(!e.sample_complete||e.counts_in_returned_sample?.unparsed!==0||e.warnings?.length)reasons.push(\"Evidence is incomplete.\");\nif(e.hosts?.length!==1||e.hosts[0]!==\"sw1\"||e.macs?.length!==1||e.macs[0]!==\"02:00:00:00:00:aa\")reasons.push(\"Evidence is outside the fixed lab host/MAC.\");\nif(!(e.counts_in_returned_sample?.detections>0)||e.expected_recovery_status!==\"UNVERIFIED\")reasons.push(\"No uncleared detection evidence.\");\nconst age=Date.now()-Date.parse(e.timeline?.latest_detection_at);\nif(!Number.isFinite(age)||age<0||age>15*60*1000)reasons.push(\"Detection evidence is stale.\");\nreturn {eligible:reasons.length===0,reason:reasons.join(\" \")||\"Eligible for a placeholder approval decision only.\",target_host:\"sw1\",target_interface:\"ethernet-1/2\",job_template_id:\"\",execution_enabled:false,remediation_allowed:false};\n"
+          }
         ]
       },
       {
-        "name": "Should_Request_Approval",
         "actionId": "com.datadoghq.core.if",
+        "name": "Should_Request_Approval",
+        "outboundEdges": [
+          {
+            "branchName": "true",
+            "nextStepName": "Slack_Approval_Request"
+          },
+          {
+            "branchName": "false",
+            "nextStepName": "Complete"
+          }
+        ],
         "parameters": [
           {
             "name": "conditions",
@@ -541,20 +551,22 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ],
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Slack_Approval_Request"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Complete"
-          }
         ]
       },
       {
         "actionId": "com.datadoghq.slack.send_interactive_message",
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Approval_Unavailable",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ],
         "name": "Slack_Approval_Request",
         "outboundEdges": [
           {
@@ -577,7 +589,7 @@
           },
           {
             "name": "promptText",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:mag: *INCIDENT RESPONSE · 2/3*\n*MAC Flapping — Approval Decision*\n━━━━━━━━━━━━━━━━━━━━\n\n*Classification:* {{ Steps.Report.data.classification }}\n*Confidence:* {{ Steps.Report.data.confidence }}\n*Environment:* network-aiops\n*Fixed lab target:* sw1 · ethernet-1/2 (Host B)\n*AAP Job Template:* NOT_CONFIGURED\n*Execution:* DISABLED — placeholder only\n\nDatadog found duplicate-MAC evidence for the fixed lab MAC. The planned future response is isolation of Host B; logs alone do not establish a safe shutdown target or a physical loop.\n\nApprove to record the proposed response, or reject to stop. Approve currently launches no job and changes no port. A new approval and fresh device checks will be required when AAP is connected.\n\n*Monitor:* <https://app.datadoghq.com/monitors/340593559|View in Datadog>\n*Evidence:* <{{ Steps.Report.data.links.workflow }}|Workflow run>\n\n:shield: *No automatic remediation. No recovery claim.*\n_Expires after 1 hour; no response stops this decision._"
+            "value": "━━━━━━━━━━━━━━━━━━━━\n:mag: *INCIDENT RESPONSE · 03 AUTHORIZE*\n*MAC Flapping — Approval Decision*\n━━━━━━━━━━━━━━━━━━━━\n\n*Classification:* {{ Steps.Report.data.classification }}\n*Confidence:* {{ Steps.Report.data.confidence }}\n*Environment:* network-aiops\n*Fixed lab target:* sw1 · ethernet-1/2 (Host B)\n*AAP Job Template:* NOT_CONFIGURED\n*Execution:* DISABLED — placeholder only\n\nDatadog found duplicate-MAC evidence for the fixed lab MAC. The planned future response is isolation of Host B; logs alone do not establish a safe shutdown target or a physical loop.\n\nApprove to record the proposed response, or reject to stop. Approve enters Execute (JOB_NOT_CONFIGURED), then read-only Verify. Unverified recovery stops and escalates to this channel. No job is launched and no port is changed. A new approval and fresh device checks will be required when AAP is connected.\n\n*Monitor:* <https://app.datadoghq.com/monitors/340593559|View in Datadog>\n*Evidence:* <{{ Steps.Report.data.links.workflow }}|Workflow run>\n\n:shield: *No automatic remediation. No recovery claim.*\n_Expires after 1 hour; no response stops this decision._"
           },
           {
             "name": "actionChoices",
@@ -596,10 +608,67 @@
             "name": "timeoutHours",
             "value": 1
           }
+        ]
+      },
+      {
+        "actionId": "com.datadoghq.datatransformation.func",
+        "name": "Record_Approval_Decision",
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Route_Approved_Response"
+          }
         ],
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst a=$.Steps.Slack_Approval_Request||{},validActor=typeof a.responder?.id===\"string\"&&a.responder.id.length>0;\nconst mapped={approve:\"approve\",reject:\"reject\",\"Approve Response (AAP Placeholder)\":\"approve\",\"Reject Remediation\":\"reject\"}[a.decision];\nconst choice=validActor&&mapped?mapped:\"unavailable\";\nreturn {workflow_result:choice===\"approve\"?\"JOB_NOT_CONFIGURED\":choice===\"reject\"?\"REMEDIATION_REJECTED\":\"APPROVAL_UNAVAILABLE\",approval_status:choice===\"approve\"?\"APPROVED\":choice===\"reject\"?\"REJECTED\":\"UNAVAILABLE\",responder:validActor?a.responder:null,approval_ts:a.ts||null,recorded_at:new Date().toISOString(),target_host:\"sw1\",target_interface:\"ethernet-1/2\",aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",remediation_executed:false,remediation_allowed:false,recovery_verified:false};\n"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "actionId": "com.datadoghq.datatransformation.func",
+        "name": "Approval_Unavailable",
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Format_Decision_Result"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "script",
+            "value": "return {workflow_result:\"APPROVAL_UNAVAILABLE\",approval_status:\"UNAVAILABLE\",responder:null,aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",remediation_executed:false,remediation_allowed:false,recovery_verified:false};"
+          }
+        ]
+      },
+      {
+        "actionId": "com.datadoghq.datatransformation.func",
+        "name": "Format_Decision_Result",
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Notify_Decision_Result"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst d=$.Steps.Record_Approval_Decision?.data||$.Steps.Approval_Unavailable?.data;\nif(!d)throw new Error(\"Missing approval outcome\");\nconst approved=d.approval_status===\"APPROVED\",rejected=d.approval_status===\"REJECTED\";\nconst text=[\"━━━━━━━━━━━━━━━━━━━━\",approved?\":warning: *INCIDENT RESPONSE · JOB NOT CONFIGURED*\":rejected?\":no_entry: *INCIDENT RESPONSE · STOPPED*\":\":hourglass_flowing_sand: *INCIDENT RESPONSE · APPROVAL UNAVAILABLE*\",approved?\"*Approval Recorded — AAP Placeholder*\":rejected?\"*MAC Flapping Remediation Rejected*\":\"*MAC Flapping Decision Did Not Complete*\",\"━━━━━━━━━━━━━━━━━━━━\",\"\",\"*Decision:* \"+d.approval_status,\"*Result:* \"+d.workflow_result,\"*Environment:* network-aiops\",\"*Planned target:* sw1 · ethernet-1/2\",\"*AAP Job Template:* NOT_CONFIGURED\",\"*AAP Job ID:* none\",\"\",approved?\"Approval was recorded, but the AAP job is not configured. No job was launched and no port was changed.\":rejected?\"The proposed response was rejected. No job was launched and no port was changed.\":\"The approval request failed, timed out, or returned no valid decision. No action was executed.\",\"\",\":shield: *No remediation executed. Device recovery is not verified.*\",\"_Next → Configure and verify AAP inventory, credentials, read-only preflight and the fixed isolation Job Template. A new approval is required after integration._\",\"\",\"<https://app.datadoghq.com/monitors/340593559|Monitor> · <https://app.datadoghq.com/workflow/\"+String($.WorkflowId)+\"?instance=\"+String($.InstanceId)+\"|Workflow evidence>\"].join(\"\\n\");\nreturn {...d,slack_text:text};\n"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "errorHandlers": [
           {
-            "fallbackStepName": "Approval_Unavailable",
+            "fallbackStepName": "Decision_Notification_Failed",
             "retryStrategy": {
               "kind": "RETRY_STRATEGY_LINEAR",
               "linear": {
@@ -608,65 +677,14 @@
               }
             }
           }
-        ]
-      },
-      {
-        "name": "Record_Approval_Decision",
-        "actionId": "com.datadoghq.datatransformation.func",
-        "parameters": [
-          {
-            "name": "script",
-            "value": "\nconst a=$.Steps.Slack_Approval_Request||{},validActor=typeof a.responder?.id===\"string\"&&a.responder.id.length>0;\nconst mapped={approve:\"approve\",reject:\"reject\",\"Approve Response (AAP Placeholder)\":\"approve\",\"Reject Remediation\":\"reject\"}[a.decision];\nconst choice=validActor&&mapped?mapped:\"unavailable\";\nreturn {workflow_result:choice===\"approve\"?\"JOB_NOT_CONFIGURED\":choice===\"reject\"?\"REMEDIATION_REJECTED\":\"APPROVAL_UNAVAILABLE\",approval_status:choice===\"approve\"?\"APPROVED\":choice===\"reject\"?\"REJECTED\":\"UNAVAILABLE\",responder:validActor?a.responder:null,approval_ts:a.ts||null,recorded_at:new Date().toISOString(),target_host:\"sw1\",target_interface:\"ethernet-1/2\",aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",remediation_executed:false,remediation_allowed:false,recovery_verified:false};\n"
-          }
         ],
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Format_Decision_Result"
-          }
-        ],
-        "readinessGate": {
-          "thresholdType": "ANY"
-        }
-      },
-      {
-        "name": "Approval_Unavailable",
-        "actionId": "com.datadoghq.datatransformation.func",
-        "parameters": [
-          {
-            "name": "script",
-            "value": "return {workflow_result:\"APPROVAL_UNAVAILABLE\",approval_status:\"UNAVAILABLE\",responder:null,aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",remediation_executed:false,remediation_allowed:false,recovery_verified:false};"
-          }
-        ],
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Format_Decision_Result"
-          }
-        ]
-      },
-      {
-        "name": "Format_Decision_Result",
-        "actionId": "com.datadoghq.datatransformation.func",
-        "parameters": [
-          {
-            "name": "script",
-            "value": "\nconst d=$.Steps.Record_Approval_Decision?.data||$.Steps.Approval_Unavailable?.data;\nif(!d)throw new Error(\"Missing approval outcome\");\nconst approved=d.approval_status===\"APPROVED\",rejected=d.approval_status===\"REJECTED\";\nconst text=[\"━━━━━━━━━━━━━━━━━━━━\",approved?\":warning: *INCIDENT RESPONSE · JOB NOT CONFIGURED*\":rejected?\":no_entry: *INCIDENT RESPONSE · STOPPED*\":\":hourglass_flowing_sand: *INCIDENT RESPONSE · APPROVAL UNAVAILABLE*\",approved?\"*Approval Recorded — AAP Placeholder*\":rejected?\"*MAC Flapping Remediation Rejected*\":\"*MAC Flapping Decision Did Not Complete*\",\"━━━━━━━━━━━━━━━━━━━━\",\"\",\"*Decision:* \"+d.approval_status,\"*Result:* \"+d.workflow_result,\"*Environment:* network-aiops\",\"*Planned target:* sw1 · ethernet-1/2\",\"*AAP Job Template:* NOT_CONFIGURED\",\"*AAP Job ID:* none\",\"\",approved?\"Approval was recorded, but the AAP job is not configured. No job was launched and no port was changed.\":rejected?\"The proposed response was rejected. No job was launched and no port was changed.\":\"The approval request failed, timed out, or returned no valid decision. No action was executed.\",\"\",\":shield: *No remediation executed. Device recovery is not verified.*\",\"_Next → Configure and verify AAP inventory, credentials, read-only preflight and the fixed isolation Job Template. A new approval is required after integration._\",\"\",\"<https://app.datadoghq.com/monitors/340593559|Monitor> · <https://app.datadoghq.com/workflow/\"+String($.WorkflowId)+\"?instance=\"+String($.InstanceId)+\"|Workflow evidence>\"].join(\"\\n\");\nreturn {...d,slack_text:text};\n"
-          }
-        ],
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Notify_Decision_Result"
-          }
-        ],
-        "readinessGate": {
-          "thresholdType": "ANY"
-        }
-      },
-      {
         "name": "Notify_Decision_Result",
-        "actionId": "com.datadoghq.slack.send_simple_message",
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Complete"
+          }
+        ],
         "parameters": [
           {
             "name": "teamId",
@@ -688,16 +706,104 @@
             "name": "unfurlMedia",
             "value": false
           }
-        ],
+        ]
+      },
+      {
+        "actionId": "com.datadoghq.datatransformation.func",
+        "name": "Decision_Notification_Failed",
         "outboundEdges": [
           {
             "branchName": "main",
             "nextStepName": "Complete"
           }
         ],
+        "parameters": [
+          {
+            "name": "script",
+            "value": "return {notification_error:\"Decision result notification failed; inspect Notify_Decision_Result.\"};"
+          }
+        ]
+      },
+      {
+        "name": "Route_Approved_Response",
+        "actionId": "com.datadoghq.core.if",
+        "parameters": [
+          {
+            "name": "conditions",
+            "value": [
+              {
+                "comparisonOperator": "eq",
+                "leftValue": "{{ Steps.Record_Approval_Decision.data.approval_status }}",
+                "rightValue": "APPROVED"
+              }
+            ]
+          },
+          {
+            "name": "joinOperator",
+            "value": "and"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "true",
+            "nextStepName": "Execute_AAP_Placeholder"
+          },
+          {
+            "branchName": "false",
+            "nextStepName": "Format_Decision_Result"
+          }
+        ]
+      },
+      {
+        "name": "Execute_AAP_Placeholder",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst d=$.Steps.Record_Approval_Decision.data;\nconst approved=d.approval_status===\"APPROVED\"&&Boolean(d.responder?.id);\nreturn {stage:\"EXECUTE\",status:approved?\"JOB_NOT_CONFIGURED\":\"EXECUTION_BLOCKED\",reason:approved?\"Fixed AAP isolation Job Template is not configured. No job was dispatched.\":\"No valid approval. Execution is blocked.\",target_host:\"sw1\",target_interface:\"ethernet-1/2\",aap_job_template_id:\"\",aap_job_id:\"\",execution_backend:\"NONE\",job_launched:false,execution_succeeded:false,remediation_executed:false,recorded_at:new Date().toISOString()};\n"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Build_Verification_Window"
+          }
+        ]
+      },
+      {
+        "name": "Build_Verification_Window",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const now=Date.now();return {from:new Date(now-300000).toISOString(),to:new Date(now).toISOString()};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Verify_Monitor_State"
+          }
+        ]
+      },
+      {
+        "name": "Verify_Monitor_State",
+        "actionId": "com.datadoghq.dd.monitor.getMonitor",
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "value": 340593559
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Verify_Interface_Admin"
+          }
+        ],
         "errorHandlers": [
           {
-            "fallbackStepName": "Decision_Notification_Failed",
+            "fallbackStepName": "Verification_Collection_Failed",
             "retryStrategy": {
               "kind": "RETRY_STRATEGY_LINEAR",
               "linear": {
@@ -709,12 +815,241 @@
         ]
       },
       {
-        "name": "Decision_Notification_Failed",
+        "name": "Verify_Interface_Admin",
+        "actionId": "com.datadoghq.dd.metrics.queryMetrics",
+        "parameters": [
+          {
+            "name": "time",
+            "value": "{{ Steps.Build_Verification_Window.data }}"
+          },
+          {
+            "name": "query",
+            "value": "max:snmp.ifAdminStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Verify_Interface_Oper"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Verification_Collection_Failed",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Verify_Interface_Oper",
+        "actionId": "com.datadoghq.dd.metrics.queryMetrics",
+        "parameters": [
+          {
+            "name": "time",
+            "value": "{{ Steps.Build_Verification_Window.data }}"
+          },
+          {
+            "name": "query",
+            "value": "max:snmp.ifOperStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface}"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Verify_Forwarding"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Verification_Collection_Failed",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Verify_Forwarding",
+        "actionId": "com.datadoghq.dd.metrics.queryMetrics",
+        "parameters": [
+          {
+            "name": "time",
+            "value": "{{ Steps.Build_Verification_Window.data }}"
+          },
+          {
+            "name": "query",
+            "value": "max:network_aiops.lab.probe.loss_pct{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a}"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Verify_Collector_Freshness"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Verification_Collection_Failed",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Verify_Collector_Freshness",
+        "actionId": "com.datadoghq.dd.metrics.queryMetrics",
+        "parameters": [
+          {
+            "name": "time",
+            "value": "{{ Steps.Build_Verification_Window.data }}"
+          },
+          {
+            "name": "query",
+            "value": "max:network_aiops.lab.collector.heartbeat{env:network-aiops,lab_id:macflap-v2}"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Evaluate_Recovery"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Verification_Collection_Failed",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Verification_Collection_Failed",
         "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
-            "value": "return {notification_error:\"Decision result notification failed; inspect Notify_Decision_Result.\"};"
+            "value": "return {reason:\"One or more read-only verification queries failed. Missing evidence is not recovery.\"};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Evaluate_Recovery"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "name": "Evaluate_Recovery",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst steps=$.Steps,now=Date.now(),execution=steps.Execute_AAP_Placeholder?.data||{};\nfunction latest(step,iface){\n const r=steps[step];if(r?.status!==\"ok\")return {available:false,reason:\"Metric query unavailable\"};\n const series=(r.series||[]).filter(s=>!iface||(s.tag_set||s.tagSet||String(s.scope||\"\").split(\",\")).includes(\"interface:\"+iface));\n if(series.length!==1)return {available:false,reason:\"Expected exactly one scoped series\"};\n const points=(series[0].pointlist||[]).filter(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1])).map(p=>[p[0]<1e12?p[0]*1000:p[0],p[1]]).sort((a,b)=>a[0]-b[0]);\n const last=points.at(-1);if(!last)return {available:false,reason:\"No numeric samples\"};\n const age=(now-last[0])/1000;\n return {available:age>=0&&age<=180,value:last[1],timestamp:new Date(last[0]).toISOString(),age_seconds:age,reason:age>=0&&age<=180?\"Fresh sample\":\"Stale or future sample\"};\n}\nconst admin={},oper={};for(const port of [\"ethernet-1/1\",\"ethernet-1/2\",\"ethernet-1/3\"]){admin[port]=latest(\"Verify_Interface_Admin\",port);oper[port]=latest(\"Verify_Interface_Oper\",port);}\nconst loss=latest(\"Verify_Forwarding\"),heartbeat=latest(\"Verify_Collector_Freshness\");\nconst fixedIsolation=admin[\"ethernet-1/2\"].available&&admin[\"ethernet-1/2\"].value===2&&oper[\"ethernet-1/2\"].available&&oper[\"ethernet-1/2\"].value===2;\nconst trustedPorts=[\"ethernet-1/1\",\"ethernet-1/3\"].every(p=>admin[p].available&&admin[p].value===1&&oper[p].available&&oper[p].value===1);\nconst monitor=steps.Verify_Monitor_State?.overall_state||\"Unknown\";\nconst criteria={aap_execution_succeeded:execution.execution_succeeded===true&&execution.job_launched===true&&/^[1-9][0-9]*$/.test(String(execution.aap_job_id||\"\")),fixed_port_isolated:fixedIsolation,trusted_ports_up:trustedPorts,independent_forwarding_zero_loss:loss.available&&loss.value===0,collector_fresh:heartbeat.available&&heartbeat.value===1,monitor_ok:monitor===\"OK\",device_duplicate_state_verified:false,post_execution_evidence_verified:false};\nconst missing=Object.entries(criteria).filter(([,v])=>!v).map(([k])=>k);\nreturn {stage:\"VERIFY\",status:\"RECOVERY_NOT_VERIFIED\",recovery_verified:false,criteria,missing,reason:\"Recovery cannot be verified: AAP execution and post-execution device/duplicate-MAC evidence remain placeholders.\",observed:{monitor_state:monitor,admin,oper,loss_pct:loss,collector_heartbeat:heartbeat,collection_error:steps.Verification_Collection_Failed?.data?.reason||null},execution,required_device_checks:[\"Fresh duplicate entries and MAC table after hold-down\",\"Fixed e1/2 admin/oper down; e1/1 and e1/3 admin/oper up\",\"Independent Host C to Host A forwarding after the approved job\"],remediation_executed:false,automatic_retry:false,checked_at:new Date().toISOString()};\n"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Stop_And_Escalate"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "name": "Stop_And_Escalate",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "\nconst v=$.Steps.Evaluate_Recovery?.data||{},x=$.Steps.Execute_AAP_Placeholder?.data||{},a=$.Steps.Record_Approval_Decision?.data||{};\nconst safe=s=>String(s??\"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\").replace(/@/g,\"＠\");\nconst lines=[\"━━━━━━━━━━━━━━━━━━━━\",\":warning: *INCIDENT RESPONSE · RECOVERY NOT VERIFIED*\",\"*MAC Flapping — Stopped and Escalated*\",\"━━━━━━━━━━━━━━━━━━━━\",\"\",\"*Decision:* \"+safe(a.approval_status),\"*Execute:* \"+safe(x.status||\"NOT_EXECUTED\"),\"*AAP Job Template:* NOT_CONFIGURED\",\"*AAP Job ID:* none\",\"*Fixed target:* sw1 · ethernet-1/2\",\"*Verify:* RECOVERY_NOT_VERIFIED\",\"*Monitor state observed:* \"+safe(v.observed?.monitor_state||\"Unknown\"),\"\",\"*Verification Evidence*\",\"• Failed or missing criteria: \"+safe((v.missing||[]).join(\", \")||\"Verification unavailable\"),\"• \"+safe(v.reason||\"Required device recovery evidence is unavailable.\"),\"\",\"No job was launched and no port was changed. Metric observations are recorded in the workflow; they are not post-remediation proof.\",\"\",\":shield: *Further Automation Stopped*\",\"No retry, additional remediation, or recovery claim. A monitor OK or quiet logs alone does not prove recovery.\",\"\",\"*Next → Operator review required*\",\"Configure AAP inventory, credentials, fixed isolation and read-only verification jobs. Check current duplicate entries, MAC table, interfaces, and independent C→A forwarding. Obtain a new approval before any later execution.\",\"\",\"<https://app.datadoghq.com/monitors/340593559|Monitor> · <https://app.datadoghq.com/workflow/\"+String($.WorkflowId)+\"?instance=\"+String($.InstanceId)+\"|Execution and verification evidence> · <https://app.datadoghq.com/notebook/16202843|Runbook>\"];\nreturn {workflow_result:\"RECOVERY_NOT_VERIFIED\",approval_status:a.approval_status||\"UNKNOWN\",execute_status:x.status||\"NOT_EXECUTED\",verification_status:\"RECOVERY_NOT_VERIFIED\",recovery_verified:false,remediation_executed:false,automatic_retry:false,stopped:true,escalation_required:true,slack_text:lines.join(\"\\n\")};\n"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Slack_Escalate_Recovery"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        }
+      },
+      {
+        "name": "Slack_Escalate_Recovery",
+        "actionId": "com.datadoghq.slack.send_simple_message",
+        "parameters": [
+          {
+            "name": "teamId",
+            "value": "REPLACE_WITH_SLACK_TEAM_ID"
+          },
+          {
+            "name": "channel",
+            "value": "#datadog-automation"
+          },
+          {
+            "name": "text",
+            "value": "{{ Steps.Stop_And_Escalate.data.slack_text }}"
+          },
+          {
+            "name": "unfurlLinks",
+            "value": false
+          },
+          {
+            "name": "unfurlMedia",
+            "value": false
+          }
+        ],
+        "outboundEdges": [
+          {
+            "branchName": "main",
+            "nextStepName": "Complete"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "fallbackStepName": "Escalation_Delivery_Failed",
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Escalation_Delivery_Failed",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "return {workflow_result:\"ESCALATION_DELIVERY_FAILED\",recovery_verified:false,remediation_executed:false,automatic_retry:false,reason:\"Recovery is not verified and Slack escalation delivery failed. Review this workflow run manually.\"};"
           }
         ],
         "outboundEdges": [

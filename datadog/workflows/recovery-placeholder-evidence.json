@@ -1,0 +1,118 @@
+{
+  "published_readback": {
+    "aap_actions": 0,
+    "escalate": true,
+    "execute": true,
+    "published": true,
+    "steps": 37,
+    "tags": [
+      "automation:bits-agent",
+      "domain:network",
+      "env:network-aiops",
+      "project:berca-poc",
+      "scenario:mac-flapping",
+      "service:nokia-srlinux",
+      "team:tps",
+      "use_case:mac-flapping",
+      "workflow_role:investigation"
+    ],
+    "updatedAt": "2026-11-06T08:50:45.649Z",
+    "verify": true
+  },
+  "local_tests": 24,
+  "slack_actions_overridden_in_tests": true,
+  "real_slack_delivery_verified": false,
+  "real_aap_execution_verified": false,
+  "runtime_tests": [
+    {
+      "choice": "approve_live_reads",
+      "instance_id": "5da4f769-a639-4982-ae44-0e22dfc0bba3",
+      "runtime_status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "result": "RECOVERY_NOT_VERIFIED",
+      "execute_status": "JOB_NOT_CONFIGURED",
+      "criteria": {
+        "aap_execution_succeeded": false,
+        "collector_fresh": true,
+        "device_duplicate_state_verified": false,
+        "fixed_port_isolated": false,
+        "independent_forwarding_zero_loss": true,
+        "monitor_ok": true,
+        "post_execution_evidence_verified": false,
+        "trusted_ports_up": true
+      },
+      "verification_status": "RECOVERY_NOT_VERIFIED",
+      "escalation_required": true,
+      "simulated_escalation_sent": true,
+      "remediation_executed": false,
+      "notification_error": ""
+    },
+    {
+      "choice": "reject",
+      "instance_id": "c3c44ef8-e86d-495b-8f6d-979d64c785f6",
+      "runtime_status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "result": "REMEDIATION_REJECTED",
+      "execute_status": "NOT_REQUESTED",
+      "verification_status": "NOT_REQUESTED",
+      "escalation_required": false,
+      "simulated_escalation_sent": false,
+      "remediation_executed": false,
+      "notification_error": ""
+    },
+    {
+      "choice": "verify_read_error",
+      "instance_id": "758bbf3f-6430-4c29-9fec-d717226daf31",
+      "runtime_status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "result": "RECOVERY_NOT_VERIFIED",
+      "execute_status": "JOB_NOT_CONFIGURED",
+      "criteria": {
+        "aap_execution_succeeded": false,
+        "collector_fresh": false,
+        "device_duplicate_state_verified": false,
+        "fixed_port_isolated": false,
+        "independent_forwarding_zero_loss": false,
+        "monitor_ok": false,
+        "post_execution_evidence_verified": false,
+        "trusted_ports_up": false
+      },
+      "verification_status": "RECOVERY_NOT_VERIFIED",
+      "escalation_required": true,
+      "simulated_escalation_sent": true,
+      "remediation_executed": false,
+      "notification_error": ""
+    },
+    {
+      "choice": "escalation_error",
+      "instance_id": "46751956-48e6-4b75-8a6d-bb4fe55a7d91",
+      "runtime_status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "result": "ESCALATION_DELIVERY_FAILED",
+      "execute_status": "JOB_NOT_CONFIGURED",
+      "criteria": {
+        "aap_execution_succeeded": false,
+        "collector_fresh": true,
+        "device_duplicate_state_verified": false,
+        "fixed_port_isolated": false,
+        "independent_forwarding_zero_loss": true,
+        "monitor_ok": true,
+        "post_execution_evidence_verified": false,
+        "trusted_ports_up": true
+      },
+      "verification_status": "RECOVERY_NOT_VERIFIED",
+      "escalation_required": true,
+      "simulated_escalation_sent": false,
+      "remediation_executed": false,
+      "notification_error": "Recovery is not verified and Slack escalation delivery failed. Review this workflow run manually."
+    }
+  ]
+}

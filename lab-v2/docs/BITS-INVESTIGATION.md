@@ -1,6 +1,6 @@
 # Bits agent workflow and chronological evidence validation
 
-Updated 2026-11-06. The investigation workflow uses 24 steps and the custom Bits agent only.
+Updated 2026-11-06. The investigation workflow uses 37 steps and the custom Bits agent only.
 Native Bits Investigation is no longer started automatically. Earlier native investigations
 remain historical records; their conclusions are not inputs to this workflow.
 
@@ -9,7 +9,8 @@ remain historical records; their conclusions are not inputs to this workflow.
 Monitor 340593559 Alert → validate source → collect scoped logs → strictly parse Nokia
 messages → calculate per-target chronology → custom Bits agent → validate output →
 POC incident-response Slack summary → eligibility gate → Slack approve/reject →
-record decision and announce the outcome. AAP is a non-executable placeholder.
+record decision → inactive Execute → read-only Verify → stop and escalate when
+recovery is unverified. AAP is a non-executable placeholder.
 
 The agent receives bounded validated log evidence, not external repository topology.
 It cannot execute AAP jobs, change devices, or perform remediation.
@@ -22,7 +23,8 @@ in #datadog-automation, following Operational Conditions. Incomplete, stale, low
 cleared, unrelated, and manual evidence does not request approval. The decision gate
 does not establish that a shutdown target is safe: it permits a placeholder review only.
 
-- Approve Response (AAP Placeholder): records APPROVED and JOB_NOT_CONFIGURED.
+- Approve Response (AAP Placeholder): records APPROVED, enters Execute with
+  JOB_NOT_CONFIGURED, then Verify and RECOVERY_NOT_VERIFIED escalation.
 - Reject Remediation: records REJECTED and REMEDIATION_REJECTED.
 - No response for one hour, Slack failure, or invalid response: stops without action.
 
@@ -36,6 +38,9 @@ that requires fresh device checks and a new approval.
 approve, reject, request-error and ineligible routing with all Slack actions overridden.
 These tests do not prove actual Slack button delivery/click behavior or a wall-clock
 one-hour expiry. See approval-placeholder-evidence.json for instance IDs and results.
+
+Those runs describe the previous 24-step approval-only version. Current Execute/Verify
+behavior and its separate regression results are documented in [RECOVERY-WORKFLOW.md](RECOVERY-WORKFLOW.md).
 
 A deletion clears an observed detection only for the same host, MAC, target type,
 and target, with a strictly later timestamp. Older, equal-time, or different-target deletion

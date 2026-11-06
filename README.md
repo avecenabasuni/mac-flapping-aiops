@@ -61,7 +61,9 @@ flowchart TD
     SLACK --> HUMAN["Engineer reviews findings"]
     HUMAN --> GATE["Fresh validated lab detection"]
     GATE --> DECISION["Slack Approve / Reject"]
-    DECISION -->|Approve| PLACEHOLDER["JOB_NOT_CONFIGURED<br/>No AAP execution"]
+    DECISION -->|Approve| PLACEHOLDER["Execute: JOB_NOT_CONFIGURED<br/>No AAP execution"]
+    PLACEHOLDER --> VERIFY["Verify: current Datadog telemetry<br/>Device/job evidence missing"]
+    VERIFY --> ESCALATE["RECOVERY_NOT_VERIFIED<br/>Stop and escalate to Slack"]
     DECISION -->|Reject or unavailable| STOP["Stop without device changes"]
 ```
 
@@ -71,7 +73,7 @@ The query matches **detection events** and excludes generic `DATADOG_SYSLOG_TEST
 
 [Datadog workflow run](https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=1f909fed-cf5f-46dd-a4ab-a3217adf4f63) · [Datadog runbook](https://app.datadoghq.com/notebook/16202843)
 
-**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md). Fresh validated monitor detections now request Approve/Reject in #datadog-automation. Approve records JOB_NOT_CONFIGURED; no AAP job or device action runs.
+**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md). Fresh validated monitor detections now request Approve/Reject in #datadog-automation. Approve enters Execute with JOB_NOT_CONFIGURED, reads current telemetry in Verify, and stops/escalates RECOVERY_NOT_VERIFIED. No AAP job or device action runs. See [recovery stages](lab-v2/docs/RECOVERY-WORKFLOW.md).
 
 ## 3. Target architecture: investigation, approval, remediation and verification
 
