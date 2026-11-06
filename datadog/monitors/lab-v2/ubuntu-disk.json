@@ -10,7 +10,7 @@
     "team:tps"
   ],
   "name": "[POC] Lab Ubuntu Disk Usage High",
-  "query": "avg(last_5m):max:system.disk.in_use{host:network-aiops-lab} by {device} > 0.85",
+  "query": "avg(last_5m):max:system.disk.in_use{host:network-aiops-lab,!device:/dev/loop*,!device:tmpfs} by {device} > 0.85",
   "message": "{{#is_alert}}\nA monitored filesystem exceeded 85% usage; exclude ephemeral mounts after inspecting actual device tags.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
   "options": {
     "thresholds": {

@@ -1,0 +1,377 @@
+{
+  "checked_at": "2026-11-06T08:30:00Z",
+  "dashboard": {
+    "id": "rtw-gpm-4t5",
+    "url": "https://app.datadoghq.com/dashboard/rtw-gpm-4t5",
+    "created": true,
+    "visual_render_verified": false
+  },
+  "monitors": [
+    {
+      "file": "collector-heartbeat.json",
+      "created": "2026-11-06T08:29:37.701054Z",
+      "draft_status": "draft",
+      "id": 341625797,
+      "message": "{{#is_alert}}\nCollector heartbeat is absent. A heartbeat means the check ran; use the collector service check to assess collection success.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:37.701054Z",
+      "name": "[POC] Lab Collector Heartbeat Missing",
+      "priority": 5,
+      "query": "avg(last_5m):avg:network_aiops.lab.collector.heartbeat{env:network-aiops,lab_id:macflap-v2} < 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625797/edit"
+    },
+    {
+      "file": "collector-status.json",
+      "created": "2026-11-06T08:29:38.197939Z",
+      "draft_status": "draft",
+      "id": 341625798,
+      "message": "Docker inventory could not be read, or container stats/probe collection is incomplete. Distinguish collection errors from observed packet loss.\nNo automatic remediation. Collector UNKNOWN is not proof of device failure.\n@slack-datadog-monitor",
+      "modified": "2026-11-06T08:29:38.197939Z",
+      "name": "[POC] Lab Telemetry Collection Failed",
+      "priority": 5,
+      "query": "\"network_aiops.lab.collector\".over(\"env:network-aiops\",\"lab_id:macflap-v2\").by(\"host\").last(3).count_by_status()",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "service check",
+      "publish_url": "https://app.datadoghq.com/monitors/341625798/edit"
+    },
+    {
+      "file": "container-cpu.json",
+      "created": "2026-11-06T08:29:38.696522Z",
+      "draft_status": "draft",
+      "id": 341625800,
+      "message": "Deployment note: custom Docker resource metrics were not reporting at deployment; a no-data state is a collection gap, not proof of container failure.\n\n{{#is_alert}}\nDocker reports CPU above 90% (one CPU core basis; values can exceed 100% on multiple cores). Tune against the lab baseline.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:38.696522Z",
+      "name": "[POC] Lab Container CPU Busy",
+      "priority": 5,
+      "query": "avg(last_5m):avg:network_aiops.lab.container.cpu_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container} > 90",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625800/edit"
+    },
+    {
+      "file": "container-memory.json",
+      "created": "2026-11-06T08:29:39.956322Z",
+      "draft_status": "draft",
+      "id": 341625802,
+      "message": "Deployment note: custom Docker resource metrics were not reporting at deployment; a no-data state is a collection gap, not proof of container failure.\n\n{{#is_alert}}\nContainer memory use exceeded 85% of the Docker-reported memory limit.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:39.956322Z",
+      "name": "[POC] Lab Container Memory High",
+      "priority": 5,
+      "query": "avg(last_5m):avg:network_aiops.lab.container.memory_pct{env:network-aiops,lab_id:macflap-v2} by {lab_container} > 85",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625802/edit"
+    },
+    {
+      "file": "container-state.json",
+      "created": "2026-11-06T08:29:40.488556Z",
+      "draft_status": "draft",
+      "id": 341625804,
+      "message": "An expected lab container is absent, stopped, or reports an unhealthy Docker healthcheck. Running state alone is not application health.\nNo automatic remediation. Collector UNKNOWN is not proof of device failure.\n@slack-datadog-monitor",
+      "modified": "2026-11-06T08:29:40.488556Z",
+      "name": "[POC] Lab Container Unavailable or Unhealthy",
+      "priority": 5,
+      "query": "\"network_aiops.lab.container\".over(\"env:network-aiops\",\"lab_id:macflap-v2\").by(\"lab_container\").last(3).count_by_status()",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "service check",
+      "publish_url": "https://app.datadoghq.com/monitors/341625804/edit"
+    },
+    {
+      "file": "forwarding-latency.json",
+      "created": "2026-11-06T08:29:41.0129Z",
+      "draft_status": "draft",
+      "id": 341625808,
+      "message": "{{#is_alert}}\nAverage observed RTT exceeded 50 ms. Tune this initial threshold against the healthy baseline.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:41.0129Z",
+      "name": "[POC] Lab Host C to Host A Latency High",
+      "priority": 5,
+      "query": "avg(last_5m):avg:network_aiops.lab.probe.rtt_avg_ms{env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a} > 50",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625808/edit"
+    },
+    {
+      "file": "forwarding-status.json",
+      "created": "2026-11-06T08:29:41.529861Z",
+      "draft_status": "draft",
+      "id": 341625813,
+      "message": "The independent three-packet data-plane sample lost packets. UNKNOWN means the probe could not execute or its output was incomplete.\nNo automatic remediation. Collector UNKNOWN is not proof of device failure.\n@slack-datadog-monitor",
+      "modified": "2026-11-06T08:29:41.529861Z",
+      "name": "[POC] Lab Host C to Host A Forwarding Failed",
+      "priority": 5,
+      "query": "\"network_aiops.lab.forwarding\".over(\"env:network-aiops\",\"lab_id:macflap-v2\").by(\"host\").last(3).count_by_status()",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "service check",
+      "publish_url": "https://app.datadoghq.com/monitors/341625813/edit"
+    },
+    {
+      "file": "switch-e1-1.json",
+      "created": "2026-11-06T08:29:41.991512Z",
+      "draft_status": "draft",
+      "id": 341625815,
+      "message": "{{#is_alert}}\nExpected trusted interface ethernet-1/1 is not operationally up. Unlike e1/2, this port should remain active during containment.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:41.991512Z",
+      "name": "[POC] Lab SW1 trusted Port Not Up",
+      "priority": 5,
+      "query": "max(last_2m):max:snmp.ifOperStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1,interface:ethernet-1/1} > 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625815/edit"
+    },
+    {
+      "file": "switch-e1-2-unexpected.json",
+      "created": "2026-11-06T08:29:42.505322Z",
+      "draft_status": "draft",
+      "id": 341625817,
+      "message": "{{#is_alert}}\ne1/2 is admin-enabled but not operationally up. An admin-disabled e1/2 is intentionally excluded; review its isolation state separately.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:42.505322Z",
+      "name": "[POC] Lab SW1 Duplicate-Source Port Unexpectedly Not Up",
+      "priority": 5,
+      "query": "max(last_2m):(clamp_max(clamp_min(max:snmp.ifOperStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1,interface:ethernet-1/2} - 1, 0), 1) * clamp_max(clamp_min(2 - max:snmp.ifAdminStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1,interface:ethernet-1/2}, 0), 1)) > 0",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625817/edit"
+    },
+    {
+      "file": "switch-e1-3.json",
+      "created": "2026-11-06T08:29:43.016341Z",
+      "draft_status": "draft",
+      "id": 341625821,
+      "message": "{{#is_alert}}\nExpected probe interface ethernet-1/3 is not operationally up. Unlike e1/2, this port should remain active during containment.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:43.016341Z",
+      "name": "[POC] Lab SW1 probe Port Not Up",
+      "priority": 5,
+      "query": "max(last_2m):max:snmp.ifOperStatus{env:network-aiops,lab_id:macflap-v2,lab_device:sw1,interface:ethernet-1/3} > 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625821/edit"
+    },
+    {
+      "file": "switch-in-discards.json",
+      "created": "2026-11-06T08:29:43.533661Z",
+      "draft_status": "draft",
+      "id": 341625822,
+      "message": "{{#is_alert}}\nThe interface ifInDiscards rate exceeded 1 per second. Verify rate semantics for the Agent/profile version and tune this starting threshold.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:43.533661Z",
+      "name": "[POC] Lab SW1 Interface in-discards Observed",
+      "priority": 5,
+      "query": "avg(last_5m):sum:snmp.ifInDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface} > 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625822/edit"
+    },
+    {
+      "file": "switch-in-errors.json",
+      "created": "2026-11-06T08:29:44.018223Z",
+      "draft_status": "draft",
+      "id": 341625824,
+      "message": "{{#is_alert}}\nThe interface ifInErrors rate exceeded 1 per second. Verify rate semantics for the Agent/profile version and tune this starting threshold.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:44.018223Z",
+      "name": "[POC] Lab SW1 Interface in-errors Observed",
+      "priority": 5,
+      "query": "avg(last_5m):sum:snmp.ifInErrors.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface} > 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625824/edit"
+    },
+    {
+      "file": "switch-out-discards.json",
+      "created": "2026-11-06T08:29:44.548536Z",
+      "draft_status": "draft",
+      "id": 341625825,
+      "message": "{{#is_alert}}\nThe interface ifOutDiscards rate exceeded 1 per second. Verify rate semantics for the Agent/profile version and tune this starting threshold.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:44.548536Z",
+      "name": "[POC] Lab SW1 Interface out-discards Observed",
+      "priority": 5,
+      "query": "avg(last_5m):sum:snmp.ifOutDiscards.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface} > 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625825/edit"
+    },
+    {
+      "file": "switch-out-errors.json",
+      "created": "2026-11-06T08:29:45.082522Z",
+      "draft_status": "draft",
+      "id": 341625826,
+      "message": "{{#is_alert}}\nThe interface ifOutErrors rate exceeded 1 per second. Verify rate semantics for the Agent/profile version and tune this starting threshold.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:45.082522Z",
+      "name": "[POC] Lab SW1 Interface out-errors Observed",
+      "priority": 5,
+      "query": "avg(last_5m):sum:snmp.ifOutErrors.rate{env:network-aiops,lab_id:macflap-v2,lab_device:sw1} by {interface} > 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625826/edit"
+    },
+    {
+      "file": "switch-snmp.json",
+      "created": "2026-11-06T08:29:46.378132Z",
+      "draft_status": "draft",
+      "id": 341625839,
+      "message": "SNMP collection is failing or partial. Correlate with Ubuntu Agent, management reachability and switch container state.\nNo automatic remediation. Collector UNKNOWN is not proof of device failure.\n@slack-datadog-monitor",
+      "modified": "2026-11-06T08:29:46.378132Z",
+      "name": "[POC] Lab SW1 SNMP Collection Failed",
+      "priority": 5,
+      "query": "\"snmp.can_check\".over(\"env:network-aiops\",\"lab_id:macflap-v2\").by(\"host\").last(3).count_by_status()",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "service check",
+      "publish_url": "https://app.datadoghq.com/monitors/341625839/edit"
+    },
+    {
+      "file": "ubuntu-cpu.json",
+      "created": "2026-11-06T08:29:46.912919Z",
+      "draft_status": "draft",
+      "id": 341625843,
+      "message": "{{#is_alert}}\nCPU idle stayed below 10% over five minutes.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:46.912919Z",
+      "name": "[POC] Lab Ubuntu CPU Busy",
+      "priority": 5,
+      "query": "avg(last_5m):avg:system.cpu.idle{host:network-aiops-lab} < 10",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625843/edit"
+    },
+    {
+      "file": "ubuntu-disk.json",
+      "created": "2026-11-06T08:29:47.385904Z",
+      "draft_status": "draft",
+      "id": 341625844,
+      "message": "{{#is_alert}}\nA monitored filesystem exceeded 85% usage; exclude ephemeral mounts after inspecting actual device tags.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:47.385904Z",
+      "name": "[POC] Lab Ubuntu Disk Usage High",
+      "priority": 5,
+      "query": "avg(last_5m):max:system.disk.in_use{host:network-aiops-lab,!device:/dev/loop*,!device:tmpfs} by {device} > 0.85",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625844/edit"
+    },
+    {
+      "file": "ubuntu-telemetry.json",
+      "created": "2026-11-06T08:29:47.903003Z",
+      "draft_status": "draft",
+      "id": 341625846,
+      "message": "{{#is_alert}}\nUptime is below one second, or the monitor reports missing host telemetry. Missing telemetry does not prove the VM is powered off.\nEvidence only; inspect the device, container and probe context. No automatic remediation.\n@slack-datadog-monitor\n{{/is_alert}}\n{{#is_recovery}}\nThe monitor condition cleared. This alone does not establish network recovery.\n@slack-datadog-monitor\n{{/is_recovery}}",
+      "modified": "2026-11-06T08:29:47.903003Z",
+      "name": "[POC] Lab Ubuntu Telemetry Missing",
+      "priority": 5,
+      "query": "avg(last_5m):avg:system.uptime{host:network-aiops-lab} < 1",
+      "tags": [
+        "project:berca-poc",
+        "env:network-aiops",
+        "lab_id:macflap-v2",
+        "monitor_role:health",
+        "team:tps"
+      ],
+      "type": "query alert",
+      "publish_url": "https://app.datadoghq.com/monitors/341625846/edit"
+    }
+  ],
+  "reused_memory_monitor_id": 340591132,
+  "publication_blocker": "Creation tool enforces drafts and UI review/publication. Computer Use stopped because current Chrome URL could not be determined for policy enforcement. No monitor was published.",
+  "source_gaps": [
+    "Custom container cpu_pct, memory_pct, memory_used_bytes and pids had no series at deployment."
+  ],
+  "existing_monitors_modified": false
+}

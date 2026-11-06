@@ -1,13 +1,17 @@
 {
   "title": "[POC] MAC Flapping Lab - Full Observability",
-  "description": "Configuration template. Deploy collectors before importing. Port isolation, probe success and monitor OK remain separate evidence.",
+  "description": "Live lab monitoring: Ubuntu, SW1 SNMP interfaces, four container states, and independent C-to-A forwarding. Custom Docker CPU/memory/PIDs were not reporting at deployment; empty charts are a collection gap, not healthy state. No automatic remediation.",
   "layout_type": "ordered",
   "reflow_type": "auto",
   "widgets": [
     {
       "definition": {
         "type": "note",
-        "content": "Coverage: Ubuntu VM, SW1 + Host A/B/C containers, switch interfaces/SNMP and independent C→A forwarding. e1/2 admin-disabled is expected during containment. No automatic remediation; review source freshness and recovery evidence."
+        "content": "Coverage: Ubuntu VM, SW1 + Host A/B/C containers, switch interfaces/SNMP and independent Câ†’A forwarding. e1/2 admin-disabled is expected during containment. No automatic remediation; review source freshness and recovery evidence.\n\nDeployment: SNMP and container state/probe sources verified 2026-11-06. Custom container CPU/memory/PIDs currently have no samples; inspect lab_observability resource collection. Disk chart excludes read-only loop and tmpfs mounts. Existing global Ubuntu memory monitor 340591132 is reused; the other new health monitors await UI publication."
+      },
+      "layout": {
+        "width": 12,
+        "height": 3
       }
     },
     {
@@ -20,6 +24,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -32,6 +40,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -40,10 +52,14 @@
         "title": "Ubuntu disk usage (%)",
         "requests": [
           {
-            "q": "max:system.disk.in_use{host:network-aiops-lab} by {device} * 100",
+            "q": "max:system.disk.in_use{host:network-aiops-lab,!device:/dev/loop*,!device:tmpfs} by {device} * 100",
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -56,6 +72,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -72,6 +92,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -84,6 +108,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -96,6 +124,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -108,6 +140,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -120,6 +156,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -132,6 +172,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -144,6 +188,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -156,6 +204,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -168,6 +220,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -180,6 +236,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -192,6 +252,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -204,6 +268,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -216,6 +284,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -232,6 +304,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -248,6 +324,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     },
     {
@@ -264,6 +344,10 @@
             "display_type": "line"
           }
         ]
+      },
+      "layout": {
+        "width": 6,
+        "height": 3
       }
     }
   ]
