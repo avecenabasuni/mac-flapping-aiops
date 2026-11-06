@@ -1,0 +1,58 @@
+{
+  "published_readback": {
+    "published": true,
+    "slack": [
+      {
+        "channel": "#datadog-automation",
+        "name": "Send_Summary",
+        "sendInThread": null
+      },
+      {
+        "channel": "#datadog-automation",
+        "name": "Slack_Approval_Request",
+        "sendInThread": null
+      },
+      {
+        "channel": "#datadog-automation",
+        "name": "Notify_Decision_Result",
+        "sendInThread": null
+      },
+      {
+        "channel": "#datadog-automation",
+        "name": "Slack_Escalate_Recovery",
+        "sendInThread": null
+      }
+    ],
+    "steps": 37,
+    "updatedAt": "2026-11-06T08:56:16.954Z"
+  },
+  "reference_workflow": "f3041229-4fc9-4ae5-8c2e-4ef7deb48b0a",
+  "slack_behavior": {
+    "channel": "#datadog-automation",
+    "send_in_thread": false,
+    "monitor_notifications_channel": "#datadog-monitor"
+  },
+  "live_run_before_channel_alignment": {
+    "instance_id": "b9bb3d5f-ff6e-4e27-8bd1-70a3090a4856",
+    "start": "2026-11-06T08:53:20.307348Z",
+    "end": "2026-11-06T08:54:05.441342Z",
+    "runtime_status": {
+      "detailsKind": "SUCCEEDED",
+      "displayName": "Success"
+    },
+    "workflow_result": "RECOVERY_NOT_VERIFIED",
+    "classification": "MAC_FLAPPING_EVIDENCE",
+    "parsed_sample_counts": {
+      "deletions": 0,
+      "detections": 2,
+      "ignored": 0,
+      "unparsed": 0
+    },
+    "approval_status": "APPROVED",
+    "execute_status": "JOB_NOT_CONFIGURED",
+    "verification_status": "RECOVERY_NOT_VERIFIED",
+    "escalation_sent": true,
+    "remediation_executed": false
+  },
+  "local_tests": 25
+}

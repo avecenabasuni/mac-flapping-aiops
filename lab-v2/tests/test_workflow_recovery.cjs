@@ -5,6 +5,14 @@ const path = require('node:path');
 const spec = JSON.parse(fs.readFileSync(path.join(__dirname,
   '../../datadog/workflows/investigate-network-mac-flapping.json'), 'utf8')).spec;
 const script = name => new Function('$', spec.steps.find(s => s.name === name).parameters[0].value);
+test('all workflow Slack messages match Operational Conditions channel and thread behavior',()=>{
+  const slack=spec.steps.filter(s=>s.actionId.includes('slack'));
+  assert.equal(slack.length,4);
+  for(const s of slack){
+    assert.equal(s.parameters.find(p=>p.name==='channel').value,'#datadog-automation');
+    assert.equal(s.parameters.some(p=>p.name==='sendInThread'),false);
+  }
+});
 function samples(values, timestamp=Date.now()-30000) {
   return {status:'ok',series:values.map(([port,value])=>({scope:port?'interface:'+port:'',pointlist:[[timestamp,value]]}))};
 }

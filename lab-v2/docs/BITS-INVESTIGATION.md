@@ -17,7 +17,9 @@ It cannot execute AAP jobs, change devices, or perform remediation.
 
 ## Slack approval placeholder
 
-The existing evidence summary stays in #datadog-monitor. Fresh validated automatic
+All workflow messages use #datadog-automation, matching Operational Conditions.
+No sendInThread option is set: messages are top-level, as in that workflow.
+The monitor notification itself remains separate in #datadog-monitor. Fresh validated automatic
 monitor detections for the fixed sw1 / 02:00:00:00:00:aa lab scope request a decision
 in #datadog-automation, following Operational Conditions. Incomplete, stale, low-confidence,
 cleared, unrelated, and manual evidence does not request approval. The decision gate
@@ -55,8 +57,7 @@ and Next → read-only checks. EVIDENCE REVIEWED, PAUSED, and INVESTIGATION FAIL
 describe investigation results without claiming remediation or verified recovery.
 
 Messages include host, MAC, interfaces, network instance, sample counts, UTC window,
-limitations, and monitor/log/workflow/runbook links. The existing #datadog-monitor
-destination is preserved. Collection and agent failures produce explicit failure summaries.
+limitations, and monitor/log/workflow/runbook links. All workflow messages use #datadog-automation. Collection and agent failures produce explicit failure summaries.
 Recovery or unrelated monitor events are skipped. Tests disable Slack.
 
 ## Verification

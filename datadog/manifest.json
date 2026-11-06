@@ -22,7 +22,7 @@
     "all_four_message_variants_parsed": true,
     "device_recovery_verified": false
   },
-  "investigation_workflow_updated_at": "2026-11-06T08:50:45.649Z",
+  "investigation_workflow_updated_at": "2026-11-06T08:56:16.954Z",
   "investigation_workflow_features": {
     "custom_bits_agent_only": true,
     "native_bits_investigation_per_monitor_alert": false,
@@ -34,6 +34,7 @@
     "execute_stage_placeholder": true,
     "read_only_verify_stage": true,
     "stop_and_escalate_unverified_recovery": true,
-    "automatic_retry": false
+    "automatic_retry": false,
+    "slack_behavior_matches_operational_conditions": true
   }
 }

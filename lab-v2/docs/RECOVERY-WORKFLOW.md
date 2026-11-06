@@ -1,5 +1,16 @@
 # MAC flapping recovery workflow
 
+All four workflow Slack actions use #datadog-automation with top-level messages,
+matching Operational Conditions. Neither workflow sets sendInThread. The monitor's
+own alert/recovery notification remains in #datadog-monitor. This channel alignment
+applies to new runs; existing Slack messages were not moved or reposted.
+
+Live run b9bb3d5f-ff6e-4e27-8bd1-70a3090a4856 on 2026-11-06 at 08:53–08:54 UTC
+verified real approval-button interaction and escalation delivery. Two detection logs
+parsed without errors, approval was recorded, Execute remained JOB_NOT_CONFIGURED,
+and the final result was RECOVERY_NOT_VERIFIED with escalation_sent=true. No AAP job
+or port change occurred. This run preceded the summary-channel alignment.
+
 The published workflow follows Observe → Investigate → Authorize → Execute → Verify.
 Execute remains an inactive AAP placeholder. It never launches a job or changes ports.
 
