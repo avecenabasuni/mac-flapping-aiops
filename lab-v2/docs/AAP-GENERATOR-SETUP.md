@@ -1,8 +1,25 @@
 # AAP generator Job Templates
 
-The playbooks are ready for template creation. They have not yet been executed in
-AAP or connected to the live Scenario Controller. Create the two templates below,
-then send their assigned IDs so the controller can be wired and tested.
+The templates now exist: **Start JT45** and **Stop JT46**. Read-only checks confirm
+project37/inventory7, Ubuntu credential9 and prompted variables. The Scenario
+Controller has a validated **98-step saved draft**, but its published version still
+has the original placeholders. The draft has not been published or fault-tested:
+the selected connection's account, `svc-datadog-fault-control` (user4), still
+receives HTTP403 when reading prerequisite JT41 and JT42.
+
+In AAP, open **JT41 → Access → Add → Users → svc-datadog-fault-control → Execute**
+and save; repeat on JT42. Granting access only to `svc-datadog-remediation` does
+not authorize this selected connection. The account already has Execute on
+JT45/46, but cannot edit templates. After access is verified, publish and test the
+saved controller draft. No new token is needed.
+
+The draft retains all application scenario steps. Its network branches use the
+user-selected existing connection under a separate `NETWORK_AAP` label, verify
+the Linux credential against JT41 and require complete generator job artifacts.
+Seven local scenario fixtures passed. A read-only runtime test (all launch steps
+disabled and Slack mocked) confirmed fail-closed routing on the current403;
+it did not execute AAP jobs. See the saved draft and binding evidence under
+`datadog/workflows/`.
 
 First sync AAP project **37** with the repository's **main** branch. The two new
 playbooks must appear in its playbook selector. Use JT41 (Verify Forwarding) as
@@ -37,7 +54,7 @@ refuse multi-host execution. This is the Linux Machine credential, not the SR
 Linux credential used by JT38–40/JT42. Its account must be able to become root
 noninteractively, as required for Docker and systemd management.
 
-Give `svc-datadog-remediation` Read and Execute access to both new templates and
+Give `svc-datadog-fault-control` Read and Execute access to both new templates and
 the resource access needed to launch them. Reuse the inventory/credential access
 already working for JT41. The service account does not need administrator access.
 Do not paste credentials into the playbooks, template variables or repository.
@@ -72,11 +89,11 @@ Successful jobs publish AAP artifacts for the controller to verify:
 | `macflap_generator_service` | `network-aiops-mac-flapping.service` | Same |
 | `macflap_generator_main_pid` | Positive PID | 0 |
 
-After creating the templates, send their two IDs. The planned controller paths
+The saved draft uses the supplied IDs in these explicit controller paths
 are explicit manual actions:
 
-- `mac-flapping`: Stop Generator → JT42 restore e1/2 → Start Generator.
-- `reset-mac-flapping`: Stop Generator → JT42 restore e1/2 → JT41 verify forwarding.
+- `mac-flapping`: JT46 Stop Generator → JT42 restore e1/2 → JT45 Start Generator.
+- `reset-mac-flapping`: JT46 Stop Generator → JT42 restore e1/2 → JT41 verify forwarding.
 
 These paths are not live yet. Existing recovery remains approval-gated. AAP job
 completion alone does not establish Datadog detection or verified recovery.

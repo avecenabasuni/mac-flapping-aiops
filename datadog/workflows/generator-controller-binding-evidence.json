@@ -1,0 +1,31 @@
+{
+  "workflow_id": "45ac61cf-8a35-4e2d-bed3-370ffc6a8506",
+  "status": "SAVED_DRAFT_NOT_PUBLISHED",
+  "start_template_id": 45,
+  "stop_template_id": 46,
+  "connection_selection": "User-selected existing Scenario Controller connection; no credential or token exported.",
+  "connection_identity": "svc-datadog-fault-control",
+  "steps": 98,
+  "validation_passed": true,
+  "unrelated_steps_changed": [],
+  "local_scenario_tests_passed": 7,
+  "preflight": {
+    "templates_45_46_read": true,
+    "project": 37,
+    "inventory": 7,
+    "linux_credential_id": 9,
+    "linux_credential_name": "Ubuntu Host SSH Credential",
+    "prompt_variables": true,
+    "jt42_http_status": 403,
+    "jt41_http_status": 403
+  },
+  "readonly_guard_test": {
+    "instance_id": "8a1f5e97-ffff-4e9c-971b-c1f7d7dedbcd",
+    "business_result": "NETWORK_SCENARIO_FAILED",
+    "expected_reason": "JT41 access denied; fail closed before launch",
+    "all_network_launch_steps_disabled": true,
+    "slack_actions_mocked": true,
+    "real_aap_jobs_launched": 0
+  },
+  "real_start_reset_tested": false
+}
