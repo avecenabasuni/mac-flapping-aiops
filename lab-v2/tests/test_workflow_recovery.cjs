@@ -25,6 +25,14 @@ test('old clears cannot clear newer detections, and both detection targets must 
  const c=context();c.Steps.Verify_Recovery_Logs.data.pop();assert.equal(evaluate(c).criteria.matching_post_isolation_log_clearance,false);
  const d=context();d.Steps.Verify_Recovery_Logs.data.push(d.log('ethernet-1/2.1','detected',Date.now()-10000));assert.equal(evaluate(d).recovery_verified,false);
 });
+test('a matching clear during the approved isolation job counts, but a pre-start clear does not',()=>{
+ const c=context(),start=Date.parse(c.Variables.aap_jobs.isolate.started);
+ c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',start+5000),c.log('ethernet-1/2.1','deleted',start+5000)];
+ assert.equal(evaluate(c).recovery_verified,true);
+ const d=context(),before=Date.parse(d.Variables.aap_jobs.isolate.started)-1;
+ d.Steps.Verify_Recovery_Logs.data=[d.log('mac-flap','deleted',before),d.log('ethernet-1/2.1','deleted',before)];
+ assert.equal(evaluate(d).recovery_verified,false);
+});
 test('wrong host/MAC/target and malformed logs never establish clearance',()=>{
  for(const mutate of [c=>c.Steps.Verify_Recovery_Logs.data[0].attributes.host='other',c=>c.Steps.Verify_Recovery_Logs.data[0].attributes.message=c.Steps.Verify_Recovery_Logs.data[0].attributes.message.replace('00:AA','00:BB'),c=>c.Steps.Verify_Recovery_Logs.data[1]=c.log('ethernet-1/3.1'),c=>c.Steps.Verify_Recovery_Logs.data[0].attributes.message='DATADOG_SYSLOG_TEST']){const c=context();mutate(c);assert.equal(evaluate(c).recovery_verified,false);}
 });

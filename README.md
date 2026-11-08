@@ -12,9 +12,9 @@ This repository combines a **working Datadog detection and investigation configu
 | --- | --- | --- |
 | Nokia SR Linux MAC duplication demo (v1) | Validated | MAC movement detected in the prior lab. |
 | Datadog log parsing, monitor and read-only investigation | Validated | Real Nokia log samples triggered the workflow, Bits AI summary and Slack notification on Nov 4, 2026. |
-| Lab v2 with independent Host C probe | **Built in GitHub, runtime test pending** | New topology and fault generator must be deployed and tested on the Ubuntu VM. |
-| AAP evidence collection and port-isolation playbooks | **Code ready, execution pending** | Requires reachable SR Linux management API, AAP credentials and actual Approval node. |
-| End-to-end closed-loop remediation | **Not yet validated** | Datadog investigation currently makes **no network changes**. |
+| Lab v2 with independent Host C probe | Validated | Real v2 detection, SNMP and independent forwarding telemetry observed Nov 8. |
+| AAP collect/isolate/device/forwarding jobs | Validated execution | Slack-approved actual jobs 322/JT38, 324/JT39, 326/JT40 and 328/JT41 succeeded Nov 8. |
+| Recovery verifier | Validated read-only replay after cutoff fix | Actual approved isolation succeeded; the first verifier missed a clear emitted during the job. Fixed verifier passed all 13 criteria on the same job evidence and real telemetry, without rerunning AAP. Original run retains its old version/result. |
 
 ## 1. Network architecture: Containerlab v2
 
@@ -45,7 +45,7 @@ Implementation: [lab-v2 topology and scripts](lab-v2/README.md) · [Migration fr
 
 ## 2. Current Datadog architecture: detection and investigation
 
-The v2 syslog, parser, monitor, Bits agent summary and Slack delivery were verified on Nov 6. The workflow now adds an approval decision with an inactive AAP placeholder; no device action is connected.
+The v2 syslog, parser, monitor, Bits agent summary and Slack delivery were verified on Nov 6. The Nov 8 workflow connects Slack approval to fixed AAP jobs 38–41 and bounded Datadog verification; the first actual approved job sequence succeeded.
 
 ```mermaid
 flowchart TD
@@ -177,7 +177,7 @@ mac-flapping-aiops/
 
 - Datadog files are **sanitized exports**, not a turn-key deployment. Replace account-specific connection, Slack, AAP and workflow references when importing elsewhere. Keep credentials in Datadog Connections/AAP credentials, never Git.
 - Existing scenario controller choices include `pool`, `disk`, `autoscale`, `rollback`, `memory`, `reset-memory` and `reset`. The new `mac-flapping` / `reset-mac-flapping` choices currently resolve to `JOB_NOT_CONFIGURED`: **no AAP job is launched**.
-- The current Datadog investigation workflow is **read-only** and **does not change Nokia configuration**.
+- Investigation and telemetry verification are read-only. After explicit Slack approval, JT39 can disable only sw1 ethernet-1/2. JT42 restore remains manual.
 - The existing investigation has a maximum 100-log sample, a 60-second monitor-trigger rate limit, and no cross-run deduplication.
 - **Network recovery is not validated** merely because a log message is deleted, a hold-down expires or a monitor returns to OK.
 
@@ -186,3 +186,7 @@ mac-flapping-aiops/
 **Detect → Investigate → Approve → Isolate → Verify.**
 
 Keep Host B's duplicate-source generator running throughout the demonstration, show the approved change to `ethernet-1/2`, and independently verify that Host A remains reachable through Host C. Only claim full remediation after these outcomes are observed on the actual running lab.
+
+Latest real-run evidence: [first live AAP sequence and verifier cutoff fix](datadog/workflows/first-live-aap-recovery-evidence.json).
+
+The original instance finished at 01:20:56Z with runtime SUCCEEDED but business result RECOVERY_NOT_VERIFIED. Its old cutoff excluded the matching clears; the ten-minute bound expired and Slack escalation succeeded. The corrected replay passed, but no single new alert-to-recovery run on the corrected version has been observed.

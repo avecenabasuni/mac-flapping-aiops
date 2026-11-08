@@ -22,7 +22,7 @@
     "all_four_message_variants_parsed": true,
     "device_recovery_verified": false
   },
-  "investigation_workflow_updated_at": "2026-11-08T00:54:17.459083Z",
+  "investigation_workflow_updated_at": "2026-11-08T01:13:53.404378Z",
   "investigation_workflow_features": {
     "custom_bits_agent_only": true,
     "native_bits_investigation_per_monitor_alert": false,
@@ -49,6 +49,11 @@
     "verified_recovery_live_incident_observed": false,
     "telemetry_verified_scope": "containment_and_forwarding_with_datadog_log_clearance",
     "verification_quiet_seconds": 300,
-    "verification_observation_seconds": 600
-  }
+    "verification_observation_seconds": 600,
+    "real_approved_aap_sequence_verified": true,
+    "corrected_read_only_verifier_replay_verified": true,
+    "single_run_end_to_end_recovery_verified": false,
+    "telemetry_log_clearance_verified": true
+  },
+  "latest_real_aap_recovery_evidence": "datadog/workflows/first-live-aap-recovery-evidence.json"
 }

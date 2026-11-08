@@ -29,8 +29,12 @@ All passing proof yields RECOVERY_VERIFIED in the containment/forwarding + log-c
 scope. Missing proof or read failure stops and escalates; no direct empty-MAC-table or
 physical-loop claim is made. See [exact policy](TELEMETRY-VERIFIER.md).
 
-38 offline fixtures passed. Controlled routing tests mocked AAP/Slack and the final
-gate; a live read-only verifier test rejected recovery with no job proof. An actual
-fault-to-recovery incident has not yet been observed with this version. Real execution of
+39 offline fixtures passed. Controlled routing tests mocked AAP/Slack and the final
+gate; a live read-only verifier test rejected recovery with no job proof. The first real alert/approval/AAP sequence succeeded; its clear logs exposed a cutoff
+bug. The corrected read-only verifier replay passed on real telemetry and original
+approval/job evidence without rerunning AAP. See the exact incident evidence and
+cutoff explanation in [verifier policy](TELEMETRY-VERIFIER.md). Real execution of
 JT39 requires a new eligible alert and explicit Approve in Slack; publication alone
 did not launch a job or change a port.
+
+The original instance finished at 01:20:56Z with runtime SUCCEEDED but business result RECOVERY_NOT_VERIFIED. Its old cutoff excluded the matching clears; the ten-minute bound expired and Slack escalation succeeded. The corrected replay passed, but no single new alert-to-recovery run on the corrected version has been observed.

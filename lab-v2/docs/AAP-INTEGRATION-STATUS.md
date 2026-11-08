@@ -17,10 +17,10 @@ responses stop the sequence, preserve any returned job ID, and escalate to Slack
 JT42 Restore Host B remains manual-only. Scenario Controller generator choices
 remain placeholders because no start/stop generator Job Template exists.
 
-38 local tests passed, including strict template/job identity, ignored extra-vars,
+39 local tests passed, including strict template/job identity, ignored extra-vars,
 approval, bounded polling, partial execution and escalation behavior. Controlled
-routing tests mocked job launches/poll outcomes/Slack; a real approved isolation and
-verification sequence has not yet been run by Codex.
+routing tests mocked job launches/poll outcomes/Slack; the real user-approved jobs 322/324/326/328 have now all succeeded. The corrected
+verifier replay passed all 13 telemetry criteria without repeating those jobs.
 
 Verify Device asserts the three port states and prints bridge-table evidence. Direct
 device table clearance is not asserted. Recovery can instead be verified within
@@ -32,3 +32,5 @@ The main workflow JSON is the current published export. The .aap-draft.json file
 a historical preparation snapshot marked SUPERSEDED_BY_PUBLISHED_WORKFLOW. Exact
 access and publication evidence is in datadog/workflows/aap-publication-evidence.json.
 Credentials stay in Datadog Connections; never add tokens to workflow JSON or git.
+
+The original instance finished at 01:20:56Z with runtime SUCCEEDED but business result RECOVERY_NOT_VERIFIED. Its old cutoff excluded the matching clears; the ten-minute bound expired and Slack escalation succeeded. The corrected replay passed, but no single new alert-to-recovery run on the corrected version has been observed.
