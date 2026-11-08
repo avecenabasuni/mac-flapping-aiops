@@ -26,9 +26,14 @@ JSON, extra-vars or this public repository. Direct network access from the local
 Codex machine to the AAP host was unavailable. A newly supplied token has not been
 authenticated or saved by Codex.
 
-The draft currently binds the same connection as Operational Conditions. The API
-returns connection IDs, not display names. The URL/ID for the user-named
-POC_AAP_CONNECTION_REMEDIATION connection is needed to confirm the exact binding.
+The user confirmed that POC_AAP_CONNECTION_REMEDIATION is the same connection as
+Operational Conditions. A fresh GET /me authenticated successfully (HTTP 200),
+while GET of JT 38 still returned HTTP 403. The remaining blocker is AAP role/access
+for the principal stored in that connection, not its ID or network reachability.
+Give that principal Execute access to the fixed JT 38-41 and required related
+resources. Do not broaden it to administrator or automatically activate restore JT 42.
+Controlled run 9e8fbf4a-d7bb-4723-ac44-9d2a93855095 confirmed that a real template
+permission failure stops before any launch; all Slack/launch actions were mocked.
 Six local integration fixtures passed, and the four-job routing path completed in
 Datadog with all launches, job statuses, polling and Slack actions mocked. No real
 isolation job was launched by these tests.
