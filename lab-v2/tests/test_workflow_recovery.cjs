@@ -17,16 +17,18 @@ function samples(values, timestamp=Date.now()-30000) {
   return {status:'ok',series:values.map(([port,value])=>({scope:port?'interface:'+port:'',pointlist:[[timestamp,value]]}))};
 }
 function context() {
-  return {Steps:{Execute_AAP_Placeholder:{data:{status:'JOB_NOT_CONFIGURED',job_launched:false,execution_succeeded:false,aap_job_id:''}},
+  return {Steps:{Record_AAP_Execution:{data:{status:'JOB_NOT_CONFIGURED',job_launched:false,execution_succeeded:false,aap_job_id:''}},
     Verify_Monitor_State:{overall_state:'OK'},
     Verify_Interface_Admin:samples([['ethernet-1/1',1],['ethernet-1/2',2],['ethernet-1/3',1]]),
     Verify_Interface_Oper:samples([['ethernet-1/1',1],['ethernet-1/2',2],['ethernet-1/3',1]]),
     Verify_Forwarding:samples([['',0]]),Verify_Collector_Freshness:samples([['',1]])}};
 }
-test('approved execution remains a non-executable fixed AAP placeholder',()=>{
-  const r=script('Execute_AAP_Placeholder')({Steps:{Record_Approval_Decision:{data:{approval_status:'APPROVED',responder:{id:'U_TEST'}}}}});
-  assert.equal(r.status,'JOB_NOT_CONFIGURED');assert.equal(r.job_launched,false);
-  assert.equal(r.target_interface,'ethernet-1/2');assert.equal(r.aap_job_id,'');
+test('AAP recovery preparation requires an authenticated approval',()=>{
+  const Variables={};const Helpers={setVariable:(k,v)=>Variables[k]=v};
+  const r=script('Prepare_AAP_Recovery')({Variables,Helpers,Steps:{Record_Approval_Decision:{data:{approval_status:'APPROVED',responder:{id:'U_TEST'}}}}});
+  assert.equal(Variables.aap_phase,'collect');assert.equal(r.target_interface,'ethernet-1/2');
+  assert.equal(r.job_launched,false);
+  assert.throws(()=>script('Prepare_AAP_Recovery')({Variables,Helpers,Steps:{Record_Approval_Decision:{data:{approval_status:'REJECTED'}}}}));
 });
 test('all green telemetry cannot establish recovery without execution and device evidence',()=>{
   const r=script('Evaluate_Recovery')(context());

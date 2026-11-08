@@ -31,7 +31,7 @@ test('manual, stale, incomplete, foreign and cleared evidence cannot request app
   for(const mutate of mutations){const c=context();mutate(c);assert.equal(script('Evaluate_Approval_Eligibility')(c).eligible,false);}
 });
 test('approve, reject and missing actor are audited without any AAP job', () => {
-  for(const [decision,expected] of [['approve','JOB_NOT_CONFIGURED'],['reject','REMEDIATION_REJECTED'],['unexpected','APPROVAL_UNAVAILABLE']]){
+  for(const [decision,expected] of [['approve','APPROVED'],['reject','REMEDIATION_REJECTED'],['unexpected','APPROVAL_UNAVAILABLE']]){
     const r=script('Record_Approval_Decision')({Steps:{Slack_Approval_Request:{decision,responder:{id:'U_TEST',team_id:'T_TEST',username:'fixture'}}}});
     assert.equal(r.workflow_result,expected);assert.equal(r.aap_job_id,'');
     assert.equal(r.remediation_executed,false);assert.equal(r.recovery_verified,false);
@@ -43,8 +43,11 @@ test('approval timeout/error fails closed and formatter never claims remediation
   const r=script('Format_Decision_Result')({WorkflowId:'w',InstanceId:'i',Steps:{Approval_Unavailable:{data:d}}});
   assert.equal(d.workflow_result,'APPROVAL_UNAVAILABLE');assert.match(r.slack_text,/No remediation executed/);
 });
-test('no executable AAP or native investigation actions exist', () => {
-  for(const s of spec.steps)assert.ok(!/http.request|ansible|bitsai.sre/i.test(s.actionId));
+test('AAP launches are fixed and never retried; native investigation absent', () => {
+  for(const s of spec.steps)assert.ok(!/bitsai.sre/i.test(s.actionId));
+  const launches=spec.steps.filter(s=>s.name.endsWith('_AAP_Launch_Fixed_Job'));
+  assert.equal(launches.length,4);
+  for(const s of launches)assert.equal(s.errorHandlers[0].retryStrategy.linear.maxRetries,0);
   const a=spec.steps.find(s=>s.name==='Slack_Approval_Request');
   assert.equal(a.parameters.find(p=>p.name==='timeoutHours').value,1);
   assert.equal(a.parameters.find(p=>p.name==='channel').value,'#datadog-automation');

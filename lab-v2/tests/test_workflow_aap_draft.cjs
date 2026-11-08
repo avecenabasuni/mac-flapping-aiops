@@ -1,11 +1,11 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const spec=JSON.parse(fs.readFileSync(path.join(__dirname,'../../datadog/workflows/investigate-network-mac-flapping.aap-draft.json'),'utf8')).spec;
+const spec=JSON.parse(fs.readFileSync(path.join(__dirname,'../../datadog/workflows/investigate-network-mac-flapping.json'),'utf8')).spec;
 const script=n=>new Function('$',spec.steps.find(s=>s.name===n).parameters[0].value);
 function ctx(phase='isolate'){
  const Variables={aap_phase:phase,aap_config:{id:39,name:'Isolate Host B',playbook:'lab-v2/ansible/isolate-b.yml',extra_vars:{lab_id:'macflap-v2',target_interface:'ethernet-1/2',change_approved:true}},aap_job_id:'123',aap_jobs:{},aap_poll_count:0};
  return {Variables,Steps:{},Helpers:{setVariable:(k,v)=>Variables[k]=v}};
 }
-function template(){return {status:200,body:{id:39,playbook:'lab-v2/ansible/isolate-b.yml',inventory:7,job_type:'run',ask_variables_on_launch:true,summary_fields:{user_capabilities:{start:true}}}};}
+function template(){return {status:200,body:{id:39,playbook:'lab-v2/ansible/isolate-b.yml',inventory:7,project:37,job_type:'run',ask_variables_on_launch:true,summary_fields:{user_capabilities:{start:true}}}};}
 test('fixed template mapping contains only 38-41, restore 42 is never auto-launched',()=>{
  for(const [p,id,phase]of [['Collect',38,'collect'],['Isolate',39,'isolate'],['Device',40,'verify_device'],['Forward',41,'verify_forwarding']]){
   const c=ctx(phase);const r=script(p+'_Configure_AAP_Phase')(c);assert.equal(r.id,id);
@@ -13,7 +13,7 @@ test('fixed template mapping contains only 38-41, restore 42 is never auto-launc
  }
 });
 test('template fingerprint, permission and approved extra vars fail closed',()=>{
- for(const mutate of [r=>r.status=403,r=>r.body.id=42,r=>r.body.playbook='other.yml',r=>r.body.inventory=null,r=>r.body.summary_fields.user_capabilities.start=false,r=>{r.body.ask_variables_on_launch=false;r.body.extra_vars='{}';}]){
+ for(const mutate of [r=>r.status=403,r=>r.body.id=42,r=>r.body.playbook='other.yml',r=>r.body.inventory=null,r=>r.body.inventory=8,r=>r.body.project=99,r=>r.body.summary_fields.user_capabilities.start=false,r=>{r.body.ask_variables_on_launch=false;r.body.extra_vars='{}';}]){
   const c=ctx(),r=template();mutate(r);c.Steps.Isolate_AAP_Read_Template=r;
   assert.equal(script('Isolate_Validate_AAP_Template')(c).valid,false);
  }

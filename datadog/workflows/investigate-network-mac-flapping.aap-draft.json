@@ -2,7 +2,7 @@
   "name": "[POC] Investigate Network MAC Flapping",
   "spec_target": "draft",
   "published": false,
-  "status": "AAP_ACCESS_BLOCKED",
+  "status": "SUPERSEDED_BY_PUBLISHED_WORKFLOW",
   "spec": {
     "handle": "network-mac-flapping-investigation-poc",
     "inputSchema": {
@@ -2607,5 +2607,6 @@
         ]
       }
     ]
-  }
+  },
+  "historical_snapshot": true
 }

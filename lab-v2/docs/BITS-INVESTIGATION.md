@@ -1,3 +1,9 @@
+# Current AAP integration — 2026-11-08
+
+The 91-step workflow now executes fixed AAP jobs after Slack approval. The placeholder
+notes below describe historical Nov 6 behavior. See [current recovery workflow](RECOVERY-WORKFLOW.md)
+and [AAP access/publication status](AAP-INTEGRATION-STATUS.md).
+
 # Bits agent workflow and chronological evidence validation
 
 Updated 2026-11-06. The investigation workflow uses 37 steps and the custom Bits agent only.

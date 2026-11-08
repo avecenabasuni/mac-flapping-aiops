@@ -1,0 +1,93 @@
+{
+  "published": true,
+  "workflow_id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
+  "updated_at": "2026-11-08T00:43:02.516008Z",
+  "steps": 91,
+  "has_saved_draft": false,
+  "connection_name": "POC_AAP_CONNECTION_REMEDIATION",
+  "access_verification": {
+    "instance_id": "9fa1e151-7419-442a-92c8-c3459cff53f8",
+    "templates": [
+      {
+        "ask_variables_on_launch": false,
+        "bound_vars": {},
+        "capabilities": {
+          "copy": false,
+          "delete": false,
+          "edit": false,
+          "schedule": true,
+          "start": true
+        },
+        "http_status": 200,
+        "id": 38,
+        "inventory": 7,
+        "job_type": "run",
+        "name": "Collect Evidence",
+        "playbook": "lab-v2/ansible/collect-evidence.yml",
+        "project": 37,
+        "requested_id": 38
+      },
+      {
+        "ask_variables_on_launch": true,
+        "bound_vars": {},
+        "capabilities": {
+          "copy": false,
+          "delete": false,
+          "edit": false,
+          "schedule": true,
+          "start": true
+        },
+        "http_status": 200,
+        "id": 39,
+        "inventory": 7,
+        "job_type": "run",
+        "name": "Isolate Host B",
+        "playbook": "lab-v2/ansible/isolate-b.yml",
+        "project": 37,
+        "requested_id": 39
+      },
+      {
+        "ask_variables_on_launch": false,
+        "bound_vars": {},
+        "capabilities": {
+          "copy": false,
+          "delete": false,
+          "edit": false,
+          "schedule": true,
+          "start": true
+        },
+        "http_status": 200,
+        "id": 40,
+        "inventory": 7,
+        "job_type": "run",
+        "name": "Verify Device",
+        "playbook": "lab-v2/ansible/verify.yml",
+        "project": 37,
+        "requested_id": 40
+      },
+      {
+        "ask_variables_on_launch": false,
+        "bound_vars": {},
+        "capabilities": {
+          "copy": false,
+          "delete": false,
+          "edit": false,
+          "schedule": true,
+          "start": true
+        },
+        "http_status": 200,
+        "id": 41,
+        "inventory": 7,
+        "job_type": "run",
+        "name": "Verify Forwarding",
+        "playbook": "lab-v2/ansible/verify-forwarding.yml",
+        "project": 37,
+        "requested_id": 41
+      }
+    ],
+    "no_job_launches": true
+  },
+  "local_tests": 31,
+  "real_approved_execution_tested": false,
+  "recovery_clearance_proof_available": false
+}
