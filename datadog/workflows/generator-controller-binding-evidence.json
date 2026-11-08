@@ -1,31 +1,180 @@
 {
   "workflow_id": "45ac61cf-8a35-4e2d-bed3-370ffc6a8506",
-  "status": "SAVED_DRAFT_NOT_PUBLISHED",
+  "status": "PUBLISHED",
+  "published_at": "2026-11-08T04:52:16.465256Z",
+  "steps": 98,
   "start_template_id": 45,
   "stop_template_id": 46,
-  "connection_selection": "User-selected existing Scenario Controller connection; no credential or token exported.",
   "connection_identity": "svc-datadog-fault-control",
-  "steps": 98,
+  "connection_id": "5c779fe2-0d2c-409d-8c1d-3319bf7d87e2",
+  "prerequisite_templates": [
+    41,
+    42
+  ],
+  "access_verified": true,
   "validation_passed": true,
+  "local_scenario_tests_passed": 8,
   "unrelated_steps_changed": [],
-  "local_scenario_tests_passed": 7,
-  "preflight": {
-    "templates_45_46_read": true,
-    "project": 37,
-    "inventory": 7,
-    "linux_credential_id": 9,
-    "linux_credential_name": "Ubuntu Host SSH Credential",
-    "prompt_variables": true,
-    "jt42_http_status": 403,
-    "jt41_http_status": 403
+  "initial_live_failure": {
+    "instance_id": "43a2f5de-5ab2-45df-b65f-f3d21ff64059",
+    "job_id": 341,
+    "template_id": 46,
+    "reason": "Permission denied creating /usr/local/libexec: task did not have root privileges.",
+    "later_phases_executed": false,
+    "fix": "Explicit ansible_become=true, ansible_become_user=root, ansible_become_method=sudo on fixed generator jobs.",
+    "automatic_retry": false
   },
-  "readonly_guard_test": {
-    "instance_id": "8a1f5e97-ffff-4e9c-971b-c1f7d7dedbcd",
-    "business_result": "NETWORK_SCENARIO_FAILED",
-    "expected_reason": "JT41 access denied; fail closed before launch",
-    "all_network_launch_steps_disabled": true,
-    "slack_actions_mocked": true,
-    "real_aap_jobs_launched": 0
+  "start_test": {
+    "instance_id": "7b2180ba-6fb3-4462-810a-ece4e8442e4c",
+    "result": "ACTION_SUCCEEDED",
+    "jobs": [
+      {
+        "artifacts": {
+          "macflap_generator_main_pid": 0,
+          "macflap_generator_service": "network-aiops-mac-flapping.service",
+          "macflap_generator_state": "stopped",
+          "macflap_lab_id": "macflap-v2"
+        },
+        "finished": "2026-11-08T04:53:03.620367Z",
+        "id": 343,
+        "started": "2026-11-08T04:52:53.265491Z",
+        "status": "successful",
+        "template_id": 46
+      },
+      {
+        "artifacts": {},
+        "finished": "2026-11-08T04:53:47.996905Z",
+        "id": 345,
+        "started": "2026-11-08T04:53:41.715038Z",
+        "status": "successful",
+        "template_id": 42
+      },
+      {
+        "artifacts": {
+          "macflap_generator_mac": "02:00:00:00:00:aa",
+          "macflap_generator_main_pid": "1310687",
+          "macflap_generator_max_seconds": 600,
+          "macflap_generator_service": "network-aiops-mac-flapping.service",
+          "macflap_generator_state": "running",
+          "macflap_lab_id": "macflap-v2"
+        },
+        "finished": "2026-11-08T04:54:39.117874Z",
+        "id": 347,
+        "started": "2026-11-08T04:54:28.326373Z",
+        "status": "successful",
+        "template_id": 45
+      }
+    ],
+    "slack": {
+      "channel": "#datadog-workflow",
+      "ts": "1794113694.832479",
+      "mocked": false
+    },
+    "real_detection_logs": [
+      {
+        "message": "bridgetable|2163|2163|00119|N: A duplicate MAC address 02:00:00:00:00:AA was detected on mac-flap.",
+        "timestamp": "2026-11-08T04:54:46.854Z"
+      },
+      {
+        "message": "bridgetable|2163|2163|00120|N: A duplicate MAC address 02:00:00:00:00:AA was detected on sub-interface ethernet-1/2.1.",
+        "timestamp": "2026-11-08T04:54:46.854Z"
+      }
+    ]
   },
-  "real_start_reset_tested": false
+  "reset_test": {
+    "instance_id": "b573e5bf-8108-4cad-8945-4f109974bdc0",
+    "result": "ACTION_SUCCEEDED",
+    "jobs": [
+      {
+        "artifacts": {
+          "macflap_generator_main_pid": 0,
+          "macflap_generator_service": "network-aiops-mac-flapping.service",
+          "macflap_generator_state": "stopped",
+          "macflap_lab_id": "macflap-v2"
+        },
+        "finished": "2026-11-08T04:56:16.918520Z",
+        "id": 349,
+        "started": "2026-11-08T04:56:07.107593Z",
+        "status": "successful",
+        "template_id": 46
+      },
+      {
+        "artifacts": {},
+        "finished": "2026-11-08T04:56:57.084435Z",
+        "id": 351,
+        "started": "2026-11-08T04:56:51.076903Z",
+        "status": "successful",
+        "template_id": 42
+      },
+      {
+        "artifacts": {},
+        "finished": "2026-11-08T04:57:57.347611Z",
+        "id": 353,
+        "started": "2026-11-08T04:57:36.774266Z",
+        "status": "successful",
+        "template_id": 41
+      }
+    ],
+    "slack": {
+      "channel": "#datadog-workflow",
+      "ts": "1794113882.672259",
+      "mocked": false
+    },
+    "telemetry": {
+      "metrics": [
+        {
+          "metric": "snmp.ifAdminStatus",
+          "series": [
+            {
+              "latest": [
+                {
+                  "at": "2026-11-08T04:58:01.000Z",
+                  "value": 1
+                },
+                {
+                  "at": "2026-11-08T04:58:17.000Z",
+                  "value": 1
+                },
+                {
+                  "at": "2026-11-08T04:58:31.000Z",
+                  "value": 1
+                }
+              ],
+              "scope": "env:network-aiops,interface:ethernet-1/2,lab_device:sw1,lab_id:macflap-v2"
+            }
+          ]
+        },
+        {
+          "metric": "snmp.ifOperStatus",
+          "series": [
+            {
+              "latest": [
+                {
+                  "at": "2026-11-08T04:58:01.000Z",
+                  "value": 1
+                },
+                {
+                  "at": "2026-11-08T04:58:17.000Z",
+                  "value": 1
+                },
+                {
+                  "at": "2026-11-08T04:58:31.000Z",
+                  "value": 1
+                }
+              ],
+              "scope": "env:network-aiops,interface:ethernet-1/2,lab_device:sw1,lab_id:macflap-v2"
+            }
+          ]
+        }
+      ],
+      "monitor": "Alert",
+      "now": "2026-11-08T04:58:44.671Z"
+    }
+  },
+  "real_start_reset_tested": true,
+  "final_generator_state": "stopped",
+  "final_e1_2_admin_oper": "up/up",
+  "forwarding_job_succeeded": true,
+  "recovery_verified_claim": false,
+  "recovery_approval_granted_by_this_test": false
 }

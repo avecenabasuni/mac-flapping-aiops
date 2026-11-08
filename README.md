@@ -170,13 +170,13 @@ mac-flapping-aiops/
 | [MAC flapping monitor](datadog/monitors/network-mac-flapping.json) | P3 query, thresholds and notification message. |
 | [Investigation workflow](datadog/workflows/investigate-network-mac-flapping.json) | Bounded log collection, Bits AI summary and Slack. |
 | [Bits agent workflow and timeline validation](lab-v2/docs/BITS-INVESTIGATION.md) | Bounded custom-agent analysis, chronological clear-event checks, POC Slack messages, and verification evidence. |
-| [Scenario controller](datadog/workflows/operational-scenario-controller-v6-aap.json) | Existing AAP scenarios; MAC-flapping scenarios are placeholders. |
+| [Scenario controller](datadog/workflows/operational-scenario-controller-v6-aap.json) | Existing AAP scenarios plus live MAC-flapping trigger/reset using JT45/46, restore JT42 and forwarding JT41. |
 | [Sanitized export manifest](datadog/manifest.json) | Deployed source IDs and stored validation results. |
 
 ## 6. Datadog export notes and current limits
 
 - Datadog files are **sanitized exports**, not a turn-key deployment. Replace account-specific connection, Slack, AAP and workflow references when importing elsewhere. Keep credentials in Datadog Connections/AAP credentials, never Git.
-- Existing scenario controller choices include `pool`, `disk`, `autoscale`, `rollback`, `memory`, `reset-memory` and `reset`. The new `mac-flapping` / `reset-mac-flapping` choices currently resolve to `JOB_NOT_CONFIGURED`: **no AAP job is launched**.
+- Existing scenario controller choices include `pool`, `disk`, `autoscale`, `rollback`, `memory`, `reset-memory` and `reset`. The `mac-flapping` choice runs JT46 Stop → JT42 Restore → JT45 Start; `reset-mac-flapping` runs JT46 Stop → JT42 Restore → JT41 Verify Forwarding. See [generator settings and evidence](lab-v2/docs/AAP-GENERATOR-SETUP.md).
 - Investigation and telemetry verification are read-only. After explicit Slack approval, JT39 can disable only sw1 ethernet-1/2. JT42 restore remains manual.
 - The existing investigation has a maximum 100-log sample, a 60-second monitor-trigger rate limit, and no cross-run deduplication.
 - **Network recovery is not validated** merely because a log message is deleted, a hold-down expires or a monitor returns to OK.

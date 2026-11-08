@@ -14,8 +14,7 @@ Device → JT41 Verify Forwarding. Fixed template identity/playbook/inventory/pr
 start permission and approved variables are checked. Each job is polled every ten
 seconds for at most 60 checks. Launch POSTs have zero retries. Failed or ambiguous
 responses stop the sequence, preserve any returned job ID, and escalate to Slack.
-JT42 Restore Host B remains manual-only. Scenario Controller generator choices
-remain placeholders because no start/stop generator Job Template exists.
+JT42 Restore Host B remains manual-only. Scenario Controller now uses JT45 Start and JT46 Stop with explicit stop/restore/start and stop/restore/forwarding sequences. See [generator setup and live evidence](AAP-GENERATOR-SETUP.md).
 
 39 local tests passed, including strict template/job identity, ignored extra-vars,
 approval, bounded polling, partial execution and escalation behavior. Controlled

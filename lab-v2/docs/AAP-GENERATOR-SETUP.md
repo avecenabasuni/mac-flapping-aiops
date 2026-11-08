@@ -1,25 +1,29 @@
 # AAP generator Job Templates
 
-The templates now exist: **Start JT45** and **Stop JT46**. Read-only checks confirm
-project37/inventory7, Ubuntu credential9 and prompted variables. The Scenario
-Controller has a validated **98-step saved draft**, but its published version still
-has the original placeholders. The draft has not been published or fault-tested:
-the selected connection's account, `svc-datadog-fault-control` (user4), still
-receives HTTP403 when reading prerequisite JT41 and JT42.
+The templates are live: **Start JT45** and **Stop JT46**. The **98-step Scenario
+Controller is published**, using the user-selected connection for
+`svc-datadog-fault-control` (user4). Read-only checks confirm Execute access to
+JT41/42/45/46, project37/inventory7, Ubuntu credential9 and prompted variables.
 
-In AAP, open **JT41 → Access → Add → Users → svc-datadog-fault-control → Execute**
-and save; repeat on JT42. Granting access only to `svc-datadog-remediation` does
-not authorize this selected connection. The account already has Execute on
-JT45/46, but cannot edit templates. After access is verified, publish and test the
-saved controller draft. No new token is needed.
+Network branches retain all application scenario steps, verify template identity
+and the Linux credential against JT41, require generator state artifacts, and
+stop on failure without automatic relaunch. Slack messages use #datadog-workflow,
+matching the existing controller. Eight local scenario fixtures passed.
 
-The draft retains all application scenario steps. Its network branches use the
-user-selected existing connection under a separate `NETWORK_AAP` label, verify
-the Linux credential against JT41 and require complete generator job artifacts.
-Seven local scenario fixtures passed. A read-only runtime test (all launch steps
-disabled and Slack mocked) confirmed fail-closed routing on the current403;
-it did not execute AAP jobs. See the saved draft and binding evidence under
-`datadog/workflows/`.
+The first real Stop job341 failed because the file task lacked root permissions.
+The corrected controller explicitly passes sudo/root become variables to the
+generator templates. Successful Start then ran jobs343/JT46 →345/JT42 →347/JT45,
+and real duplicate-MAC logs appeared from sw1 at04:54:46.854Z. Exact start/reset
+results and Slack delivery evidence are in
+`datadog/workflows/generator-controller-binding-evidence.json`.
+
+The real reset run also succeeded: jobs349/JT46 →351/JT42 →353/JT41. Stop artifacts
+confirmed PID0 and stopped service; SNMP confirmed e1/2 admin/oper up after restore,
+and JT41 independently verified forwarding. Both real controller runs delivered
+success messages to #datadog-workflow. The reset left the managed generator stopped
+and e1/2 up. This is scenario reset evidence, not a RECOVERY_VERIFIED result from
+the separately approval-gated recovery workflow. The five-minute log monitor may
+remain Alert temporarily after reset while the prior detections leave its window.
 
 First sync AAP project **37** with the repository's **main** branch. The two new
 playbooks must appear in its playbook selector. Use JT41 (Verify Forwarding) as
@@ -47,6 +51,9 @@ Use these **Extra Variables** on both templates:
 ```yaml
 lab_id: macflap-v2
 scenario_approved: true
+ansible_become: true
+ansible_become_user: root
+ansible_become_method: sudo
 ```
 
 `lab_linux` must resolve to exactly one Ubuntu Containerlab host. The playbooks
@@ -89,15 +96,15 @@ Successful jobs publish AAP artifacts for the controller to verify:
 | `macflap_generator_service` | `network-aiops-mac-flapping.service` | Same |
 | `macflap_generator_main_pid` | Positive PID | 0 |
 
-The saved draft uses the supplied IDs in these explicit controller paths
+The published controller uses these fixed IDs in explicit controller paths
 are explicit manual actions:
 
 - `mac-flapping`: JT46 Stop Generator → JT42 restore e1/2 → JT45 Start Generator.
 - `reset-mac-flapping`: JT46 Stop Generator → JT42 restore e1/2 → JT41 verify forwarding.
 
-These paths are not live yet. Existing recovery remains approval-gated. AAP job
+These paths are live. Existing recovery remains approval-gated. AAP job
 completion alone does not establish Datadog detection or verified recovery.
-First real Start execution should be coordinated as a lab fault test; it can
+Start execution is a controlled lab fault test; it can
 produce a real monitor alert and a new Slack approval request.
 
 ## Validation

@@ -52,7 +52,7 @@ def build(source, start_id, stop_id, connection_id, team_id):
             params['body'] = body
         return add(name, HTTP, params, next_name, connectionLabel='NETWORK_AAP')
 
-    approved = {'lab_id': 'macflap-v2', 'scenario_approved': True}
+    approved = {'lab_id': 'macflap-v2', 'scenario_approved': True, 'ansible_become': True, 'ansible_become_user': 'root', 'ansible_become_method': 'sudo'}
     plans = {
         'mac-flapping': [
             {'id': stop_id, 'playbook': 'lab-v2/ansible/stop-generator.yml', 'vars': approved, 'state': 'stopped'},
@@ -102,6 +102,9 @@ def build(source, start_id, stop_id, connection_id, team_id):
     for step in steps:
         if not step['name'].startswith('Network_'):
             continue
+        if step['name'].endswith('_Record_Job'):
+            parameter = next(p for p in step['parameters'] if p['name'] == 'script')
+            parameter['value'] = parameter['value'].replace("fail=reason=>{$.Helpers.setVariable('network_failure_detail',reason);throw Error(reason);}", "fail=reason=>{$.Helpers.setVariable('network_failure_detail',reason);$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);return {pending:false,succeeded:false,reason};}").replace(')fail(', ')return fail(')
         if step['name'] in ['Network_Configure', 'Network_Failed'] or step['name'].endswith('_Poll_Failed'):
             step['readinessGate'] = {'thresholdType': 'ANY'}
         if step['name'] in common_positions:

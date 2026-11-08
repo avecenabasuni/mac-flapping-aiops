@@ -9,10 +9,7 @@
     "runbook_id": 16202843
   },
   "export_format": "Sanitized configuration snapshots. Adapt payloads to the target API/tool before import.",
-  "scenario_placeholders": [
-    "mac-flapping",
-    "reset-mac-flapping"
-  ],
+  "scenario_placeholders": [],
   "live_evidence": {
     "instance_id": "1f909fed-cf5f-46dd-a4ab-a3217adf4f63",
     "runtime_status": "SUCCEEDED",
@@ -58,5 +55,13 @@
   "latest_real_aap_recovery_evidence": "datadog/workflows/live-end-to-end-recovery-evidence.json",
   "latest_recovery_result": "RECOVERY_VERIFIED",
   "latest_recovery_instance_id": "15951b0a-c1e1-45b8-9604-5c1dae1462e1",
-  "latest_recovery_slack_delivery_verified": true
+  "latest_recovery_slack_delivery_verified": true,
+  "scenario_controller_updated_at": "2026-11-08T04:52:16.465256Z",
+  "scenario_generator_templates": {
+    "start": 45,
+    "stop": 46,
+    "restore": 42,
+    "verify_forwarding": 41
+  },
+  "scenario_generator_evidence": "datadog/workflows/generator-controller-binding-evidence.json"
 }

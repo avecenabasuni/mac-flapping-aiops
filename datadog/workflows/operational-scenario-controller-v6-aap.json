@@ -14,165 +14,29 @@
     "workflow_role:scenario-controller"
   ],
   "spec": {
-    "connectionEnvs": [
+    "triggers": [
       {
-        "connections": [
-          {
-            "connectionId": "REPLACE_WITH_DATADOG_CONNECTION_ID_1",
-            "label": "INTEGRATION_NONE"
-          }
+        "startStepNames": [
+          "Route_Scenario"
         ],
-        "env": "default"
+        "slackTrigger": {}
+      },
+      {
+        "startStepNames": [
+          "Route_Scenario"
+        ],
+        "agentTrigger": {
+          "rateLimit": {
+            "count": 6,
+            "interval": "60s"
+          }
+        }
       }
     ],
-    "inputSchema": {
-      "parameters": [
-        {
-          "allowedValues": [
-            "pool",
-            "disk",
-            "autoscale",
-            "rollback",
-            "memory",
-            "reset-memory",
-            "reset",
-            "mac-flapping",
-            "reset-mac-flapping"
-          ],
-          "defaultValue": "pool",
-          "description": "Isolated POC scenario to activate, or reset the complete demo environment. mac-flapping and reset-mac-flapping are placeholders: no AAP job is launched until their Job Templates are configured.",
-          "label": "Scenario",
-          "name": "scenario",
-          "type": "STRING"
-        }
-      ]
-    },
-    "outputSchema": {
-      "parameters": [
-        {
-          "description": "Outcome code of the workflow execution",
-          "label": "Workflow Result",
-          "name": "workflow_result",
-          "type": "STRING",
-          "value": "{{ Variables.workflow_result }}"
-        },
-        {
-          "description": "Scenario that was executed",
-          "label": "Scenario",
-          "name": "scenario",
-          "type": "STRING",
-          "value": "{{ Trigger.scenario }}"
-        },
-        {
-          "description": "Ansible Automation Platform",
-          "label": "Execution Backend",
-          "name": "execution_backend",
-          "type": "STRING",
-          "value": "{{ Variables.execution_backend }}"
-        },
-        {
-          "description": "AAP job ID",
-          "label": "Job ID",
-          "name": "job_id",
-          "type": "STRING",
-          "value": "{{ Variables.job_id }}"
-        },
-        {
-          "description": "Normalized final job state",
-          "label": "Job State",
-          "name": "job_state",
-          "type": "STRING",
-          "value": "{{ Variables.job_state }}"
-        },
-        {
-          "description": "Raw state returned by AAP",
-          "label": "Raw Job State",
-          "name": "raw_job_state",
-          "type": "STRING",
-          "value": "{{ Variables.raw_job_state }}"
-        },
-        {
-          "description": "AAP Job Template ID when AAP is used",
-          "label": "AAP Job Template ID",
-          "name": "aap_job_template_id",
-          "type": "STRING",
-          "value": "{{ Variables.aap_job_template_id }}"
-        },
-        {
-          "description": "Selected fixed action",
-          "label": "Action",
-          "name": "action",
-          "type": "STRING",
-          "value": "{{ Variables.job_action }}"
-        },
-        {
-          "description": "Number of polling attempts made",
-          "label": "Poll Count",
-          "name": "poll_count",
-          "type": "NUMBER",
-          "value": "{{ Variables.poll_count }}"
-        },
-        {
-          "description": "Failure reason, if any",
-          "label": "Error",
-          "name": "error",
-          "type": "STRING",
-          "value": "{{ Variables.failure_reason }}"
-        }
-      ]
-    },
     "steps": [
       {
-        "actionId": "com.datadoghq.core.switch",
-        "display": {
-          "bounds": {
-            "x": 0,
-            "y": 100
-          }
-        },
         "name": "Route_Scenario",
-        "outboundEdges": [
-          {
-            "branchName": "pool",
-            "nextStepName": "Notify_Pool_Started"
-          },
-          {
-            "branchName": "disk",
-            "nextStepName": "Notify_Disk_Started"
-          },
-          {
-            "branchName": "autoscale",
-            "nextStepName": "Notify_Autoscale_Started"
-          },
-          {
-            "branchName": "rollback",
-            "nextStepName": "Notify_Rollback_Started"
-          },
-          {
-            "branchName": "reset",
-            "nextStepName": "Notify_Reset_Started"
-          },
-          {
-            "branchName": "memory",
-            "nextStepName": "Notify_Memory_Started"
-          },
-          {
-            "branchName": "reset-memory",
-            "nextStepName": "Notify_Reset_Memory_Started"
-          },
-          {
-            "branchName": "mac-flapping",
-            "nextStepName": "MAC_Flapping_Job_Not_Configured"
-          },
-          {
-            "branchName": "reset-mac-flapping",
-            "nextStepName": "Reset_MAC_Flapping_Job_Not_Configured"
-          },
-          {
-            "branchName": "default",
-            "nextStepName": "Reject_Invalid_Scenario"
-          }
-        ],
+        "actionId": "com.datadoghq.core.switch",
         "parameters": [
           {
             "name": "switchExpression",
@@ -231,23 +95,59 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": -2000,
-            "y": 360
-          }
-        },
-        "name": "Notify_Pool_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Pool_Fault"
+            "nextStepName": "Notify_Pool_Started",
+            "branchName": "pool"
+          },
+          {
+            "nextStepName": "Notify_Disk_Started",
+            "branchName": "disk"
+          },
+          {
+            "nextStepName": "Notify_Autoscale_Started",
+            "branchName": "autoscale"
+          },
+          {
+            "nextStepName": "Notify_Rollback_Started",
+            "branchName": "rollback"
+          },
+          {
+            "nextStepName": "Notify_Reset_Started",
+            "branchName": "reset"
+          },
+          {
+            "nextStepName": "Notify_Memory_Started",
+            "branchName": "memory"
+          },
+          {
+            "nextStepName": "Notify_Reset_Memory_Started",
+            "branchName": "reset-memory"
+          },
+          {
+            "nextStepName": "Network_Configure",
+            "branchName": "mac-flapping"
+          },
+          {
+            "nextStepName": "Network_Configure",
+            "branchName": "reset-mac-flapping"
+          },
+          {
+            "nextStepName": "Reject_Invalid_Scenario",
+            "branchName": "default"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 0,
+            "y": 100
+          }
+        }
+      },
+      {
+        "name": "Notify_Pool_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -261,23 +161,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Connection Pool Exhaustion*\n━━━━━━━━━━━━━━━━━━━━\n\nA controlled PgBouncer pool-exhaustion fault is being activated through Ansible Automation Platform.\n\n*Scenario:* `pool`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Pool Fault (JT 21)`\n\n:shield: *Only the pre-defined POC action is permitted.*\n\n_Next → Controlled execution_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": -1500,
-            "y": 360
-          }
-        },
-        "name": "Notify_Disk_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Disk_Fault"
+            "nextStepName": "Launch_AAP_Pool_Fault",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": -2000,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Notify_Disk_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -291,23 +191,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Disk Saturation*\n━━━━━━━━━━━━━━━━━━━━\n\nA controlled disk-saturation fault is being activated through Ansible Automation Platform.\n\n*Scenario:* `disk`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Disk Fault (JT 22)`\n\n:shield: *Only the pre-defined POC action is permitted.*\n\n_Next → Controlled execution_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": -1000,
-            "y": 360
-          }
-        },
-        "name": "Notify_Autoscale_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Autoscale_Fault"
+            "nextStepName": "Launch_AAP_Disk_Fault",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": -1500,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Notify_Autoscale_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -321,23 +221,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:chart_with_upwards_trend: *POC CONTROL · STARTED*\n*Storefront Capacity Pressure*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is starting the approved storefront traffic-pressure fault.\n\n*Scenario:* `autoscale`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Inject Storefront Traffic Spike (JT 31)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next → Controlled execution_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": -500,
-            "y": 360
-          }
-        },
-        "name": "Notify_Rollback_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Rollback_Fault"
+            "nextStepName": "Launch_AAP_Autoscale_Fault",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": -1000,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Notify_Rollback_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -351,23 +251,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:package: *POC CONTROL · STARTED*\n*Deployment Regression*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is deploying the approved known-bad storefront candidate.\n\n*Scenario:* `rollback`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Deploy Storefront Demo-Bad (JT 29)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next → Controlled execution_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": 0,
-            "y": 360
-          }
-        },
-        "name": "Notify_Reset_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Reset_Demo"
+            "nextStepName": "Launch_AAP_Rollback_Fault",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": -500,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Notify_Reset_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -381,23 +281,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:arrows_counterclockwise: *POC CONTROL · RESETTING*\n*Restore Demo Baseline*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is running the approved full baseline reset.\n\n*Scenario:* `reset`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Reset Demo (JT 15)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next → Controlled execution_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": 500,
-            "y": 360
-          }
-        },
-        "name": "Notify_Memory_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Memory_Fault"
+            "nextStepName": "Launch_AAP_Reset_Demo",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 0,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Notify_Memory_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -411,23 +311,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Application VM Memory Pressure*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is starting the bounded synthetic memory-pressure workload on the approved Berca application VM.\n\n*Scenario:* `memory`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Inject Memory Pressure (JT 33)`\n\n:shield: *The allocation, timeout, target VM, and safety floor remain fixed in protected automation configuration.*\n\n_Next → Datadog observes usable memory pressure and application health_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
-        "display": {
-          "bounds": {
-            "x": 1500,
-            "y": 360
-          }
-        },
-        "name": "Notify_Reset_Memory_Started",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Launch_Memory_Reset_Preparation"
+            "nextStepName": "Launch_AAP_Memory_Fault",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 500,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Notify_Reset_Memory_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -441,23 +341,23 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:arrows_counterclockwise: *POC CONTROL · RESETTING*\n*Application VM Memory Baseline*\n━━━━━━━━━━━━━━━━━━━━\n\nFirst JT 15 stops/removes memory pressure and resets the POC scenarios. Only after that job succeeds, JT 35 restores configured RAM above 16 GiB to the approved 16 GiB baseline.\n\n*Scenario:* `reset-memory`\n*Environment:* `poc`\n*Execution:* `AAP JT 15 → AAP JT 35`\n\n:warning: *Restoring RAM above baseline powers the application VM off and on. Temporary application downtime is expected. Use only after the demo.*\n\nJT 35 does not stop pressure itself. It returns without resizing when RAM is at or below baseline; below-baseline results require manual review.\n\n_Next → Stop pressure with JT 15, then restore RAM with JT 35_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 2000,
-            "y": 360
-          }
-        },
-        "name": "Reject_Invalid_Scenario",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Notify_Invalid_Scenario"
+            "nextStepName": "Launch_Memory_Reset_Preparation",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 1500,
+            "y": 360
+          }
+        }
+      },
+      {
+        "name": "Reject_Invalid_Scenario",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -504,17 +404,23 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_Invalid_Scenario",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2000,
-            "y": 600
+            "y": 360
           }
-        },
+        }
+      },
+      {
         "name": "Notify_Invalid_Scenario",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -526,38 +432,84 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:warning: *POC CONTROL · INVALID REQUEST*\n*Unsupported Scenario*\n━━━━━━━━━━━━━━━━━━━━\n\n*Allowed Scenarios*\n• `pool`\n• `disk`\n• `autoscale`\n• `rollback`\n• `memory`\n• `reset-memory`\n• `mac-flapping` (job not configured)\n• `reset-mac-flapping` (job not configured)\n• `reset`\n\n:shield: *No changes were executed.*"
+            "value": "━━━━━━━━━━━━━━━━━━━━\n:warning: *POC CONTROL · INVALID REQUEST*\n*Unsupported Scenario*\n━━━━━━━━━━━━━━━━━━━━\n\n*Allowed Scenarios*\n• `pool`\n• `disk`\n• `autoscale`\n• `rollback`\n• `memory`\n• `reset-memory`\n• `mac-flapping`\n• `reset-mac-flapping`\n• `reset`\n\n:shield: *No changes were executed.*"
           }
-        ]
+        ],
+        "display": {
+          "bounds": {
+            "x": 2000,
+            "y": 600
+          }
+        }
       },
       {
+        "name": "Launch_AAP_Pool_Fault",
         "actionId": "com.datadoghq.http.request",
         "connectionLabel": "INTEGRATION_NONE",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "POST"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/21/launch/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "body",
+            "value": {
+              "extra_vars": {}
+            }
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": -2000,
             "y": 600
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Pool_Fault",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Launch_Response"
-          }
-        ],
+        }
+      },
+      {
+        "name": "Launch_AAP_Disk_Fault",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -565,7 +517,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/21/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/22/launch/"
           },
           {
             "name": "requestHeaders",
@@ -592,36 +544,36 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": -1500,
             "y": 600
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Disk_Fault",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Launch_Response"
-          }
-        ],
+        }
+      },
+      {
+        "name": "Launch_AAP_Reset_Demo",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -629,7 +581,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/22/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/15/launch/"
           },
           {
             "name": "requestHeaders",
@@ -656,36 +608,36 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 0,
             "y": 600
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Reset_Demo",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Launch_Response"
-          }
-        ],
+        }
+      },
+      {
+        "name": "Launch_AAP_Memory_Fault",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -693,7 +645,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/15/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/33/launch/"
           },
           {
             "name": "requestHeaders",
@@ -720,36 +672,36 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Memory_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 500,
             "y": 600
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Memory_Fault",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Memory_Launch_Response"
-          }
-        ],
+        }
+      },
+      {
+        "name": "Launch_AAP_Reset_Memory",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -757,7 +709,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/33/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/35/launch/"
           },
           {
             "name": "requestHeaders",
@@ -784,36 +736,39 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Memory_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        },
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2400,
             "y": 4020
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Reset_Memory",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Memory_Launch_Response"
-          }
-        ],
+        }
+      },
+      {
+        "name": "Launch_AAP_Autoscale_Fault",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -821,7 +776,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/35/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/31/launch/"
           },
           {
             "name": "requestHeaders",
@@ -849,38 +804,35 @@
             "value": true
           }
         ],
-        "readinessGate": {
-          "thresholdType": "ANY"
-        }
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": -1000,
             "y": 600
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Autoscale_Fault",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Launch_Response"
-          }
-        ],
+        }
+      },
+      {
+        "name": "Launch_AAP_Rollback_Fault",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -888,7 +840,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/31/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/29/launch/"
           },
           {
             "name": "requestHeaders",
@@ -915,116 +867,60 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Launch_Response",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": -500,
             "y": 600
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_AAP_Rollback_Fault",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Launch_Response"
-          }
-        ],
-        "parameters": [
-          {
-            "name": "verb",
-            "value": "POST"
-          },
-          {
-            "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/29/launch/"
-          },
-          {
-            "name": "requestHeaders",
-            "value": [
-              {
-                "key": "Content-Type",
-                "value": [
-                  "application/json"
-                ]
-              }
-            ]
-          },
-          {
-            "name": "body",
-            "value": {
-              "extra_vars": {}
-            }
-          },
-          {
-            "name": "responseParsing",
-            "value": "json"
-          },
-          {
-            "name": "allowExpiredCertificate",
-            "value": true
-          }
-        ]
+        }
       },
       {
-        "actionId": "com.datadoghq.datatransformation.func",
-        "display": {
-          "bounds": {
-            "x": -750,
-            "y": 4200
-          }
-        },
         "name": "Normalize_Launch_Response",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Validate_Launch_Response"
-          }
-        ],
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
             "value": "const scenario = $.Trigger.scenario;\n\nconst config = {\n  pool: {\n    response: $.Steps.Launch_AAP_Pool_Fault,\n    templateId: '21',\n    templateName: 'Pool Fault',\n    action: 'pool'\n  },\n  disk: {\n    response: $.Steps.Launch_AAP_Disk_Fault,\n    templateId: '22',\n    templateName: 'Disk Fault',\n    action: 'disk'\n  },\n  reset: {\n    response: $.Steps.Launch_AAP_Reset_Demo,\n    templateId: '15',\n    templateName: 'Reset Demo',\n    action: 'reset'\n  },\n  autoscale: {\n    response: $.Steps.Launch_AAP_Autoscale_Fault,\n    templateId: '31',\n    templateName: 'Inject Storefront Traffic Spike',\n    action: 'autoscale'\n  },\n  rollback: {\n    response: $.Steps.Launch_AAP_Rollback_Fault,\n    templateId: '29',\n    templateName: 'Deploy Storefront Demo-Bad',\n    action: 'rollback'\n  }\n};\n\nconst selected = config[scenario] || {};\nconst response = selected.response || {};\nconst body = response.body || {};\nconst httpStatus = Number(response.status || 0);\nconst jobId = body.id !== undefined && body.id !== null ? String(body.id) : '';\nconst rawState = String(body.status || 'pending');\nconst accepted = httpStatus === 201 && jobId !== '';\n\n$.Helpers.setVariable('execution_backend', 'AAP');\n$.Helpers.setVariable('job_id', jobId);\n$.Helpers.setVariable('job_state', accepted ? 'running' : 'launch_failed');\n$.Helpers.setVariable('raw_job_state', rawState);\n$.Helpers.setVariable('aap_job_template_id', selected.templateId || '');\n$.Helpers.setVariable('aap_job_template_name', selected.templateName || '');\n$.Helpers.setVariable('job_action', selected.action || '');\n$.Helpers.setVariable('launch_http_status', httpStatus);\n$.Helpers.setVariable(\n  'failure_reason',\n  accepted ? '' : 'AAP did not return HTTP 201 with a valid job ID'\n);\n\nreturn {\n  accepted,\n  backend: 'AAP',\n  http_status: httpStatus,\n  job_id: jobId,\n  raw_state: rawState\n};"
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Validate_Launch_Response",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
-        }
-      },
-      {
-        "actionId": "com.datadoghq.core.if",
+        },
         "display": {
           "bounds": {
             "x": -750,
-            "y": 4420
+            "y": 4200
           }
-        },
+        }
+      },
+      {
         "name": "Validate_Launch_Response",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Initialize_Job_Polling"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Set_Launch_Failed"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -1040,52 +936,52 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
-        "display": {
-          "bounds": {
-            "x": 1000,
-            "y": 4200
-          }
-        },
-        "name": "Normalize_Memory_Launch_Response",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Validate_Memory_Launch_Response"
+            "nextStepName": "Initialize_Job_Polling",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Set_Launch_Failed",
+            "branchName": "false"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": -750,
+            "y": 4420
+          }
+        }
+      },
+      {
+        "name": "Normalize_Memory_Launch_Response",
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
             "value": "const scenario = $.Trigger.scenario;\nconst config = {\n  memory: { backend: 'AAP', response: $.Steps.Launch_AAP_Memory_Fault, action: 'memory', templateId: '33', templateName: 'Inject Memory Pressure' },\n  'reset-memory': { backend: 'AAP', response: $.Steps.Launch_AAP_Reset_Memory, action: 'reset-memory', templateId: '35', templateName: 'Restore Memory Baseline' }\n};\nconst selected = config[scenario] || {};\nconst response = selected.response || {};\nconst body = response.body || {};\nconst httpStatus = Number(response.status || 0);\nlet jobId = '';\nlet rawState = '';\nlet accepted = false;\nif (selected.backend === 'AAP') {\n  jobId = body.id !== undefined && body.id !== null ? String(body.id) : '';\n  rawState = String(body.status || 'pending');\n  accepted = httpStatus === 201 && /^[1-9][0-9]*$/.test(jobId);\n}\n$.Helpers.setVariable('execution_backend', selected.backend || 'UNKNOWN');\n$.Helpers.setVariable('job_id', jobId);\n$.Helpers.setVariable('job_state', accepted ? 'running' : 'launch_failed');\n$.Helpers.setVariable('raw_job_state', rawState);\n$.Helpers.setVariable('aap_job_template_id', selected.templateId || '');\n$.Helpers.setVariable('aap_job_template_name', selected.templateName || '');\n$.Helpers.setVariable('job_action', selected.action || '');\n$.Helpers.setVariable('launch_http_status', httpStatus);\n$.Helpers.setVariable('failure_reason', accepted ? '' : 'AAP did not return the expected Job Template launch response');\nreturn { accepted, backend: selected.backend || 'UNKNOWN', http_status: httpStatus, job_id: jobId, raw_state: rawState };"
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Validate_Memory_Launch_Response",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
-        }
-      },
-      {
-        "actionId": "com.datadoghq.core.if",
+        },
         "display": {
           "bounds": {
             "x": 1000,
-            "y": 4420
+            "y": 4200
           }
-        },
+        }
+      },
+      {
         "name": "Validate_Memory_Launch_Response",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Initialize_Job_Polling"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Set_Launch_Failed"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -1101,23 +997,27 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 1500,
-            "y": 4640
-          }
-        },
-        "name": "Set_Launch_Failed",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Notify_Failure"
+            "nextStepName": "Initialize_Job_Polling",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Set_Launch_Failed",
+            "branchName": "false"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 1000,
+            "y": 4420
+          }
+        }
+      },
+      {
+        "name": "Set_Launch_Failed",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1145,25 +1045,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_Failure",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 1500,
+            "y": 4640
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 0,
-            "y": 4640
-          }
-        },
         "name": "Initialize_Job_Polling",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Poll_Job_Status"
-          }
-        ],
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1187,29 +1087,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Poll_Job_Status",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
-        }
-      },
-      {
-        "actionId": "com.datadoghq.core.whileLoop",
+        },
         "display": {
           "bounds": {
             "x": 0,
-            "y": 4860
+            "y": 4640
           }
-        },
+        }
+      },
+      {
         "name": "Poll_Job_Status",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Evaluate_Final_Job_State"
-          },
-          {
-            "branchName": "loopStart",
-            "nextStepName": "Poll_Sleep"
-          }
-        ],
+        "actionId": "com.datadoghq.core.whileLoop",
         "parameters": [
           {
             "name": "conditions",
@@ -1230,58 +1126,50 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.sleep",
-        "display": {
-          "bounds": {
-            "x": 450,
-            "y": 5080
-          }
-        },
-        "name": "Poll_Sleep",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Get_AAP_Job_Status"
+            "nextStepName": "Evaluate_Final_Job_State",
+            "branchName": "main"
+          },
+          {
+            "nextStepName": "Poll_Sleep",
+            "branchName": "loopStart"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 0,
+            "y": 4860
+          }
+        }
+      },
+      {
+        "name": "Poll_Sleep",
+        "actionId": "com.datadoghq.core.sleep",
         "parameters": [
           {
             "name": "durationSeconds",
             "value": 10
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
-        "display": {
-          "bounds": {
-            "x": 150,
-            "y": 5520
-          }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Status_Check_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
         ],
-        "name": "Get_AAP_Job_Status",
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Normalize_Status_Response"
+            "nextStepName": "Get_AAP_Job_Status",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 450,
+            "y": 5080
+          }
+        }
+      },
+      {
+        "name": "Get_AAP_Job_Status",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -1289,7 +1177,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/jobs/{{ Variables.job_id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.job_id }}/"
           },
           {
             "name": "requestHeaders",
@@ -1310,49 +1198,57 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
-        "display": {
-          "bounds": {
-            "x": 450,
-            "y": 5740
-          }
-        },
-        "name": "Normalize_Status_Response",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Validate_Status_Response"
+            "nextStepName": "Normalize_Status_Response",
+            "branchName": "main"
           }
         ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Status_Check_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 150,
+            "y": 5520
+          }
+        }
+      },
+      {
+        "name": "Normalize_Status_Response",
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
             "value": "const expectedJobId = String($.Variables.job_id || '');\nconst response = $.Steps.Get_AAP_Job_Status || {};\nconst body = response.body || {};\nconst responseJobId =\n  body.id !== undefined && body.id !== null ? String(body.id) : '';\n\nconst valid =\n  Number(response.status || 0) === 200 &&\n  responseJobId === expectedJobId;\nconst rawState = String(body.status || '');\nlet normalizedState = 'unexpected';\nlet detail = '';\nif (valid) $.Helpers.setVariable('aap_job_artifacts', body.artifacts || {});\n\nif (['pending', 'waiting', 'running'].includes(rawState)) {\n  normalizedState = 'running';\n} else if (rawState === 'successful') {\n  normalizedState = 'succeeded';\n} else if (['failed', 'error', 'canceled'].includes(rawState)) {\n  normalizedState = 'failed';\n  detail = 'AAP terminal state: ' + rawState;\n}\n\n$.Helpers.setVariable('status_response_valid', valid);\n$.Helpers.setVariable('raw_job_state', rawState);\n$.Helpers.setVariable('job_state', normalizedState);\n\nif (normalizedState === 'failed' && detail) {\n  $.Helpers.setVariable('failure_reason', detail);\n}\n\nreturn {\n  valid,\n  backend: 'AAP',\n  raw_state: rawState,\n  normalized_state: normalizedState,\n  detail\n};"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.if",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Validate_Status_Response",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 450,
-            "y": 5960
+            "y": 5740
           }
-        },
+        }
+      },
+      {
         "name": "Validate_Status_Response",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Check_Job_In_Progress"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Set_Status_Check_Failed"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -1368,23 +1264,27 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 1200,
-            "y": 6180
-          }
-        },
-        "name": "Set_Status_Check_Failed",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Increment_Poll_Count"
+            "nextStepName": "Check_Job_In_Progress",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Set_Status_Check_Failed",
+            "branchName": "false"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 450,
+            "y": 5960
+          }
+        }
+      },
+      {
+        "name": "Set_Status_Check_Failed",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1408,29 +1308,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Increment_Poll_Count",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 1200,
+            "y": 6180
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.if",
-        "display": {
-          "bounds": {
-            "x": 450,
-            "y": 6180
-          }
-        },
         "name": "Check_Job_In_Progress",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Increment_Poll_Count"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Stop_Job_Polling"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -1446,23 +1342,27 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 900,
-            "y": 6400
-          }
-        },
-        "name": "Stop_Job_Polling",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Increment_Poll_Count"
+            "nextStepName": "Increment_Poll_Count",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Stop_Job_Polling",
+            "branchName": "false"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 450,
+            "y": 6180
+          }
+        }
+      },
+      {
+        "name": "Stop_Job_Polling",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1473,17 +1373,23 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Increment_Poll_Count",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
-            "x": 450,
-            "y": 6620
+            "x": 900,
+            "y": 6400
           }
-        },
+        }
+      },
+      {
         "name": "Increment_Poll_Count",
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
@@ -1492,35 +1398,17 @@
         ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 450,
+            "y": 6620
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.switch",
-        "display": {
-          "bounds": {
-            "x": 0,
-            "y": 6840
-          }
-        },
         "name": "Evaluate_Final_Job_State",
-        "outboundEdges": [
-          {
-            "branchName": "succeeded",
-            "nextStepName": "Set_Action_Succeeded"
-          },
-          {
-            "branchName": "failed",
-            "nextStepName": "Set_Action_Failed"
-          },
-          {
-            "branchName": "timeout",
-            "nextStepName": "Set_Action_Timeout"
-          },
-          {
-            "branchName": "default",
-            "nextStepName": "Set_Unexpected_Final_State"
-          }
-        ],
+        "actionId": "com.datadoghq.core.switch",
         "parameters": [
           {
             "name": "switchExpression",
@@ -1549,45 +1437,57 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Set_Action_Succeeded",
+            "branchName": "succeeded"
+          },
+          {
+            "nextStepName": "Set_Action_Failed",
+            "branchName": "failed"
+          },
+          {
+            "nextStepName": "Set_Action_Timeout",
+            "branchName": "timeout"
+          },
+          {
+            "nextStepName": "Set_Unexpected_Final_State",
+            "branchName": "default"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 0,
-            "y": 7060
+            "y": 6840
           }
-        },
+        }
+      },
+      {
         "name": "Set_Action_Succeeded",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Check_Reset_Evidence"
-          }
-        ],
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
             "value": "let passed = true;\nlet reason = '';\nif ($.Trigger.scenario === 'reset-memory') {\n  const a = $.Variables.aap_job_artifacts || {};\n  const changed = a.poc_restore_changed === true || a.poc_restore_changed === 'true';\n  const unchanged = a.poc_restore_changed === false || a.poc_restore_changed === 'false';\n  const after = Number(a.poc_memory_after_gib);\n  const current = Number(a.poc_memory_current_gib);\n  passed = (changed && Number.isFinite(after) && after >= 15 && after <= 17) ||\n    (unchanged && current === 16 && Number(a.poc_memory_baseline_gib) === 16);\n  if (!passed) reason = 'JT 35 succeeded but artifacts do not demonstrate the 16 GiB baseline. Below-baseline no-change is not a successful restore. Review AAP output; no automatic relaunch.';\n}\n$.Helpers.setVariable('workflow_result', passed ? 'ACTION_SUCCEEDED' : 'RESET_EVIDENCE_FAILED');\n$.Helpers.setVariable('failure_reason', reason);\nreturn {passed, reason};"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 600,
-            "y": 7060
-          }
-        },
-        "name": "Set_Action_Failed",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Notify_Failure"
+            "nextStepName": "Check_Reset_Evidence",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 0,
+            "y": 7060
+          }
+        }
+      },
+      {
+        "name": "Set_Action_Failed",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1599,25 +1499,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_Failure",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 600,
+            "y": 7060
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 1000,
-            "y": 7060
-          }
-        },
         "name": "Set_Action_Timeout",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Notify_Failure"
-          }
-        ],
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1641,25 +1541,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_Failure",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 1000,
+            "y": 7060
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 1400,
-            "y": 7060
-          }
-        },
         "name": "Set_Unexpected_Final_State",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Notify_Failure"
-          }
-        ],
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1675,33 +1575,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_Failure",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 1400,
+            "y": 7060
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.switch",
-        "display": {
-          "bounds": {
-            "x": 0,
-            "y": 7520
-          }
-        },
         "name": "Route_Success_Notification",
-        "outboundEdges": [
-          {
-            "branchName": "aap_scenario",
-            "nextStepName": "Notify_AAP_Scenario_Success"
-          },
-          {
-            "branchName": "reset",
-            "nextStepName": "Notify_Reset_Success"
-          },
-          {
-            "branchName": "default",
-            "nextStepName": "Notify_Failure"
-          }
-        ],
+        "actionId": "com.datadoghq.core.switch",
         "parameters": [
           {
             "name": "switchExpression",
@@ -1750,17 +1642,31 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_AAP_Scenario_Success",
+            "branchName": "aap_scenario"
+          },
+          {
+            "nextStepName": "Notify_Reset_Success",
+            "branchName": "reset"
+          },
+          {
+            "nextStepName": "Notify_Failure",
+            "branchName": "default"
+          }
+        ],
         "display": {
           "bounds": {
-            "x": -500,
-            "y": 7740
+            "x": 0,
+            "y": 7520
           }
-        },
+        }
+      },
+      {
         "name": "Notify_AAP_Scenario_Success",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -1774,17 +1680,17 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:white_check_mark: *POC CONTROL · ACTIVE*\n*AAP Scenario Activated Successfully*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform completed the fixed fault-injection Job Template successfully.\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* `poc`\n*AAP Job Template:* `{{ Variables.aap_job_template_name }} (JT {{ Variables.aap_job_template_id }})`\n*AAP Job ID:* `{{ Variables.job_id }}`\n*AAP Status:* `{{ Variables.raw_job_state }}`\n\n:mag: *Datadog observation phase started.*\n\nDatadog monitors must independently detect the resulting service degradation or proactive memory capacity alert.\n\n_Next → Datadog detection and AIOps response_"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
+        ],
         "display": {
           "bounds": {
-            "x": 500,
+            "x": -500,
             "y": 7740
           }
-        },
+        }
+      },
+      {
         "name": "Notify_Reset_Success",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -1798,17 +1704,17 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:white_check_mark: *POC CONTROL · RESET JOB COMPLETED*\n*Ansible Reset Completed*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform completed the selected reset successfully.\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* `poc`\n*AAP Job Template:* `{{ Variables.aap_job_template_name }} (JT {{ Variables.aap_job_template_id }})`\n*AAP Job ID:* `{{ Variables.job_id }}`\n*AAP Status:* `{{ Variables.raw_job_state }}`\n\n:mag: *AAP completion is execution evidence, not independent Datadog recovery evidence.*\n\nFor reset-memory, JT 15 completed before JT 35. Review JT 35 artifacts for the actual RAM result: a no-change result below 16 GiB does not mean the approved baseline was restored.\n\n_Next → Confirm fresh Datadog system.mem.total near 16 GiB, memory pressure stopped, service monitors OK and https://store.bercalab.my.id/id/store HTTP 200 before the next demo._"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
+        ],
         "display": {
           "bounds": {
-            "x": 1000,
+            "x": 500,
             "y": 7740
           }
-        },
+        }
+      },
+      {
         "name": "Notify_Failure",
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -1825,36 +1731,18 @@
         ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 1000,
+            "y": 7740
+          }
         }
       },
       {
+        "name": "Launch_Memory_Reset_Preparation",
         "actionId": "com.datadoghq.http.request",
         "connectionLabel": "INTEGRATION_NONE",
-        "display": {
-          "bounds": {
-            "x": 2400,
-            "y": 600
-          }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Launch_Failed",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
-        "name": "Launch_Memory_Reset_Preparation",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Normalize_Memory_Reset_Preparation"
-          }
-        ],
         "parameters": [
           {
             "name": "verb",
@@ -1862,7 +1750,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/15/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/15/launch/"
           },
           {
             "name": "requestHeaders",
@@ -1889,49 +1777,57 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Normalize_Memory_Reset_Preparation",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Launch_Failed"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2400,
-            "y": 860
+            "y": 600
           }
-        },
+        }
+      },
+      {
         "name": "Normalize_Memory_Reset_Preparation",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Validate_Memory_Reset_Preparation"
-          }
-        ],
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
             "value": "const response = $.Steps.Launch_Memory_Reset_Preparation || {};\nconst body = response.body || {};\nconst id = String(body.id || '');\nconst accepted = Number(response.status) === 201 && /^[1-9][0-9]*$/.test(id);\n$.Helpers.setVariable('job_id', id);\n$.Helpers.setVariable('memory_cleanup_job_id', id);\n$.Helpers.setVariable('execution_backend', 'AAP');\n$.Helpers.setVariable('aap_job_template_id', '15');\n$.Helpers.setVariable('aap_job_template_name', 'Reset Demo before Memory Restore');\n$.Helpers.setVariable('job_action', 'reset');\n$.Helpers.setVariable('job_state', accepted ? 'running' : 'launch_failed');\n$.Helpers.setVariable('raw_job_state', String(body.status || 'pending'));\n$.Helpers.setVariable('failure_reason', accepted ? '' : 'JT 15 cleanup launch was not accepted; JT 35 was not launched');\nreturn {accepted};"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.if",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Validate_Memory_Reset_Preparation",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2400,
-            "y": 1120
+            "y": 860
           }
-        },
+        }
+      },
+      {
         "name": "Validate_Memory_Reset_Preparation",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Initialize_Job_Polling_Prepare"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Set_Launch_Failed"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -1947,23 +1843,27 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Initialize_Job_Polling_Prepare",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Set_Launch_Failed",
+            "branchName": "false"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2400,
-            "y": 1340
+            "y": 1120
           }
-        },
+        }
+      },
+      {
         "name": "Initialize_Job_Polling_Prepare",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Poll_Job_Status_Prepare"
-          }
-        ],
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -1986,27 +1886,23 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.whileLoop",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Poll_Job_Status_Prepare",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2400,
-            "y": 1560
+            "y": 1340
           }
-        },
+        }
+      },
+      {
         "name": "Poll_Job_Status_Prepare",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Evaluate_Final_Job_State_Prepare"
-          },
-          {
-            "branchName": "loopStart",
-            "nextStepName": "Poll_Sleep_Prepare"
-          }
-        ],
+        "actionId": "com.datadoghq.core.whileLoop",
         "parameters": [
           {
             "name": "conditions",
@@ -2027,58 +1923,50 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.sleep",
-        "display": {
-          "bounds": {
-            "x": 2850,
-            "y": 1780
-          }
-        },
-        "name": "Poll_Sleep_Prepare",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Get_AAP_Job_Status_Prepare"
+            "nextStepName": "Evaluate_Final_Job_State_Prepare",
+            "branchName": "main"
+          },
+          {
+            "nextStepName": "Poll_Sleep_Prepare",
+            "branchName": "loopStart"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 1560
+          }
+        }
+      },
+      {
+        "name": "Poll_Sleep_Prepare",
+        "actionId": "com.datadoghq.core.sleep",
         "parameters": [
           {
             "name": "durationSeconds",
             "value": 10
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.http.request",
-        "connectionLabel": "INTEGRATION_NONE",
-        "display": {
-          "bounds": {
-            "x": 2550,
-            "y": 2220
-          }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Set_Status_Check_Failed_Prepare",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
         ],
-        "name": "Get_AAP_Job_Status_Prepare",
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Normalize_Status_Response_Prepare"
+            "nextStepName": "Get_AAP_Job_Status_Prepare",
+            "branchName": "main"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 2850,
+            "y": 1780
+          }
+        }
+      },
+      {
+        "name": "Get_AAP_Job_Status_Prepare",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "INTEGRATION_NONE",
         "parameters": [
           {
             "name": "verb",
@@ -2086,7 +1974,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/jobs/{{ Variables.job_id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.job_id }}/"
           },
           {
             "name": "requestHeaders",
@@ -2107,49 +1995,57 @@
             "name": "allowExpiredCertificate",
             "value": true
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
-        "display": {
-          "bounds": {
-            "x": 2850,
-            "y": 2440
-          }
-        },
-        "name": "Normalize_Status_Response_Prepare",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Validate_Status_Response_Prepare"
+            "nextStepName": "Normalize_Status_Response_Prepare",
+            "branchName": "main"
           }
         ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Set_Status_Check_Failed_Prepare"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2550,
+            "y": 2220
+          }
+        }
+      },
+      {
+        "name": "Normalize_Status_Response_Prepare",
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
             "value": "const expectedJobId = String($.Variables.job_id || '');\nconst response = $.Steps.Get_AAP_Job_Status_Prepare || {};\nconst body = response.body || {};\nconst responseJobId =\n  body.id !== undefined && body.id !== null ? String(body.id) : '';\n\nconst valid =\n  Number(response.status || 0) === 200 &&\n  responseJobId === expectedJobId;\nconst rawState = String(body.status || '');\nlet normalizedState = 'unexpected';\nlet detail = '';\n\nif (['pending', 'waiting', 'running'].includes(rawState)) {\n  normalizedState = 'running';\n} else if (rawState === 'successful') {\n  normalizedState = 'succeeded';\n} else if (['failed', 'error', 'canceled'].includes(rawState)) {\n  normalizedState = 'failed';\n  detail = 'AAP terminal state: ' + rawState;\n}\n\n$.Helpers.setVariable('status_response_valid', valid);\n$.Helpers.setVariable('raw_job_state', rawState);\n$.Helpers.setVariable('job_state', normalizedState);\n\nif (normalizedState === 'failed' && detail) {\n  $.Helpers.setVariable('failure_reason', detail);\n}\n\nreturn {\n  valid,\n  backend: 'AAP',\n  raw_state: rawState,\n  normalized_state: normalizedState,\n  detail\n};"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.if",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Validate_Status_Response_Prepare",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2850,
-            "y": 2660
+            "y": 2440
           }
-        },
+        }
+      },
+      {
         "name": "Validate_Status_Response_Prepare",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Check_Job_In_Progress_Prepare"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Set_Status_Check_Failed_Prepare"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -2165,23 +2061,27 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 3600,
-            "y": 2880
-          }
-        },
-        "name": "Set_Status_Check_Failed_Prepare",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Increment_Poll_Count_Prepare"
+            "nextStepName": "Check_Job_In_Progress_Prepare",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Set_Status_Check_Failed_Prepare",
+            "branchName": "false"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 2850,
+            "y": 2660
+          }
+        }
+      },
+      {
+        "name": "Set_Status_Check_Failed_Prepare",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -2205,29 +2105,25 @@
             ]
           }
         ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Increment_Poll_Count_Prepare",
+            "branchName": "main"
+          }
+        ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 3600,
+            "y": 2880
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.if",
-        "display": {
-          "bounds": {
-            "x": 2850,
-            "y": 2880
-          }
-        },
         "name": "Check_Job_In_Progress_Prepare",
-        "outboundEdges": [
-          {
-            "branchName": "true",
-            "nextStepName": "Increment_Poll_Count_Prepare"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Stop_Job_Polling_Prepare"
-          }
-        ],
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -2243,23 +2139,27 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 3300,
-            "y": 3100
-          }
-        },
-        "name": "Stop_Job_Polling_Prepare",
+        ],
         "outboundEdges": [
           {
-            "branchName": "main",
-            "nextStepName": "Increment_Poll_Count_Prepare"
+            "nextStepName": "Increment_Poll_Count_Prepare",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Stop_Job_Polling_Prepare",
+            "branchName": "false"
           }
         ],
+        "display": {
+          "bounds": {
+            "x": 2850,
+            "y": 2880
+          }
+        }
+      },
+      {
+        "name": "Stop_Job_Polling_Prepare",
+        "actionId": "com.datadoghq.core.setVariables",
         "parameters": [
           {
             "name": "variables",
@@ -2270,17 +2170,23 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.datatransformation.func",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Increment_Poll_Count_Prepare",
+            "branchName": "main"
+          }
+        ],
         "display": {
           "bounds": {
-            "x": 2850,
-            "y": 3320
+            "x": 3300,
+            "y": 3100
           }
-        },
+        }
+      },
+      {
         "name": "Increment_Poll_Count_Prepare",
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
             "name": "script",
@@ -2289,35 +2195,17 @@
         ],
         "readinessGate": {
           "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 2850,
+            "y": 3320
+          }
         }
       },
       {
-        "actionId": "com.datadoghq.core.switch",
-        "display": {
-          "bounds": {
-            "x": 2400,
-            "y": 3540
-          }
-        },
         "name": "Evaluate_Final_Job_State_Prepare",
-        "outboundEdges": [
-          {
-            "branchName": "succeeded",
-            "nextStepName": "Notify_Memory_Pressure_Stopped"
-          },
-          {
-            "branchName": "failed",
-            "nextStepName": "Set_Action_Failed"
-          },
-          {
-            "branchName": "timeout",
-            "nextStepName": "Set_Action_Timeout"
-          },
-          {
-            "branchName": "default",
-            "nextStepName": "Set_Unexpected_Final_State"
-          }
-        ],
+        "actionId": "com.datadoghq.core.switch",
         "parameters": [
           {
             "name": "switchExpression",
@@ -2346,35 +2234,35 @@
               }
             ]
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.slack.send_simple_message",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Notify_Memory_Pressure_Stopped",
+            "branchName": "succeeded"
+          },
+          {
+            "nextStepName": "Set_Action_Failed",
+            "branchName": "failed"
+          },
+          {
+            "nextStepName": "Set_Action_Timeout",
+            "branchName": "timeout"
+          },
+          {
+            "nextStepName": "Set_Unexpected_Final_State",
+            "branchName": "default"
+          }
+        ],
         "display": {
           "bounds": {
             "x": 2400,
-            "y": 3760
+            "y": 3540
           }
-        },
-        "errorHandlers": [
-          {
-            "fallbackStepName": "Launch_AAP_Reset_Memory",
-            "retryStrategy": {
-              "kind": "RETRY_STRATEGY_LINEAR",
-              "linear": {
-                "interval": "5s",
-                "maxRetries": 0
-              }
-            }
-          }
-        ],
+        }
+      },
+      {
         "name": "Notify_Memory_Pressure_Stopped",
-        "outboundEdges": [
-          {
-            "branchName": "main",
-            "nextStepName": "Launch_AAP_Reset_Memory"
-          }
-        ],
+        "actionId": "com.datadoghq.slack.send_simple_message",
         "parameters": [
           {
             "name": "channel",
@@ -2388,27 +2276,35 @@
             "name": "text",
             "value": "━━━━━━━━━━━━━━━━━━━━\n:arrows_counterclockwise: *POC CONTROL · RESET IN PROGRESS*\n*Pressure Cleanup Completed*\n━━━━━━━━━━━━━━━━━━━━\n\n*AAP JT 15 job:* `{{ Variables.memory_cleanup_job_id }}` · successful\n\n_Next → Launch JT 35 to restore total RAM to 16 GiB. The application VM may power off/on. No automatic relaunch on failure._"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.if",
-        "display": {
-          "bounds": {
-            "x": 0,
-            "y": 7280
-          }
-        },
-        "name": "Check_Reset_Evidence",
+        ],
         "outboundEdges": [
           {
-            "branchName": "true",
-            "nextStepName": "Route_Success_Notification"
-          },
-          {
-            "branchName": "false",
-            "nextStepName": "Notify_Failure"
+            "nextStepName": "Launch_AAP_Reset_Memory",
+            "branchName": "main"
           }
         ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Launch_AAP_Reset_Memory"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 3760
+          }
+        }
+      },
+      {
+        "name": "Check_Reset_Evidence",
+        "actionId": "com.datadoghq.core.if",
         "parameters": [
           {
             "name": "conditions",
@@ -2424,132 +2320,1715 @@
             "name": "joinOperator",
             "value": "and"
           }
-        ]
-      },
-      {
-        "actionId": "com.datadoghq.core.setVariables",
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Route_Success_Notification",
+            "branchName": "true"
+          },
+          {
+            "nextStepName": "Notify_Failure",
+            "branchName": "false"
+          }
+        ],
         "display": {
           "bounds": {
-            "x": 2500,
-            "y": 360
+            "x": 0,
+            "y": 7280
           }
-        },
-        "name": "MAC_Flapping_Job_Not_Configured",
-        "parameters": [
-          {
-            "name": "variables",
-            "value": [
-              {
-                "name": "workflow_result",
-                "value": "JOB_NOT_CONFIGURED"
-              },
-              {
-                "name": "execution_backend",
-                "value": "NONE"
-              },
-              {
-                "name": "job_id",
-                "value": ""
-              },
-              {
-                "name": "job_state",
-                "value": "not_configured"
-              },
-              {
-                "name": "raw_job_state",
-                "value": "not_launched"
-              },
-              {
-                "name": "aap_job_template_id",
-                "value": ""
-              },
-              {
-                "name": "aap_job_template_name",
-                "value": ""
-              },
-              {
-                "name": "job_action",
-                "value": "mac-flapping"
-              },
-              {
-                "name": "poll_count",
-                "value": 0
-              },
-              {
-                "name": "failure_reason",
-                "value": "Placeholder: AAP Job Template for mac-flapping is not configured. No job was launched and no lab changes were made."
-              }
-            ]
-          }
-        ]
+        }
       },
       {
-        "actionId": "com.datadoghq.core.setVariables",
-        "display": {
-          "bounds": {
-            "x": 3000,
-            "y": 360
-          }
-        },
-        "name": "Reset_MAC_Flapping_Job_Not_Configured",
+        "name": "Network_Configure",
+        "actionId": "com.datadoghq.datatransformation.func",
         "parameters": [
           {
-            "name": "variables",
+            "name": "script",
+            "value": "const plans={\"mac-flapping\": [{\"id\": 46, \"playbook\": \"lab-v2/ansible/stop-generator.yml\", \"vars\": {\"lab_id\": \"macflap-v2\", \"scenario_approved\": true, \"ansible_become\": true, \"ansible_become_user\": \"root\", \"ansible_become_method\": \"sudo\"}, \"state\": \"stopped\"}, {\"id\": 42, \"playbook\": \"lab-v2/ansible/restore-b.yml\", \"vars\": {\"lab_id\": \"macflap-v2\", \"target_interface\": \"ethernet-1/2\", \"change_approved\": true}}, {\"id\": 45, \"playbook\": \"lab-v2/ansible/start-generator.yml\", \"vars\": {\"lab_id\": \"macflap-v2\", \"scenario_approved\": true, \"ansible_become\": true, \"ansible_become_user\": \"root\", \"ansible_become_method\": \"sudo\"}, \"state\": \"running\"}], \"reset-mac-flapping\": [{\"id\": 46, \"playbook\": \"lab-v2/ansible/stop-generator.yml\", \"vars\": {\"lab_id\": \"macflap-v2\", \"scenario_approved\": true, \"ansible_become\": true, \"ansible_become_user\": \"root\", \"ansible_become_method\": \"sudo\"}, \"state\": \"stopped\"}, {\"id\": 42, \"playbook\": \"lab-v2/ansible/restore-b.yml\", \"vars\": {\"lab_id\": \"macflap-v2\", \"target_interface\": \"ethernet-1/2\", \"change_approved\": true}}, {\"id\": 41, \"playbook\": \"lab-v2/ansible/verify-forwarding.yml\", \"vars\": {}}]};const p=plans[$.Trigger.scenario];if(!p)throw Error('Unsupported network scenario');$.Helpers.setVariable('network_plan',p);$.Helpers.setVariable('network_jobs',[]);$.Helpers.setVariable('execution_backend','AAP');$.Helpers.setVariable('job_action',$.Trigger.scenario);$.Helpers.setVariable('workflow_result','ACTION_RUNNING');$.Helpers.setVariable('network_failure_detail','');return {scenario:$.Trigger.scenario};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_Read_Linux_Reference",
+            "branchName": "main"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        },
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 0
+          }
+        }
+      },
+      {
+        "name": "Network_Read_Linux_Reference",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/41/"
+          },
+          {
+            "name": "requestHeaders",
             "value": [
               {
-                "name": "workflow_result",
-                "value": "JOB_NOT_CONFIGURED"
-              },
-              {
-                "name": "execution_backend",
-                "value": "NONE"
-              },
-              {
-                "name": "job_id",
-                "value": ""
-              },
-              {
-                "name": "job_state",
-                "value": "not_configured"
-              },
-              {
-                "name": "raw_job_state",
-                "value": "not_launched"
-              },
-              {
-                "name": "aap_job_template_id",
-                "value": ""
-              },
-              {
-                "name": "aap_job_template_name",
-                "value": ""
-              },
-              {
-                "name": "job_action",
-                "value": "reset-mac-flapping"
-              },
-              {
-                "name": "poll_count",
-                "value": 0
-              },
-              {
-                "name": "failure_reason",
-                "value": "Placeholder: AAP Job Template for reset-mac-flapping is not configured. No job was launched and no lab changes were made."
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
               }
             ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_Validate_Linux_Reference",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 220
+          }
+        }
+      },
+      {
+        "name": "Network_Validate_Linux_Reference",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_Read_Linux_Reference,b=r.body||{},creds=b.summary_fields?.credentials||[];if(r.status!==200||b.id!==41||b.project!==37||b.inventory!==7||b.playbook!=='lab-v2/ansible/verify-forwarding.yml'||creds.length!==1||creds[0].kind!=='ssh'||!Number.isInteger(creds[0].id))throw Error('Cannot establish JT41 Linux credential reference');$.Helpers.setVariable('network_linux_credential_id',creds[0].id);return {credential_id:creds[0].id};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_Notify_Started",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 440
+          }
+        }
+      },
+      {
+        "name": "Network_Notify_Started",
+        "actionId": "com.datadoghq.slack.send_simple_message",
+        "parameters": [
+          {
+            "name": "channel",
+            "value": "#datadog-workflow"
+          },
+          {
+            "name": "teamId",
+            "value": "REPLACE_WITH_SLACK_TEAM_ID"
+          },
+          {
+            "name": "text",
+            "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Network MAC Flapping Scenario*\n━━━━━━━━━━━━━━━━━━━━\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* network-aiops\n*Fixed lab:* macflap-v2 · sw1 ethernet-1/2\n\nStop the managed generator first, then restore the fixed port. Trigger starts a bounded ten-minute generator; reset instead verifies Host C → Host A forwarding. Job completion does not itself establish Datadog recovery.\n\n_Next → Controlled AAP execution_"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Configure",
+            "branchName": "main"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 660
+          }
+        }
+      },
+      {
+        "name": "Network_0_Configure",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const c=$.Variables.network_plan[0];$.Helpers.setVariable('network_config',c);$.Helpers.setVariable('network_phase',0);$.Helpers.setVariable('network_job_id',null);$.Helpers.setVariable('network_job_succeeded',false);$.Helpers.setVariable('network_poll',0);$.Helpers.setVariable('network_continue',true);return c;"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Read_Template",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 900
+          }
+        }
+      },
+      {
+        "name": "Network_0_Read_Template",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.network_config.id }}/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Guard_Template",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 1110
+          }
+        }
+      },
+      {
+        "name": "Network_0_Guard_Template",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_0_Read_Template,b=r.body||{},c=$.Variables.network_config,creds=b.summary_fields?.credentials||[];if(r.status!==200||b.id!==c.id||b.project!==37||b.inventory!==7||b.playbook!==c.playbook||b.job_type!=='run'||b.summary_fields?.user_capabilities?.start!==true||(Object.keys(c.vars).length&&b.ask_variables_on_launch!==true)||(c.state&&(!['','lab_linux'].includes(b.limit)||creds.length!==1||creds[0].id!==$.Variables.network_linux_credential_id)))throw Error('Fixed network template identity, Linux credential, limit or launch permission mismatch');return {allowed:true};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Launch",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 1320
+          }
+        }
+      },
+      {
+        "name": "Network_0_Launch",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "POST"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.network_config.id }}/launch/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          },
+          {
+            "name": "body",
+            "value": {
+              "extra_vars": "{{ Variables.network_config.vars }}"
+            }
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Record_Launch",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 1530
+          }
+        }
+      },
+      {
+        "name": "Network_0_Record_Launch",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_0_Launch,b=r.body||{},id=b.id||b.job;$.Helpers.setVariable('network_job_id',id||null);if(id)$.Helpers.setVariable('job_id',String(id));if(r.status!==201||!Number.isInteger(id)||id<=0||Object.keys(b.ignored_fields||{}).length)throw Error('Ambiguous launch; preserve ID and do not relaunch');$.Helpers.setVariable('aap_job_template_id',String($.Variables.network_config.id));return {job_id:id};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Poll",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 1740
+          }
+        }
+      },
+      {
+        "name": "Network_0_Poll",
+        "actionId": "com.datadoghq.core.whileLoop",
+        "parameters": [
+          {
+            "name": "conditions",
+            "value": [
+              {
+                "comparisonOperator": "lt",
+                "leftValue": "{{ Variables.network_poll }}",
+                "rightValue": 60
+              },
+              {
+                "comparisonOperator": "eq",
+                "leftValue": "{{ Variables.network_continue }}",
+                "rightValue": true
+              }
+            ]
+          },
+          {
+            "name": "joinOperator",
+            "value": "and"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Check_Completion",
+            "branchName": "main"
+          },
+          {
+            "nextStepName": "Network_0_Sleep",
+            "branchName": "loopStart"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 1950
+          }
+        }
+      },
+      {
+        "name": "Network_0_Sleep",
+        "actionId": "com.datadoghq.core.sleep",
+        "parameters": [
+          {
+            "name": "durationSeconds",
+            "value": 10
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Get_Job",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_0_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 2160
+          }
+        }
+      },
+      {
+        "name": "Network_0_Get_Job",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.network_job_id }}/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_0_Record_Job",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_0_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 2370
+          }
+        }
+      },
+      {
+        "name": "Network_0_Record_Job",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_0_Get_Job,b=r.body||{},v=$.Variables,c=v.network_config,fail=reason=>{$.Helpers.setVariable('network_failure_detail',reason);$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);return {pending:false,succeeded:false,reason};};if(r.status!==200||b.id!==v.network_job_id||b.job_template!==c.id||b.project!==37||b.inventory!==7||b.playbook!==c.playbook)return fail('Network job identity mismatch');const state=b.status,pending=['new','pending','waiting','running'].includes(state);if(!pending&&state!=='successful')return fail('Network job failed: '+state);let proof=state==='successful';const a=b.artifacts||{},pid=a.macflap_generator_main_pid;if(proof&&(!Number.isFinite(Date.parse(b.started))||!Number.isFinite(Date.parse(b.finished))||Date.parse(b.finished)<Date.parse(b.started)))return fail('Missing job completion timestamps');if(proof&&c.state)proof=a.macflap_generator_state===c.state&&a.macflap_lab_id==='macflap-v2'&&a.macflap_generator_service==='network-aiops-mac-flapping.service'&&pid!==null&&pid!==undefined&&Number.isInteger(Number(pid))&&(c.state==='running'?Number(pid)>0:Number(pid)===0);if(state==='successful'&&!proof)return fail('Missing generator state artifacts');$.Helpers.setVariable('network_continue',pending);$.Helpers.setVariable('network_job_succeeded',proof);$.Helpers.setVariable('network_poll',Number(v.network_poll||0)+1);if(proof){const jobs=v.network_jobs||[];jobs[0]={id:b.id,template_id:c.id,status:state,started:b.started,finished:b.finished,artifacts:a};$.Helpers.setVariable('network_jobs',jobs);}return {pending,succeeded:proof};"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_0_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 2580
+          }
+        }
+      },
+      {
+        "name": "Network_0_Check_Completion",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "if($.Variables.network_job_succeeded!==true)throw Error('Bounded job observation expired; do not relaunch');return {passed:true};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Configure",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 2790
+          }
+        }
+      },
+      {
+        "name": "Network_0_Poll_Failed",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);if(!$.Variables.network_failure_detail)$.Helpers.setVariable('network_failure_detail','AAP job status read failed; inspect the existing job before retrying.');return {stopped:true};"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 1800,
+            "y": 3000
+          }
+        }
+      },
+      {
+        "name": "Network_1_Configure",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const c=$.Variables.network_plan[1];$.Helpers.setVariable('network_config',c);$.Helpers.setVariable('network_phase',1);$.Helpers.setVariable('network_job_id',null);$.Helpers.setVariable('network_job_succeeded',false);$.Helpers.setVariable('network_poll',0);$.Helpers.setVariable('network_continue',true);return c;"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Read_Template",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 900
+          }
+        }
+      },
+      {
+        "name": "Network_1_Read_Template",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.network_config.id }}/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Guard_Template",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 1110
+          }
+        }
+      },
+      {
+        "name": "Network_1_Guard_Template",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_1_Read_Template,b=r.body||{},c=$.Variables.network_config,creds=b.summary_fields?.credentials||[];if(r.status!==200||b.id!==c.id||b.project!==37||b.inventory!==7||b.playbook!==c.playbook||b.job_type!=='run'||b.summary_fields?.user_capabilities?.start!==true||(Object.keys(c.vars).length&&b.ask_variables_on_launch!==true)||(c.state&&(!['','lab_linux'].includes(b.limit)||creds.length!==1||creds[0].id!==$.Variables.network_linux_credential_id)))throw Error('Fixed network template identity, Linux credential, limit or launch permission mismatch');return {allowed:true};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Launch",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 1320
+          }
+        }
+      },
+      {
+        "name": "Network_1_Launch",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "POST"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.network_config.id }}/launch/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          },
+          {
+            "name": "body",
+            "value": {
+              "extra_vars": "{{ Variables.network_config.vars }}"
+            }
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Record_Launch",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 1530
+          }
+        }
+      },
+      {
+        "name": "Network_1_Record_Launch",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_1_Launch,b=r.body||{},id=b.id||b.job;$.Helpers.setVariable('network_job_id',id||null);if(id)$.Helpers.setVariable('job_id',String(id));if(r.status!==201||!Number.isInteger(id)||id<=0||Object.keys(b.ignored_fields||{}).length)throw Error('Ambiguous launch; preserve ID and do not relaunch');$.Helpers.setVariable('aap_job_template_id',String($.Variables.network_config.id));return {job_id:id};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Poll",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 1740
+          }
+        }
+      },
+      {
+        "name": "Network_1_Poll",
+        "actionId": "com.datadoghq.core.whileLoop",
+        "parameters": [
+          {
+            "name": "conditions",
+            "value": [
+              {
+                "comparisonOperator": "lt",
+                "leftValue": "{{ Variables.network_poll }}",
+                "rightValue": 60
+              },
+              {
+                "comparisonOperator": "eq",
+                "leftValue": "{{ Variables.network_continue }}",
+                "rightValue": true
+              }
+            ]
+          },
+          {
+            "name": "joinOperator",
+            "value": "and"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Check_Completion",
+            "branchName": "main"
+          },
+          {
+            "nextStepName": "Network_1_Sleep",
+            "branchName": "loopStart"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 1950
+          }
+        }
+      },
+      {
+        "name": "Network_1_Sleep",
+        "actionId": "com.datadoghq.core.sleep",
+        "parameters": [
+          {
+            "name": "durationSeconds",
+            "value": 10
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Get_Job",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_1_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 2160
+          }
+        }
+      },
+      {
+        "name": "Network_1_Get_Job",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.network_job_id }}/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_1_Record_Job",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_1_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 2370
+          }
+        }
+      },
+      {
+        "name": "Network_1_Record_Job",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_1_Get_Job,b=r.body||{},v=$.Variables,c=v.network_config,fail=reason=>{$.Helpers.setVariable('network_failure_detail',reason);$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);return {pending:false,succeeded:false,reason};};if(r.status!==200||b.id!==v.network_job_id||b.job_template!==c.id||b.project!==37||b.inventory!==7||b.playbook!==c.playbook)return fail('Network job identity mismatch');const state=b.status,pending=['new','pending','waiting','running'].includes(state);if(!pending&&state!=='successful')return fail('Network job failed: '+state);let proof=state==='successful';const a=b.artifacts||{},pid=a.macflap_generator_main_pid;if(proof&&(!Number.isFinite(Date.parse(b.started))||!Number.isFinite(Date.parse(b.finished))||Date.parse(b.finished)<Date.parse(b.started)))return fail('Missing job completion timestamps');if(proof&&c.state)proof=a.macflap_generator_state===c.state&&a.macflap_lab_id==='macflap-v2'&&a.macflap_generator_service==='network-aiops-mac-flapping.service'&&pid!==null&&pid!==undefined&&Number.isInteger(Number(pid))&&(c.state==='running'?Number(pid)>0:Number(pid)===0);if(state==='successful'&&!proof)return fail('Missing generator state artifacts');$.Helpers.setVariable('network_continue',pending);$.Helpers.setVariable('network_job_succeeded',proof);$.Helpers.setVariable('network_poll',Number(v.network_poll||0)+1);if(proof){const jobs=v.network_jobs||[];jobs[1]={id:b.id,template_id:c.id,status:state,started:b.started,finished:b.finished,artifacts:a};$.Helpers.setVariable('network_jobs',jobs);}return {pending,succeeded:proof};"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_1_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 2580
+          }
+        }
+      },
+      {
+        "name": "Network_1_Check_Completion",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "if($.Variables.network_job_succeeded!==true)throw Error('Bounded job observation expired; do not relaunch');return {passed:true};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Configure",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 2790
+          }
+        }
+      },
+      {
+        "name": "Network_1_Poll_Failed",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);if(!$.Variables.network_failure_detail)$.Helpers.setVariable('network_failure_detail','AAP job status read failed; inspect the existing job before retrying.');return {stopped:true};"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 2600,
+            "y": 3000
+          }
+        }
+      },
+      {
+        "name": "Network_2_Configure",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const c=$.Variables.network_plan[2];$.Helpers.setVariable('network_config',c);$.Helpers.setVariable('network_phase',2);$.Helpers.setVariable('network_job_id',null);$.Helpers.setVariable('network_job_succeeded',false);$.Helpers.setVariable('network_poll',0);$.Helpers.setVariable('network_continue',true);return c;"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Read_Template",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 900
+          }
+        }
+      },
+      {
+        "name": "Network_2_Read_Template",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.network_config.id }}/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Guard_Template",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 1110
+          }
+        }
+      },
+      {
+        "name": "Network_2_Guard_Template",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_2_Read_Template,b=r.body||{},c=$.Variables.network_config,creds=b.summary_fields?.credentials||[];if(r.status!==200||b.id!==c.id||b.project!==37||b.inventory!==7||b.playbook!==c.playbook||b.job_type!=='run'||b.summary_fields?.user_capabilities?.start!==true||(Object.keys(c.vars).length&&b.ask_variables_on_launch!==true)||(c.state&&(!['','lab_linux'].includes(b.limit)||creds.length!==1||creds[0].id!==$.Variables.network_linux_credential_id)))throw Error('Fixed network template identity, Linux credential, limit or launch permission mismatch');return {allowed:true};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Launch",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 1320
+          }
+        }
+      },
+      {
+        "name": "Network_2_Launch",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "POST"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.network_config.id }}/launch/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          },
+          {
+            "name": "body",
+            "value": {
+              "extra_vars": "{{ Variables.network_config.vars }}"
+            }
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Record_Launch",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 1530
+          }
+        }
+      },
+      {
+        "name": "Network_2_Record_Launch",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_2_Launch,b=r.body||{},id=b.id||b.job;$.Helpers.setVariable('network_job_id',id||null);if(id)$.Helpers.setVariable('job_id',String(id));if(r.status!==201||!Number.isInteger(id)||id<=0||Object.keys(b.ignored_fields||{}).length)throw Error('Ambiguous launch; preserve ID and do not relaunch');$.Helpers.setVariable('aap_job_template_id',String($.Variables.network_config.id));return {job_id:id};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Poll",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 1740
+          }
+        }
+      },
+      {
+        "name": "Network_2_Poll",
+        "actionId": "com.datadoghq.core.whileLoop",
+        "parameters": [
+          {
+            "name": "conditions",
+            "value": [
+              {
+                "comparisonOperator": "lt",
+                "leftValue": "{{ Variables.network_poll }}",
+                "rightValue": 60
+              },
+              {
+                "comparisonOperator": "eq",
+                "leftValue": "{{ Variables.network_continue }}",
+                "rightValue": true
+              }
+            ]
+          },
+          {
+            "name": "joinOperator",
+            "value": "and"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Check_Completion",
+            "branchName": "main"
+          },
+          {
+            "nextStepName": "Network_2_Sleep",
+            "branchName": "loopStart"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 1950
+          }
+        }
+      },
+      {
+        "name": "Network_2_Sleep",
+        "actionId": "com.datadoghq.core.sleep",
+        "parameters": [
+          {
+            "name": "durationSeconds",
+            "value": 10
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Get_Job",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_2_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 2160
+          }
+        }
+      },
+      {
+        "name": "Network_2_Get_Job",
+        "actionId": "com.datadoghq.http.request",
+        "connectionLabel": "NETWORK_AAP",
+        "parameters": [
+          {
+            "name": "verb",
+            "value": "GET"
+          },
+          {
+            "name": "url",
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.network_job_id }}/"
+          },
+          {
+            "name": "requestHeaders",
+            "value": [
+              {
+                "key": "Content-Type",
+                "value": [
+                  "application/json"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "responseParsing",
+            "value": "json"
+          },
+          {
+            "name": "allowExpiredCertificate",
+            "value": true
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_2_Record_Job",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_2_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 2370
+          }
+        }
+      },
+      {
+        "name": "Network_2_Record_Job",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "const r=$.Steps.Network_2_Get_Job,b=r.body||{},v=$.Variables,c=v.network_config,fail=reason=>{$.Helpers.setVariable('network_failure_detail',reason);$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);return {pending:false,succeeded:false,reason};};if(r.status!==200||b.id!==v.network_job_id||b.job_template!==c.id||b.project!==37||b.inventory!==7||b.playbook!==c.playbook)return fail('Network job identity mismatch');const state=b.status,pending=['new','pending','waiting','running'].includes(state);if(!pending&&state!=='successful')return fail('Network job failed: '+state);let proof=state==='successful';const a=b.artifacts||{},pid=a.macflap_generator_main_pid;if(proof&&(!Number.isFinite(Date.parse(b.started))||!Number.isFinite(Date.parse(b.finished))||Date.parse(b.finished)<Date.parse(b.started)))return fail('Missing job completion timestamps');if(proof&&c.state)proof=a.macflap_generator_state===c.state&&a.macflap_lab_id==='macflap-v2'&&a.macflap_generator_service==='network-aiops-mac-flapping.service'&&pid!==null&&pid!==undefined&&Number.isInteger(Number(pid))&&(c.state==='running'?Number(pid)>0:Number(pid)===0);if(state==='successful'&&!proof)return fail('Missing generator state artifacts');$.Helpers.setVariable('network_continue',pending);$.Helpers.setVariable('network_job_succeeded',proof);$.Helpers.setVariable('network_poll',Number(v.network_poll||0)+1);if(proof){const jobs=v.network_jobs||[];jobs[2]={id:b.id,template_id:c.id,status:state,started:b.started,finished:b.finished,artifacts:a};$.Helpers.setVariable('network_jobs',jobs);}return {pending,succeeded:proof};"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_2_Poll_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 2580
+          }
+        }
+      },
+      {
+        "name": "Network_2_Check_Completion",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "if($.Variables.network_job_succeeded!==true)throw Error('Bounded job observation expired; do not relaunch');return {passed:true};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_Complete",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 2790
+          }
+        }
+      },
+      {
+        "name": "Network_2_Poll_Failed",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "$.Helpers.setVariable('network_continue',false);$.Helpers.setVariable('network_job_succeeded',false);if(!$.Variables.network_failure_detail)$.Helpers.setVariable('network_failure_detail','AAP job status read failed; inspect the existing job before retrying.');return {stopped:true};"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 3400,
+            "y": 3000
+          }
+        }
+      },
+      {
+        "name": "Network_Complete",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "$.Helpers.setVariable('workflow_result','ACTION_SUCCEEDED');$.Helpers.setVariable('job_state','succeeded');$.Helpers.setVariable('raw_job_state','successful');$.Helpers.setVariable('failure_reason','');const reset=$.Trigger.scenario==='reset-mac-flapping',jobs=$.Variables.network_jobs||[];const text='━━━━━━━━━━━━━━━━━━━━\\n:white_check_mark: *POC CONTROL · '+(reset?'RESET JOBS COMPLETED':'ACTIVE')+'*\\n*Network MAC Flapping*\\n━━━━━━━━━━━━━━━━━━━━\\n\\n*Scenario:* `'+$.Trigger.scenario+'`\\n*Environment:* network-aiops\\n*Fixed lab:* macflap-v2 · sw1 ethernet-1/2\\n*AAP jobs:* '+jobs.map(j=>'JT'+j.template_id+'/job'+j.id).join(' → ')+'\\n\\n'+(reset?'The managed generator is stopped, e1/2 restored and Host C → Host A forwarding verified. Job completion does not establish Datadog recovery; review fresh monitor and log evidence.':'The managed duplicate-MAC generator is running with a ten-minute bound. Datadog must independently detect real logs. Any recovery change still requires Slack approval.')+'\\n\\nManually launched terminal generators are outside this managed service.\\n\\n_Next → Datadog observation_';return {scenario:$.Trigger.scenario,jobs,recovery_verified:false,slack_text:text};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_Notify_Success",
+            "branchName": "main"
+          }
+        ],
+        "errorHandlers": [
+          {
+            "retryStrategy": {
+              "kind": "RETRY_STRATEGY_LINEAR",
+              "linear": {
+                "interval": "5s",
+                "maxRetries": 0
+              }
+            },
+            "fallbackStepName": "Network_Failed"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 3300
+          }
+        }
+      },
+      {
+        "name": "Network_Notify_Success",
+        "actionId": "com.datadoghq.slack.send_simple_message",
+        "parameters": [
+          {
+            "name": "channel",
+            "value": "#datadog-workflow"
+          },
+          {
+            "name": "teamId",
+            "value": "REPLACE_WITH_SLACK_TEAM_ID"
+          },
+          {
+            "name": "text",
+            "value": "{{ Steps.Network_Complete.data.slack_text }}"
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 2400,
+            "y": 3520
+          }
+        }
+      },
+      {
+        "name": "Network_Failed",
+        "actionId": "com.datadoghq.datatransformation.func",
+        "parameters": [
+          {
+            "name": "script",
+            "value": "$.Helpers.setVariable('workflow_result','NETWORK_SCENARIO_FAILED');$.Helpers.setVariable('failure_reason','Network phase '+String($.Variables.network_phase??'configuration')+' failed or returned incomplete evidence. '+String($.Variables.network_failure_detail||'')+' Inspect current job '+String($.Variables.network_job_id||'none')+' before retrying. No automatic relaunch.');return {scenario:$.Trigger.scenario,jobs:$.Variables.network_jobs||[],last_job_id:$.Variables.network_job_id||null};"
+          }
+        ],
+        "outboundEdges": [
+          {
+            "nextStepName": "Network_Notify_Failure",
+            "branchName": "main"
+          }
+        ],
+        "readinessGate": {
+          "thresholdType": "ANY"
+        },
+        "display": {
+          "bounds": {
+            "x": 4200,
+            "y": 1000
+          }
+        }
+      },
+      {
+        "name": "Network_Notify_Failure",
+        "actionId": "com.datadoghq.slack.send_simple_message",
+        "parameters": [
+          {
+            "name": "channel",
+            "value": "#datadog-workflow"
+          },
+          {
+            "name": "teamId",
+            "value": "REPLACE_WITH_SLACK_TEAM_ID"
+          },
+          {
+            "name": "text",
+            "value": "━━━━━━━━━━━━━━━━━━━━\n:x: *POC CONTROL · EXECUTION FAILED*\n*Network Scenario Stopped*\n━━━━━━━━━━━━━━━━━━━━\n\n*Scenario:* {{ Trigger.scenario }}\n*Environment:* network-aiops\n*Failure:* {{ Variables.failure_reason }}\n\nNo automatic retry or further change. A launched job may still be running; review AAP and the managed generator before another request."
+          }
+        ],
+        "display": {
+          "bounds": {
+            "x": 4200,
+            "y": 1220
+          }
+        }
+      }
+    ],
+    "connectionEnvs": [
+      {
+        "env": "default",
+        "connections": [
+          {
+            "connectionId": "REPLACE_WITH_DATADOG_CONNECTION_ID_1",
+            "label": "INTEGRATION_NONE"
+          },
+          {
+            "connectionId": "REPLACE_WITH_DATADOG_CONNECTION_ID_1",
+            "label": "NETWORK_AAP"
           }
         ]
       }
     ],
-    "triggers": [
-      {
-        "slackTrigger": {},
-        "startStepNames": [
-          "Route_Scenario"
-        ]
-      }
-    ]
-  },
-  "runAsUserMode": "owner",
-  "sensitivePrivileges": false
+    "inputSchema": {
+      "parameters": [
+        {
+          "name": "scenario",
+          "label": "Scenario",
+          "description": "Select a fixed POC scenario. mac-flapping stops the managed generator, restores e1/2 and starts ten minutes of duplicate-MAC traffic. reset-mac-flapping stops that generator, restores e1/2 and verifies forwarding.",
+          "type": "STRING",
+          "defaultValue": "pool",
+          "allowedValues": [
+            "pool",
+            "disk",
+            "autoscale",
+            "rollback",
+            "memory",
+            "reset-memory",
+            "reset",
+            "mac-flapping",
+            "reset-mac-flapping"
+          ]
+        }
+      ]
+    },
+    "outputSchema": {
+      "parameters": [
+        {
+          "name": "workflow_result",
+          "label": "Workflow Result",
+          "description": "Outcome code of the workflow execution",
+          "type": "STRING",
+          "value": "{{ Variables.workflow_result }}"
+        },
+        {
+          "name": "scenario",
+          "label": "Scenario",
+          "description": "Scenario that was executed",
+          "type": "STRING",
+          "value": "{{ Trigger.scenario }}"
+        },
+        {
+          "name": "execution_backend",
+          "label": "Execution Backend",
+          "description": "Ansible Automation Platform",
+          "type": "STRING",
+          "value": "{{ Variables.execution_backend }}"
+        },
+        {
+          "name": "job_id",
+          "label": "Job ID",
+          "description": "AAP job ID",
+          "type": "STRING",
+          "value": "{{ Variables.job_id }}"
+        },
+        {
+          "name": "job_state",
+          "label": "Job State",
+          "description": "Normalized final job state",
+          "type": "STRING",
+          "value": "{{ Variables.job_state }}"
+        },
+        {
+          "name": "raw_job_state",
+          "label": "Raw Job State",
+          "description": "Raw state returned by AAP",
+          "type": "STRING",
+          "value": "{{ Variables.raw_job_state }}"
+        },
+        {
+          "name": "aap_job_template_id",
+          "label": "AAP Job Template ID",
+          "description": "AAP Job Template ID when AAP is used",
+          "type": "STRING",
+          "value": "{{ Variables.aap_job_template_id }}"
+        },
+        {
+          "name": "action",
+          "label": "Action",
+          "description": "Selected fixed action",
+          "type": "STRING",
+          "value": "{{ Variables.job_action }}"
+        },
+        {
+          "name": "poll_count",
+          "label": "Poll Count",
+          "description": "Number of polling attempts made",
+          "type": "NUMBER",
+          "value": "{{ Variables.poll_count }}"
+        },
+        {
+          "name": "error",
+          "label": "Error",
+          "description": "Failure reason, if any",
+          "type": "STRING",
+          "value": "{{ Variables.failure_reason }}"
+        }
+      ]
+    }
+  }
 }

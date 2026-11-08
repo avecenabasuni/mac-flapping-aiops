@@ -2,7 +2,7 @@
   "name": "[POC] Operational Scenario Controller v6 - AAP",
   "description": "Manually activates isolated POC fault and reset scenarios through fixed Ansible Automation Platform Job Templates and polls each AAP job to a bounded terminal state.",
   "published": false,
-  "export_status": "SAVED_DRAFT_NOT_PUBLISHED",
+  "export_status": "SUPERSEDED_BY_PUBLISHED_WORKFLOW",
   "tags": [
     "automation:aap",
     "domain:application",
@@ -160,7 +160,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Connection Pool Exhaustion*\n━━━━━━━━━━━━━━━━━━━━\n\nA controlled PgBouncer pool-exhaustion fault is being activated through Ansible Automation Platform.\n\n*Scenario:* `pool`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Pool Fault (JT 21)`\n\n:shield: *Only the pre-defined POC action is permitted.*\n\n_Next → Controlled execution_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:test_tube: *POC CONTROL \u00b7 STARTED*\n*Connection Pool Exhaustion*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nA controlled PgBouncer pool-exhaustion fault is being activated through Ansible Automation Platform.\n\n*Scenario:* `pool`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Pool Fault (JT 21)`\n\n:shield: *Only the pre-defined POC action is permitted.*\n\n_Next \u2192 Controlled execution_"
           }
         ],
         "outboundEdges": [
@@ -190,7 +190,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Disk Saturation*\n━━━━━━━━━━━━━━━━━━━━\n\nA controlled disk-saturation fault is being activated through Ansible Automation Platform.\n\n*Scenario:* `disk`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Disk Fault (JT 22)`\n\n:shield: *Only the pre-defined POC action is permitted.*\n\n_Next → Controlled execution_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:test_tube: *POC CONTROL \u00b7 STARTED*\n*Disk Saturation*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nA controlled disk-saturation fault is being activated through Ansible Automation Platform.\n\n*Scenario:* `disk`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Disk Fault (JT 22)`\n\n:shield: *Only the pre-defined POC action is permitted.*\n\n_Next \u2192 Controlled execution_"
           }
         ],
         "outboundEdges": [
@@ -220,7 +220,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:chart_with_upwards_trend: *POC CONTROL · STARTED*\n*Storefront Capacity Pressure*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is starting the approved storefront traffic-pressure fault.\n\n*Scenario:* `autoscale`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Inject Storefront Traffic Spike (JT 31)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next → Controlled execution_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:chart_with_upwards_trend: *POC CONTROL \u00b7 STARTED*\n*Storefront Capacity Pressure*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAnsible Automation Platform is starting the approved storefront traffic-pressure fault.\n\n*Scenario:* `autoscale`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Inject Storefront Traffic Spike (JT 31)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next \u2192 Controlled execution_"
           }
         ],
         "outboundEdges": [
@@ -250,7 +250,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:package: *POC CONTROL · STARTED*\n*Deployment Regression*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is deploying the approved known-bad storefront candidate.\n\n*Scenario:* `rollback`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Deploy Storefront Demo-Bad (JT 29)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next → Controlled execution_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:package: *POC CONTROL \u00b7 STARTED*\n*Deployment Regression*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAnsible Automation Platform is deploying the approved known-bad storefront candidate.\n\n*Scenario:* `rollback`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Deploy Storefront Demo-Bad (JT 29)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next \u2192 Controlled execution_"
           }
         ],
         "outboundEdges": [
@@ -280,7 +280,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:arrows_counterclockwise: *POC CONTROL · RESETTING*\n*Restore Demo Baseline*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is running the approved full baseline reset.\n\n*Scenario:* `reset`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Reset Demo (JT 15)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next → Controlled execution_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:arrows_counterclockwise: *POC CONTROL \u00b7 RESETTING*\n*Restore Demo Baseline*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAnsible Automation Platform is running the approved full baseline reset.\n\n*Scenario:* `reset`\n*Environment:* `poc`\n*Execution Backend:* `Ansible Automation Platform`\n*Fixed Job Template:* `Reset Demo (JT 15)`\n\n:shield: *Only the pre-defined POC Job Template is permitted.*\n\n_Next \u2192 Controlled execution_"
           }
         ],
         "outboundEdges": [
@@ -310,7 +310,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Application VM Memory Pressure*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform is starting the bounded synthetic memory-pressure workload on the approved Berca application VM.\n\n*Scenario:* `memory`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Inject Memory Pressure (JT 33)`\n\n:shield: *The allocation, timeout, target VM, and safety floor remain fixed in protected automation configuration.*\n\n_Next → Datadog observes usable memory pressure and application health_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:test_tube: *POC CONTROL \u00b7 STARTED*\n*Application VM Memory Pressure*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAnsible Automation Platform is starting the bounded synthetic memory-pressure workload on the approved Berca application VM.\n\n*Scenario:* `memory`\n*Environment:* `poc`\n*Execution Backend:* `AAP`\n*Fixed Action:* `Inject Memory Pressure (JT 33)`\n\n:shield: *The allocation, timeout, target VM, and safety floor remain fixed in protected automation configuration.*\n\n_Next \u2192 Datadog observes usable memory pressure and application health_"
           }
         ],
         "outboundEdges": [
@@ -340,7 +340,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:arrows_counterclockwise: *POC CONTROL · RESETTING*\n*Application VM Memory Baseline*\n━━━━━━━━━━━━━━━━━━━━\n\nFirst JT 15 stops/removes memory pressure and resets the POC scenarios. Only after that job succeeds, JT 35 restores configured RAM above 16 GiB to the approved 16 GiB baseline.\n\n*Scenario:* `reset-memory`\n*Environment:* `poc`\n*Execution:* `AAP JT 15 → AAP JT 35`\n\n:warning: *Restoring RAM above baseline powers the application VM off and on. Temporary application downtime is expected. Use only after the demo.*\n\nJT 35 does not stop pressure itself. It returns without resizing when RAM is at or below baseline; below-baseline results require manual review.\n\n_Next → Stop pressure with JT 15, then restore RAM with JT 35_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:arrows_counterclockwise: *POC CONTROL \u00b7 RESETTING*\n*Application VM Memory Baseline*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nFirst JT 15 stops/removes memory pressure and resets the POC scenarios. Only after that job succeeds, JT 35 restores configured RAM above 16 GiB to the approved 16 GiB baseline.\n\n*Scenario:* `reset-memory`\n*Environment:* `poc`\n*Execution:* `AAP JT 15 \u2192 AAP JT 35`\n\n:warning: *Restoring RAM above baseline powers the application VM off and on. Temporary application downtime is expected. Use only after the demo.*\n\nJT 35 does not stop pressure itself. It returns without resizing when RAM is at or below baseline; below-baseline results require manual review.\n\n_Next \u2192 Stop pressure with JT 15, then restore RAM with JT 35_"
           }
         ],
         "outboundEdges": [
@@ -433,7 +433,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:warning: *POC CONTROL · INVALID REQUEST*\n*Unsupported Scenario*\n━━━━━━━━━━━━━━━━━━━━\n\n*Allowed Scenarios*\n• `pool`\n• `disk`\n• `autoscale`\n• `rollback`\n• `memory`\n• `reset-memory`\n• `mac-flapping`\n• `reset-mac-flapping`\n• `reset`\n\n:shield: *No changes were executed.*"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:warning: *POC CONTROL \u00b7 INVALID REQUEST*\n*Unsupported Scenario*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n*Allowed Scenarios*\n\u2022 `pool`\n\u2022 `disk`\n\u2022 `autoscale`\n\u2022 `rollback`\n\u2022 `memory`\n\u2022 `reset-memory`\n\u2022 `mac-flapping`\n\u2022 `reset-mac-flapping`\n\u2022 `reset`\n\n:shield: *No changes were executed.*"
           }
         ],
         "display": {
@@ -1679,7 +1679,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:white_check_mark: *POC CONTROL · ACTIVE*\n*AAP Scenario Activated Successfully*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform completed the fixed fault-injection Job Template successfully.\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* `poc`\n*AAP Job Template:* `{{ Variables.aap_job_template_name }} (JT {{ Variables.aap_job_template_id }})`\n*AAP Job ID:* `{{ Variables.job_id }}`\n*AAP Status:* `{{ Variables.raw_job_state }}`\n\n:mag: *Datadog observation phase started.*\n\nDatadog monitors must independently detect the resulting service degradation or proactive memory capacity alert.\n\n_Next → Datadog detection and AIOps response_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:white_check_mark: *POC CONTROL \u00b7 ACTIVE*\n*AAP Scenario Activated Successfully*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAnsible Automation Platform completed the fixed fault-injection Job Template successfully.\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* `poc`\n*AAP Job Template:* `{{ Variables.aap_job_template_name }} (JT {{ Variables.aap_job_template_id }})`\n*AAP Job ID:* `{{ Variables.job_id }}`\n*AAP Status:* `{{ Variables.raw_job_state }}`\n\n:mag: *Datadog observation phase started.*\n\nDatadog monitors must independently detect the resulting service degradation or proactive memory capacity alert.\n\n_Next \u2192 Datadog detection and AIOps response_"
           }
         ],
         "display": {
@@ -1703,7 +1703,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:white_check_mark: *POC CONTROL · RESET JOB COMPLETED*\n*Ansible Reset Completed*\n━━━━━━━━━━━━━━━━━━━━\n\nAnsible Automation Platform completed the selected reset successfully.\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* `poc`\n*AAP Job Template:* `{{ Variables.aap_job_template_name }} (JT {{ Variables.aap_job_template_id }})`\n*AAP Job ID:* `{{ Variables.job_id }}`\n*AAP Status:* `{{ Variables.raw_job_state }}`\n\n:mag: *AAP completion is execution evidence, not independent Datadog recovery evidence.*\n\nFor reset-memory, JT 15 completed before JT 35. Review JT 35 artifacts for the actual RAM result: a no-change result below 16 GiB does not mean the approved baseline was restored.\n\n_Next → Confirm fresh Datadog system.mem.total near 16 GiB, memory pressure stopped, service monitors OK and https://store.bercalab.my.id/id/store HTTP 200 before the next demo._"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:white_check_mark: *POC CONTROL \u00b7 RESET JOB COMPLETED*\n*Ansible Reset Completed*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nAnsible Automation Platform completed the selected reset successfully.\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* `poc`\n*AAP Job Template:* `{{ Variables.aap_job_template_name }} (JT {{ Variables.aap_job_template_id }})`\n*AAP Job ID:* `{{ Variables.job_id }}`\n*AAP Status:* `{{ Variables.raw_job_state }}`\n\n:mag: *AAP completion is execution evidence, not independent Datadog recovery evidence.*\n\nFor reset-memory, JT 15 completed before JT 35. Review JT 35 artifacts for the actual RAM result: a no-change result below 16 GiB does not mean the approved baseline was restored.\n\n_Next \u2192 Confirm fresh Datadog system.mem.total near 16 GiB, memory pressure stopped, service monitors OK and https://store.bercalab.my.id/id/store HTTP 200 before the next demo._"
           }
         ],
         "display": {
@@ -1727,7 +1727,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:x: *POC CONTROL · EXECUTION FAILED*\n*Scenario Did Not Complete*\n━━━━━━━━━━━━━━━━━━━━\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Execution Backend:* `{{ Variables.execution_backend }}`\n*Job ID:* `{{ Variables.job_id }}`\n*Raw Job State:* `{{ Variables.raw_job_state }}`\n*Result:* `{{ Variables.workflow_result }}`\n\n*Failure Reason*\n{{ Variables.failure_reason }}\n\n:shield: *No automatic retry was attempted.*\n\n_Next → Review the execution backend and restore the demo baseline if required_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:x: *POC CONTROL \u00b7 EXECUTION FAILED*\n*Scenario Did Not Complete*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Execution Backend:* `{{ Variables.execution_backend }}`\n*Job ID:* `{{ Variables.job_id }}`\n*Raw Job State:* `{{ Variables.raw_job_state }}`\n*Result:* `{{ Variables.workflow_result }}`\n\n*Failure Reason*\n{{ Variables.failure_reason }}\n\n:shield: *No automatic retry was attempted.*\n\n_Next \u2192 Review the execution backend and restore the demo baseline if required_"
           }
         ],
         "readinessGate": {
@@ -2275,7 +2275,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:arrows_counterclockwise: *POC CONTROL · RESET IN PROGRESS*\n*Pressure Cleanup Completed*\n━━━━━━━━━━━━━━━━━━━━\n\n*AAP JT 15 job:* `{{ Variables.memory_cleanup_job_id }}` · successful\n\n_Next → Launch JT 35 to restore total RAM to 16 GiB. The application VM may power off/on. No automatic relaunch on failure._"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:arrows_counterclockwise: *POC CONTROL \u00b7 RESET IN PROGRESS*\n*Pressure Cleanup Completed*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n*AAP JT 15 job:* `{{ Variables.memory_cleanup_job_id }}` \u00b7 successful\n\n_Next \u2192 Launch JT 35 to restore total RAM to 16 GiB. The application VM may power off/on. No automatic relaunch on failure._"
           }
         ],
         "outboundEdges": [
@@ -2482,7 +2482,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:test_tube: *POC CONTROL · STARTED*\n*Network MAC Flapping Scenario*\n━━━━━━━━━━━━━━━━━━━━\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* network-aiops\n*Fixed lab:* macflap-v2 · sw1 ethernet-1/2\n\nStop the managed generator first, then restore the fixed port. Trigger starts a bounded ten-minute generator; reset instead verifies Host C → Host A forwarding. Job completion does not itself establish Datadog recovery.\n\n_Next → Controlled AAP execution_"
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:test_tube: *POC CONTROL \u00b7 STARTED*\n*Network MAC Flapping Scenario*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n*Scenario:* `{{ Trigger.scenario }}`\n*Environment:* network-aiops\n*Fixed lab:* macflap-v2 \u00b7 sw1 ethernet-1/2\n\nStop the managed generator first, then restore the fixed port. Trigger starts a bounded ten-minute generator; reset instead verifies Host C \u2192 Host A forwarding. Job completion does not itself establish Datadog recovery.\n\n_Next \u2192 Controlled AAP execution_"
           }
         ],
         "outboundEdges": [
@@ -3818,7 +3818,7 @@
         "parameters": [
           {
             "name": "script",
-            "value": "$.Helpers.setVariable('workflow_result','ACTION_SUCCEEDED');$.Helpers.setVariable('job_state','succeeded');$.Helpers.setVariable('raw_job_state','successful');$.Helpers.setVariable('failure_reason','');const reset=$.Trigger.scenario==='reset-mac-flapping',jobs=$.Variables.network_jobs||[];const text='━━━━━━━━━━━━━━━━━━━━\\n:white_check_mark: *POC CONTROL · '+(reset?'RESET JOBS COMPLETED':'ACTIVE')+'*\\n*Network MAC Flapping*\\n━━━━━━━━━━━━━━━━━━━━\\n\\n*Scenario:* `'+$.Trigger.scenario+'`\\n*Environment:* network-aiops\\n*Fixed lab:* macflap-v2 · sw1 ethernet-1/2\\n*AAP jobs:* '+jobs.map(j=>'JT'+j.template_id+'/job'+j.id).join(' → ')+'\\n\\n'+(reset?'The managed generator is stopped, e1/2 restored and Host C → Host A forwarding verified. Job completion does not establish Datadog recovery; review fresh monitor and log evidence.':'The managed duplicate-MAC generator is running with a ten-minute bound. Datadog must independently detect real logs. Any recovery change still requires Slack approval.')+'\\n\\nManually launched terminal generators are outside this managed service.\\n\\n_Next → Datadog observation_';return {scenario:$.Trigger.scenario,jobs,recovery_verified:false,slack_text:text};"
+            "value": "$.Helpers.setVariable('workflow_result','ACTION_SUCCEEDED');$.Helpers.setVariable('job_state','succeeded');$.Helpers.setVariable('raw_job_state','successful');$.Helpers.setVariable('failure_reason','');const reset=$.Trigger.scenario==='reset-mac-flapping',jobs=$.Variables.network_jobs||[];const text='\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\\n:white_check_mark: *POC CONTROL \u00b7 '+(reset?'RESET JOBS COMPLETED':'ACTIVE')+'*\\n*Network MAC Flapping*\\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\\n\\n*Scenario:* `'+$.Trigger.scenario+'`\\n*Environment:* network-aiops\\n*Fixed lab:* macflap-v2 \u00b7 sw1 ethernet-1/2\\n*AAP jobs:* '+jobs.map(j=>'JT'+j.template_id+'/job'+j.id).join(' \u2192 ')+'\\n\\n'+(reset?'The managed generator is stopped, e1/2 restored and Host C \u2192 Host A forwarding verified. Job completion does not establish Datadog recovery; review fresh monitor and log evidence.':'The managed duplicate-MAC generator is running with a ten-minute bound. Datadog must independently detect real logs. Any recovery change still requires Slack approval.')+'\\n\\nManually launched terminal generators are outside this managed service.\\n\\n_Next \u2192 Datadog observation_';return {scenario:$.Trigger.scenario,jobs,recovery_verified:false,slack_text:text};"
           }
         ],
         "outboundEdges": [
@@ -3909,7 +3909,7 @@
           },
           {
             "name": "text",
-            "value": "━━━━━━━━━━━━━━━━━━━━\n:x: *POC CONTROL · EXECUTION FAILED*\n*Network Scenario Stopped*\n━━━━━━━━━━━━━━━━━━━━\n\n*Scenario:* {{ Trigger.scenario }}\n*Environment:* network-aiops\n*Failure:* {{ Variables.failure_reason }}\n\nNo automatic retry or further change. A launched job may still be running; review AAP and the managed generator before another request."
+            "value": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n:x: *POC CONTROL \u00b7 EXECUTION FAILED*\n*Network Scenario Stopped*\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n*Scenario:* {{ Trigger.scenario }}\n*Environment:* network-aiops\n*Failure:* {{ Variables.failure_reason }}\n\nNo automatic retry or further change. A launched job may still be running; review AAP and the managed generator before another request."
           }
         ],
         "display": {
