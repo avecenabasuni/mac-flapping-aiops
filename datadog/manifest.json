@@ -43,17 +43,20 @@
       41
     ],
     "aap_permissions_verified": true,
-    "real_aap_recovery_run_verified": false,
+    "real_aap_recovery_run_verified": true,
     "duplicate_mac_clearance_verified": false,
     "telemetry_recovery_verifier_enabled": true,
-    "verified_recovery_live_incident_observed": false,
+    "verified_recovery_live_incident_observed": true,
     "telemetry_verified_scope": "containment_and_forwarding_with_datadog_log_clearance",
     "verification_quiet_seconds": 300,
     "verification_observation_seconds": 600,
     "real_approved_aap_sequence_verified": true,
     "corrected_read_only_verifier_replay_verified": true,
-    "single_run_end_to_end_recovery_verified": false,
+    "single_run_end_to_end_recovery_verified": true,
     "telemetry_log_clearance_verified": true
   },
-  "latest_real_aap_recovery_evidence": "datadog/workflows/first-live-aap-recovery-evidence.json"
+  "latest_real_aap_recovery_evidence": "datadog/workflows/live-end-to-end-recovery-evidence.json",
+  "latest_recovery_result": "RECOVERY_VERIFIED",
+  "latest_recovery_instance_id": "15951b0a-c1e1-45b8-9604-5c1dae1462e1",
+  "latest_recovery_slack_delivery_verified": true
 }

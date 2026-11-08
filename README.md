@@ -13,8 +13,8 @@ This repository combines a **working Datadog detection and investigation configu
 | Nokia SR Linux MAC duplication demo (v1) | Validated | MAC movement detected in the prior lab. |
 | Datadog log parsing, monitor and read-only investigation | Validated | Real Nokia log samples triggered the workflow, Bits AI summary and Slack notification on Nov 4, 2026. |
 | Lab v2 with independent Host C probe | Validated | Real v2 detection, SNMP and independent forwarding telemetry observed Nov 8. |
-| AAP collect/isolate/device/forwarding jobs | Validated execution | Slack-approved actual jobs 322/JT38, 324/JT39, 326/JT40 and 328/JT41 succeeded Nov 8. |
-| Recovery verifier | Validated read-only replay after cutoff fix | Actual approved isolation succeeded; the first verifier missed a clear emitted during the job. Fixed verifier passed all 13 criteria on the same job evidence and real telemetry, without rerunning AAP. Original run retains its old version/result. |
+| AAP collect/isolate/device/forwarding jobs | Validated execution | Latest full test: Slack-approved jobs 332/JT38, 334/JT39, 336/JT40 and 338/JT41 all succeeded Nov 8. |
+| Recovery verifier and Slack success notification | Validated in a fresh full run | Real alert → Slack approval → JT38–41 → 13/13 telemetry criteria → RECOVERY_VERIFIED → actual Slack delivery, Nov 8 at 02:34:35Z. |
 
 ## 1. Network architecture: Containerlab v2
 
@@ -189,4 +189,12 @@ Keep Host B's duplicate-source generator running throughout the demonstration, s
 
 Latest real-run evidence: [first live AAP sequence and verifier cutoff fix](datadog/workflows/first-live-aap-recovery-evidence.json).
 
-The original instance finished at 01:20:56Z with runtime SUCCEEDED but business result RECOVERY_NOT_VERIFIED. Its old cutoff excluded the matching clears; the ten-minute bound expired and Slack escalation succeeded. The corrected replay passed, but no single new alert-to-recovery run on the corrected version has been observed.
+The original instance finished at 01:20:56Z with runtime SUCCEEDED but business result RECOVERY_NOT_VERIFIED. Its old cutoff excluded the matching clears; the ten-minute bound expired and Slack escalation succeeded. At that point, only the corrected replay had passed; the later fresh full test is recorded below.
+
+## Fresh full recovery test passed — Nov 8, 2026
+
+Actual monitor-triggered run 15951b0a-c1e1-45b8-9604-5c1dae1462e1 completed at 02:34:35Z with runtime SUCCEEDED and result RECOVERY_VERIFIED. Real Slack approval led to successful jobs 332/JT38, 334/JT39, 336/JT40 and 338/JT41. All 13 telemetry criteria passed at 02:34:31.249Z, including matching clears emitted during isolation, stable isolated/trusted port states, zero forwarding loss, fresh collector, monitor OK and five-minute quiet observation. Slack_Recovery_Verified succeeded in #datadog-automation with ts1794105274.450979. This run used no action overrides or mocked notifications.
+
+JT42/job330 restored e1/2 before this test under explicit user authorization. The successful test left e1/2 isolated; no automatic restore followed. Verified scope remains containment and forwarding with Datadog log clearance; a direct empty device MAC table or physical loop clearance is not claimed. Exact evidence: datadog/workflows/live-end-to-end-recovery-evidence.json. The earlier false-negative run remains historical evidence of the cutoff defect.
+
+[Fresh full recovery evidence](datadog/workflows/live-end-to-end-recovery-evidence.json).
