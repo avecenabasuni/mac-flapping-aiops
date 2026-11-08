@@ -61,9 +61,10 @@ flowchart TD
     SLACK --> HUMAN["Engineer reviews findings"]
     HUMAN --> GATE["Fresh validated lab detection"]
     GATE --> DECISION["Slack Approve / Reject"]
-    DECISION -->|Approve| PLACEHOLDER["Execute: JT 38 Collect → JT 39 Isolate"]
-    PLACEHOLDER --> VERIFY["Verify: JT 40 Device → JT 41 Forwarding<br/>Independent Datadog telemetry"]
-    VERIFY --> ESCALATE["RECOVERY_NOT_VERIFIED<br/>Stop and escalate to Slack"]
+    DECISION -->|Approve| AAPEXEC["Execute: JT 38 Collect → JT 39 Isolate"]
+    AAPEXEC --> VERIFY["Verify: JT 40 Device → JT 41 Forwarding<br/>Independent Datadog telemetry"]
+    VERIFY -->|All telemetry proof passes| VERIFIED["RECOVERY_VERIFIED<br/>Announce scope and evidence"]
+    VERIFY -->|Missing proof or deadline| ESCALATE["RECOVERY_NOT_VERIFIED<br/>Stop and escalate to Slack"]
     DECISION -->|Reject or unavailable| STOP["Stop without device changes"]
 ```
 
@@ -73,7 +74,7 @@ The query matches **detection events** and excludes generic `DATADOG_SYSLOG_TEST
 
 [Datadog workflow run](https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=1f909fed-cf5f-46dd-a4ab-a3217adf4f63) · [Datadog runbook](https://app.datadoghq.com/notebook/16202843)
 
-**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md). Fresh validated monitor detections now request Approve/Reject in #datadog-automation. The Nov 8 publication connects Approve to fixed AAP JT 38 → 39 → 40 → 41. JT39 can disable sw1 ethernet-1/2 after approval. Recovery remains unverified until duplicate-MAC clearance proof is available; missing proof stops and escalates. See [recovery stages](lab-v2/docs/RECOVERY-WORKFLOW.md).
+**Nov 6 update:** the published workflow uses the custom Bits agent with bounded log evidence and chronological clear-event validation. Native Bits Investigation is no longer started automatically. Slack follows the existing POC INCIDENT RESPONSE format, with evidence, limitations, and read-only next checks. See [workflow behavior and verification](lab-v2/docs/BITS-INVESTIGATION.md). Fresh validated monitor detections now request Approve/Reject in #datadog-automation. The Nov 8 publication connects Approve to fixed AAP JT 38 → 39 → 40 → 41. JT39 can disable sw1 ethernet-1/2 after approval. The bounded Datadog verifier can report RECOVERY_VERIFIED for containment/forwarding with matched log clearance and a five-minute quiet observation; missing proof stops and escalates. See [exact verifier policy](lab-v2/docs/TELEMETRY-VERIFIER.md). See [recovery stages](lab-v2/docs/RECOVERY-WORKFLOW.md).
 
 ## 3. Target architecture: investigation, approval, remediation and verification
 

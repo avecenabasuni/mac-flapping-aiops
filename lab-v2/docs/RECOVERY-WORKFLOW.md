@@ -21,15 +21,16 @@ Execute access before dispatch. Polls check both job and template identity. At m
 60 polls occur per job, ten seconds apart. A timeout does not cancel a still-running
 AAP job: inspect its status before any manual retry.
 
-Datadog verification requires unique, numeric metric samples no older than 180s.
-Missing, stale, duplicate, future and null data cannot pass. It checks e1/2 isolation,
-trusted/probe ports up, independent zero-loss forwarding, heartbeat and monitor state.
-Successful JT40/JT41 must follow the isolation job. The current device playbook still
-does not assert duplicate-MAC/hold-down clearance, so no verified-recovery success
-path is enabled. Missing proof yields RECOVERY_NOT_VERIFIED and Slack escalation.
-Slack delivery failure yields ESCALATION_DELIVERY_FAILED with escalation_sent=false.
+Datadog verification now observes fresh post-job SNMP/probe/collector data and complete,
+strictly parsed post-isolation logs. Every detection target must have a later matching
+deletion; at least five minutes must elapse after the latest clear without new detection.
+Observation polls every 30 seconds, with a ten-minute deadline and at most 20 attempts.
+All passing proof yields RECOVERY_VERIFIED in the containment/forwarding + log-clearance
+scope. Missing proof or read failure stops and escalates; no direct empty-MAC-table or
+physical-loop claim is made. See [exact policy](TELEMETRY-VERIFIER.md).
 
-31 offline fixtures passed. Read-only access verification succeeded for all four
-templates. Earlier routing tests mocked AAP launches and Slack. Real execution of
+38 offline fixtures passed. Controlled routing tests mocked AAP/Slack and the final
+gate; a live read-only verifier test rejected recovery with no job proof. An actual
+fault-to-recovery incident has not yet been observed with this version. Real execution of
 JT39 requires a new eligible alert and explicit Approve in Slack; publication alone
 did not launch a job or change a port.

@@ -1,0 +1,95 @@
+{
+  "workflow_id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
+  "published": true,
+  "has_saved_draft": false,
+  "updated_at": "2026-11-08T00:54:17.459083Z",
+  "steps": 101,
+  "local_tests_passed": 38,
+  "routing_tests": [
+    {
+      "escalation_required": false,
+      "instanceId": "be27f039-5aff-4863-ab20-1ad5439f9c35",
+      "mode": "verified_routing",
+      "recovery_verified": true,
+      "result": "RECOVERY_VERIFIED",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "success_notification_sent_simulated": true
+    },
+    {
+      "escalation_required": true,
+      "instanceId": "de4ec330-e6a0-4e42-861f-673149f86d7e",
+      "mode": "missing_proof",
+      "recovery_verified": false,
+      "result": "RECOVERY_NOT_VERIFIED",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "success_notification_sent_simulated": false
+    },
+    {
+      "escalation_required": false,
+      "instanceId": "d1935f2c-bba1-4eab-ae52-318250832679",
+      "mode": "success_notification_error",
+      "recovery_verified": true,
+      "result": "RECOVERY_VERIFIED_NOTIFICATION_FAILED",
+      "status": {
+        "detailsKind": "SUCCEEDED",
+        "displayName": "Success"
+      },
+      "success_notification_sent_simulated": false
+    }
+  ],
+  "live_read_only_test": {
+    "instance_id": "b15d7087-bfd7-4f31-928a-4bf343288ddc",
+    "status": {
+      "detailsKind": "SUCCEEDED",
+      "displayName": "Success"
+    },
+    "steps": [
+      {
+        "name": "Evaluate_Recovery"
+      },
+      {
+        "name": "Verify_Recovery_Logs"
+      },
+      {
+        "name": "Observe_Recovery",
+        "status": "SUCCEEDED"
+      },
+      {
+        "name": "Finalize_Recovery_Verification",
+        "status": "SUCCEEDED"
+      }
+    ],
+    "verification": {
+      "criteria": {
+        "aap_execution_and_verification_succeeded": false,
+        "authenticated_approval": false,
+        "bounded_observation": true,
+        "collector_fresh": false,
+        "complete_log_query": true,
+        "fixed_port_isolated": false,
+        "independent_forwarding_zero_loss": false,
+        "matching_post_isolation_log_clearance": false,
+        "monitor_ok": true,
+        "no_aap_integration_error": true,
+        "quiet_after_clearance_5m": false,
+        "trusted_ports_up": false,
+        "verification_reads_succeeded": true
+      },
+      "observation_complete": true,
+      "reason": "Required execution evidence, log completeness or verification reads failed; stop and escalate.",
+      "recovery_verified": false,
+      "status": "RECOVERY_NOT_VERIFIED"
+    }
+  },
+  "routing_tests_override_final_gate": true,
+  "all_test_aap_launches_and_slack_messages_mocked": true,
+  "real_fault_to_verified_recovery_observed": false,
+  "scope": "containment_and_forwarding_with_datadog_log_clearance",
+  "direct_device_mac_table_clearance_confirmed": false
+}

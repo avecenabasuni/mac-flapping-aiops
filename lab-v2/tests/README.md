@@ -32,3 +32,9 @@ node --test lab-v2/tests/test_workflow_timeline.cjs
 ~~~
 
 These tests execute the scripts from the exported workflow JSON, with fixture log/agent inputs. They do not contact Datadog or create investigations.
+
+Telemetry verifier fixtures (positive proof and failure cases):
+
+```bash
+node --test lab-v2/tests/test_workflow_recovery.cjs
+```

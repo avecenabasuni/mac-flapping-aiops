@@ -1,6 +1,6 @@
 # Current AAP integration — 2026-11-08
 
-The 91-step workflow now executes fixed AAP jobs after Slack approval. The placeholder
+The 101-step workflow now executes fixed AAP jobs after Slack approval. The telemetry verifier can now verify containment/forwarding recovery; see [verifier policy](TELEMETRY-VERIFIER.md). The placeholder
 notes below describe historical Nov 6 behavior. See [current recovery workflow](RECOVERY-WORKFLOW.md)
 and [AAP access/publication status](AAP-INTEGRATION-STATUS.md).
 

@@ -22,7 +22,7 @@
     "all_four_message_variants_parsed": true,
     "device_recovery_verified": false
   },
-  "investigation_workflow_updated_at": "2026-11-08T00:43:02.516008Z",
+  "investigation_workflow_updated_at": "2026-11-08T00:54:17.459083Z",
   "investigation_workflow_features": {
     "custom_bits_agent_only": true,
     "native_bits_investigation_per_monitor_alert": false,
@@ -44,6 +44,11 @@
     ],
     "aap_permissions_verified": true,
     "real_aap_recovery_run_verified": false,
-    "duplicate_mac_clearance_verified": false
+    "duplicate_mac_clearance_verified": false,
+    "telemetry_recovery_verifier_enabled": true,
+    "verified_recovery_live_incident_observed": false,
+    "telemetry_verified_scope": "containment_and_forwarding_with_datadog_log_clearance",
+    "verification_quiet_seconds": 300,
+    "verification_observation_seconds": 600
   }
 }
