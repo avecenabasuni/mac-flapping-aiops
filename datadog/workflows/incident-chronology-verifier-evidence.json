@@ -1,0 +1,171 @@
+{
+  "workflow_id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
+  "published": true,
+  "published_at": "2026-11-08T09:34:30.583643Z",
+  "step_count": 101,
+  "changed_steps": [
+    "Build_Recovery_Log_Window",
+    "Evaluate_Recovery",
+    "Format_Recovery_Verified"
+  ],
+  "published_readback_matches": true,
+  "local_workflow_tests_passed": 52,
+  "recovery_tests_passed": 20,
+  "original_run": {
+    "instance_id": "1fb09113-80fb-4d06-917a-380ed79d4f04",
+    "result_unchanged": "RECOVERY_NOT_VERIFIED",
+    "aap_jobs": [
+      390,
+      391,
+      392,
+      393
+    ],
+    "clear_at": "2026-11-08T09:13:38.645Z",
+    "isolation_started": "2026-11-08T09:13:43.698255Z",
+    "clear_before_isolation_seconds": 5.053255,
+    "reason": "Prior query began at isolation start and excluded the two matching clears."
+  },
+  "policy": {
+    "incident_chronology": true,
+    "matching_clear_strictly_after_latest_detection": true,
+    "post_job_metrics_still_required": true,
+    "metric_stability_seconds": 60,
+    "max_metric_age_seconds": 180,
+    "quiet_after_latest_matching_clear_seconds": 300,
+    "causality_not_attributed_to_aap": true,
+    "complete_query_required": true,
+    "no_automatic_retry_or_restore": true
+  },
+  "offline_real_evidence_replay": {
+    "kind": "OFFLINE_FROZEN_REAL_EVIDENCE_REPLAY_NO_ACTIONS",
+    "source_instance": "1fb09113-80fb-4d06-917a-380ed79d4f04",
+    "frozen_at": "2026-11-08T09:24:29.055Z",
+    "result": "RECOVERY_VERIFIED",
+    "criteria": {
+      "bounded_observation": true,
+      "authenticated_approval": true,
+      "aap_execution_and_verification_succeeded": true,
+      "no_aap_integration_error": true,
+      "fixed_port_isolated": true,
+      "trusted_ports_up": true,
+      "independent_forwarding_zero_loss": true,
+      "collector_fresh": true,
+      "monitor_ok": true,
+      "complete_log_query": true,
+      "matching_incident_log_clearance": true,
+      "quiet_after_clearance_5m": true,
+      "verification_reads_succeeded": true
+    },
+    "missing": [],
+    "query_window": {
+      "from": "2026-11-08T09:06:19.000Z",
+      "to": "2026-11-08T09:24:29.055Z"
+    },
+    "log_evidence": {
+      "complete": true,
+      "returned_count": 6,
+      "unparsed": 0,
+      "entries": [
+        {
+          "log_id": "AwAAAaG6aWomOspv7QAAABhBYUc2YVg5ekFBQjZIUlY1XzJaUEFnQUEAAAAkZjFhMWJhNmItOTA2YS00NGIxLWI5NzctMGI0NGZhNDYyNmFjAAAFkQ",
+          "timestamp": "2026-11-08T09:07:13.062Z",
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "event_action": "deleted",
+          "target_type": "mac-vrf",
+          "interface": "",
+          "network_instance": "mac-flap"
+        },
+        {
+          "log_id": "AwAAAaG6aWomYu3QOgAAABhBYUc2YVczZEFBQi1CQlhuaXcyNWN3QUEAAAAkZjFhMWJhNmItOTA2YS00NGIxLWI5NzctMGI0NGZhNDYyNmFjAAAFkg",
+          "timestamp": "2026-11-08T09:07:13.062Z",
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "event_action": "deleted",
+          "target_type": "sub-interface",
+          "interface": "ethernet-1/2.1",
+          "network_instance": ""
+        },
+        {
+          "log_id": "AwAAAaG6bIz113pSvQAAABhBYUc2YktJTkFBRDZ4QmJESTVCVlpBQUEAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFfQ",
+          "timestamp": "2026-11-08T09:10:38.581Z",
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "event_action": "detected",
+          "target_type": "mac-vrf",
+          "interface": "",
+          "network_instance": "mac-flap"
+        },
+        {
+          "log_id": "AwAAAaG6bIz213pSvgAAABhBYUc2YktJTkFBRDZ4QmJESTVCVlpBQUIAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFfA",
+          "timestamp": "2026-11-08T09:10:38.582Z",
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "event_action": "detected",
+          "target_type": "sub-interface",
+          "interface": "ethernet-1/2.1",
+          "network_instance": ""
+        },
+        {
+          "log_id": "AwAAAaG6b0xVr2p9ggAAABhBYUc2YjJGVkFBRFNWeHFiMmptRWFRQUEAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFeg",
+          "timestamp": "2026-11-08T09:13:38.645Z",
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "event_action": "deleted",
+          "target_type": "sub-interface",
+          "interface": "ethernet-1/2.1",
+          "network_instance": ""
+        },
+        {
+          "log_id": "AwAAAaG6b0xVr2p9gwAAABhBYUc2YjJGVkFBRFNWeHFiMmptRWFRQUIAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFew",
+          "timestamp": "2026-11-08T09:13:38.645Z",
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "event_action": "deleted",
+          "target_type": "mac-vrf",
+          "interface": "",
+          "network_instance": "mac-flap"
+        }
+      ],
+      "unmatched_targets": [],
+      "latest_clear_at": "2026-11-08T09:13:38.645Z",
+      "new_detections_in_last_5m": 0,
+      "query_from": "2026-11-08T09:06:19.000Z",
+      "clearance_by_target": [
+        {
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "target_type": "mac-vrf",
+          "target": "mac-flap",
+          "last_detection_at": "2026-11-08T09:10:38.581Z",
+          "matching_clear_at": "2026-11-08T09:13:38.645Z",
+          "timing_relative_to_isolation": "PRE_ISOLATION",
+          "aap_caused_clearance": false
+        },
+        {
+          "host": "sw1",
+          "mac": "02:00:00:00:00:aa",
+          "target_type": "sub-interface",
+          "target": "ethernet-1/2.1",
+          "last_detection_at": "2026-11-08T09:10:38.582Z",
+          "matching_clear_at": "2026-11-08T09:13:38.645Z",
+          "timing_relative_to_isolation": "PRE_ISOLATION",
+          "aap_caused_clearance": false
+        }
+      ],
+      "clearance_counts": {
+        "pre_isolation": 2,
+        "during_isolation": 0,
+        "post_isolation": 0
+      },
+      "aap_caused_clearance": false
+    },
+    "formatted_log_clearance_attributed_to_aap": false,
+    "formatted_message": "━━━━━━━━━━━━━━━━━━━━\n:white_check_mark: *INCIDENT RESPONSE · 05 VERIFY*\n*MAC Flapping — Telemetry Recovery Verified*\n━━━━━━━━━━━━━━━━━━━━\n\n*Target:* sw1 · ethernet-1/2 (Host B)\n*AAP:* JT39 isolated, JT40 device checks and JT41 forwarding checks successful.\n*Jobs:* 391 / 392 / 393\n*Datadog proof:* fresh post-job e1/2 down; e1/1 and e1/3 up; C→A 0% loss; collector fresh; monitor OK.\n*Log proof:* complete incident chronology; each target has a matching clear after its latest detection, with five minutes of quiet observation.\n*Clear timing relative to isolation:* 2 before · 0 during · 0 after.\n*Pre-isolation clear:* 2 target(s) had cleared before isolation began. These clear events are not attributed to AAP.\n\n*Verified scope:* containment and forwarding with Datadog log-clearance evidence. This does not confirm a physical loop or a direct read of an empty device duplicate-MAC table.\n\nNo automatic restore or extra remediation. Keep Host B isolated until an operator approves restore.\n\n<https://app.datadoghq.com/workflow/beb71b61-bff9-460d-ad37-853ae9cc778e?instance=OFFLINE_REPLAY_NOT_A_LIVE_RUN|Verification evidence> · <https://app.datadoghq.com/monitors/340593559|Monitor>",
+    "aap_jobs_relaunched": false,
+    "slack_message_sent": false
+  },
+  "new_live_recovery_run_started": false,
+  "fault_triggered": false,
+  "reset_triggered": false
+}

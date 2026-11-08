@@ -200,3 +200,5 @@ JT42/job330 restored e1/2 before this test under explicit user authorization. Th
 [Fresh full recovery evidence](datadog/workflows/live-end-to-end-recovery-evidence.json).
 
 Latest complete controller-to-recovery evidence: [Nov 8 full scenario test](datadog/workflows/scenario-controller-full-recovery-evidence.json).
+
+Verifier chronology update: matching clear events can precede isolation when they follow the latest detection for that exact target. Fresh post-job telemetry remains mandatory; log-clear causality is not attributed to AAP. [Policy and frozen real-case replay](lab-v2/docs/TELEMETRY-VERIFIER.md).

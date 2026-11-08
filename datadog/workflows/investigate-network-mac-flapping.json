@@ -946,7 +946,7 @@
         "parameters": [
           {
             "name": "script",
-            "value": "\nconst steps=$.Steps,vars=$.Variables||{},now=Date.now(),jobs=vars.aap_jobs||{},execution=steps.Record_AAP_Execution?.data||{};\nconst iso=jobs.isolate||{},dev=jobs.verify_device||{},probe=jobs.verify_forwarding||{};\nconst isoStart=Date.parse(iso.started),isoEnd=Date.parse(iso.finished),deviceEnd=Date.parse(dev.finished),probeEnd=Date.parse(probe.finished),cutoff=Math.max(isoEnd,deviceEnd,probeEnd);\nconst jobOK=(j,id)=>j.valid===true&&j.template_id===id&&Number.isInteger(j.id)&&j.id>0&&j.status===\"successful\"&&Number.isFinite(Date.parse(j.started))&&Number.isFinite(Date.parse(j.finished))&&Date.parse(j.finished)>=Date.parse(j.started)&&Date.parse(j.finished)<=now;\nconst jobProof=jobOK(iso,39)&&jobOK(dev,40)&&jobOK(probe,41)&&Date.parse(dev.started)>=isoEnd&&Date.parse(probe.started)>=deviceEnd&&execution.execution_succeeded===true&&String(iso.id)===String(execution.aap_job_id);\nfunction sample(step,iface,wanted){\n const r=steps[step],series=(r?.series||[]).filter(s=>!iface||(s.tag_set||s.tagSet||String(s.scope||\"\").split(\",\")).includes(\"interface:\"+iface));\n if(r?.status!==\"ok\"||series.length!==1)return {passed:false,reason:\"Unavailable or ambiguous series\"};\n const all=series[0].pointlist||[];\n const points=all.filter(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1])).map(p=>[p[0]<1e12?p[0]*1000:p[0],p[1]]).filter(p=>p[0]>cutoff&&p[0]>=now-180000&&p[0]<=now).sort((a,b)=>a[0]-b[0]);\n const grouped=new Map();for(const p of points){if(grouped.has(p[0])&&grouped.get(p[0])[1]!==p[1])return {passed:false,reason:\"Conflicting samples at one timestamp\"};grouped.set(p[0],p);}const unique=[...grouped.values()];\n const last=unique.at(-1),span=last&&unique.length>1?last[0]-unique[0][0]:0;\n return {passed:unique.length>=2&&span>=60000&&unique.every(p=>p[1]===wanted),value:last?.[1]??null,timestamp:last?new Date(last[0]).toISOString():null,sample_count:unique.length,stable_seconds:span/1000,reason:unique.length<2||span<60000?\"Need fresh post-job samples spanning at least 60 seconds\":\"Post-job stability evaluated\"};\n}\nconst admin={},oper={};for(const port of [\"ethernet-1/1\",\"ethernet-1/2\",\"ethernet-1/3\"]){const expected=port===\"ethernet-1/2\"?2:1;admin[port]=sample(\"Verify_Interface_Admin\",port,expected);oper[port]=sample(\"Verify_Interface_Oper\",port,expected);}\nconst loss=sample(\"Verify_Forwarding\",null,0),heartbeat=sample(\"Verify_Collector_Freshness\",null,1);\nconst raw=steps.Verify_Recovery_Logs||{},rows=Array.isArray(raw.data)?raw.data:[],entries=[],seen=new Set();let unparsed=0;\nconst detect=/^bridgetable\\|\\d+\\|\\d+\\|\\d+\\|N: A duplicate MAC address ([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}) was detected on (sub-interface )?(\\S+)\\.$/;\nconst deleted=/^bridgetable\\|\\d+\\|\\d+\\|\\d+\\|N: A duplicate MAC address ([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}) detected on (sub-interface )?(\\S+) is now deleted\\.$/;\nfor(const row of rows){\n const a=row.attributes||{},tags=a.tags||[],msg=String(a.message||\"\"),ts=Date.parse(a.timestamp),d=detect.exec(msg),clear=deleted.exec(msg),m=d||clear;\n if(!m||!row.id||a.host!==\"sw1\"||!tags.includes(\"env:network-aiops\")||!tags.includes(\"service:nokia-srlinux\")||(a.service!==\"sr_l2_mac_mgr\"&&a.attributes?.syslog?.appname!==\"sr_l2_mac_mgr\")||!Number.isFinite(ts)||ts<isoStart||ts>now){unparsed++;continue;}\n if(m[1].toLowerCase()!==\"02:00:00:00:00:aa\")continue;\n if(seen.has(row.id))continue;seen.add(row.id);\n entries.push({log_id:row.id,timestamp:new Date(ts).toISOString(),host:a.host,mac:m[1].toLowerCase(),event_action:d?\"detected\":\"deleted\",target_type:m[2]?\"sub-interface\":\"mac-vrf\",interface:m[2]?m[3]:\"\",network_instance:m[2]?\"\":m[3]});\n}\nconst complete=raw.meta?.status===\"done\"&&!raw.meta?.page?.after&&!raw.links?.next&&!raw.meta?.warnings?.length&&unparsed===0&&!vars.verification_read_failed;\nconst key=e=>JSON.stringify([e.host,e.mac.toLowerCase(),e.target_type,e.interface||e.network_instance]);\nconst det=new Map(),clear=new Map();\nconst seed=(steps.Report?.data?.evidence?.entries||[]).filter(e=>e.event_action===\"detected\"&&e.host===\"sw1\"&&e.mac?.toLowerCase()===\"02:00:00:00:00:aa\"&&e.log_id&&Number.isFinite(Date.parse(e.timestamp)));\nfor(const e of [...seed,...entries]){const map=e.event_action===\"detected\"?det:clear,k=key(e),t=Date.parse(e.timestamp);map.set(k,Math.max(map.get(k)||0,t));}\nconst unmatched=[...det].filter(([k,t])=>!(clear.get(k)>t&&clear.get(k)>=isoStart)).map(([k])=>k);\nconst lastClear=clear.size?Math.max(...clear.values()):null;\nconst recentDetections=entries.filter(e=>e.event_action===\"detected\"&&Date.parse(e.timestamp)>now-300000);\nconst logClear=complete&&det.size>0&&unmatched.length===0&&lastClear!==null;\nconst quiet=logClear&&now-lastClear>=300000&&recentDetections.length===0;\nconst monitor=steps.Verify_Monitor_State?.overall_state||\"Unknown\";\nconst criteria={bounded_observation:Number.isFinite(vars.verification_deadline)&&now<=vars.verification_deadline&&Number(vars.verification_attempt||0)<20,\nauthenticated_approval:steps.Record_Approval_Decision?.data?.approval_status===\"APPROVED\"&&Boolean(steps.Record_Approval_Decision?.data?.responder?.id),\naap_execution_and_verification_succeeded:jobProof,\nno_aap_integration_error:!steps.AAP_Integration_Failed,\nfixed_port_isolated:admin[\"ethernet-1/2\"].passed&&oper[\"ethernet-1/2\"].passed,\ntrusted_ports_up:[\"ethernet-1/1\",\"ethernet-1/3\"].every(p=>admin[p].passed&&oper[p].passed),\nindependent_forwarding_zero_loss:loss.passed,collector_fresh:heartbeat.passed,monitor_ok:monitor===\"OK\",\ncomplete_log_query:complete,matching_post_isolation_log_clearance:logClear,quiet_after_clearance_5m:quiet,\nverification_reads_succeeded:!vars.verification_read_failed};\nconst missing=Object.entries(criteria).filter(([,v])=>v!==true).map(([k])=>k),verified=missing.length===0;\nconst permanent=!jobProof||Boolean(steps.AAP_Integration_Failed)||Boolean(vars.verification_read_failed)||!complete||!criteria.authenticated_approval;\nconst attempt=Number(vars.verification_attempt||0)+1,deadline=Number(vars.verification_deadline||0),expired=now>=deadline||attempt>=20;\nconst keep=!verified&&!permanent&&!expired;\nconst result={stage:\"VERIFY\",status:verified?\"RECOVERY_VERIFIED\":\"RECOVERY_NOT_VERIFIED\",recovery_verified:verified,verification_scope:\"containment_and_forwarding_with_datadog_log_clearance\",physical_loop_confirmed:false,device_mac_table_clearance_confirmed:false,criteria,missing,attempt,observation_complete:!keep,deadline_reached:expired,reason:verified?\"Approved isolation, successful AAP verification jobs, stable fresh post-job telemetry and matching clear logs plus five-minute quiet observation passed.\":permanent?\"Required execution evidence, log completeness or verification reads failed; stop and escalate.\":expired?\"Bounded recovery observation ended with missing criteria.\":\"Waiting for stable post-job telemetry, matched clear logs and five-minute quiet observation.\",aap_jobs:jobs,execution,observed:{monitor_state:monitor,admin,oper,loss_pct:loss,collector_heartbeat:heartbeat,log_evidence:{complete,returned_count:rows.length,unparsed,entries,unmatched_targets:unmatched,latest_clear_at:lastClear?new Date(lastClear).toISOString():null,new_detections_in_last_5m:recentDetections.length}},remediation_executed:execution.remediation_executed===true,automatic_retry:false,checked_at:new Date(now).toISOString()};\n$.Helpers.setVariable(\"verification_attempt\",attempt);$.Helpers.setVariable(\"verification_continue\",keep);$.Helpers.setVariable(\"verification_result\",result);return result;\n"
+            "value": "\nconst steps=$.Steps,vars=$.Variables||{},now=Date.now(),jobs=vars.aap_jobs||{},execution=steps.Record_AAP_Execution?.data||{};\nconst iso=jobs.isolate||{},dev=jobs.verify_device||{},probe=jobs.verify_forwarding||{};\nconst isoStart=Date.parse(iso.started),isoEnd=Date.parse(iso.finished),deviceEnd=Date.parse(dev.finished),probeEnd=Date.parse(probe.finished),cutoff=Math.max(isoEnd,deviceEnd,probeEnd);\nconst jobOK=(j,id)=>j.valid===true&&j.template_id===id&&Number.isInteger(j.id)&&j.id>0&&j.status===\"successful\"&&Number.isFinite(Date.parse(j.started))&&Number.isFinite(Date.parse(j.finished))&&Date.parse(j.finished)>=Date.parse(j.started)&&Date.parse(j.finished)<=now;\nconst jobProof=jobOK(iso,39)&&jobOK(dev,40)&&jobOK(probe,41)&&Date.parse(dev.started)>=isoEnd&&Date.parse(probe.started)>=deviceEnd&&execution.execution_succeeded===true&&String(iso.id)===String(execution.aap_job_id);\nfunction sample(step,iface,wanted){\n const r=steps[step],series=(r?.series||[]).filter(s=>!iface||(s.tag_set||s.tagSet||String(s.scope||\"\").split(\",\")).includes(\"interface:\"+iface));\n if(r?.status!==\"ok\"||series.length!==1)return {passed:false,reason:\"Unavailable or ambiguous series\"};\n const all=series[0].pointlist||[];\n const points=all.filter(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1])).map(p=>[p[0]<1e12?p[0]*1000:p[0],p[1]]).filter(p=>p[0]>cutoff&&p[0]>=now-180000&&p[0]<=now).sort((a,b)=>a[0]-b[0]);\n const grouped=new Map();for(const p of points){if(grouped.has(p[0])&&grouped.get(p[0])[1]!==p[1])return {passed:false,reason:\"Conflicting samples at one timestamp\"};grouped.set(p[0],p);}const unique=[...grouped.values()];\n const last=unique.at(-1),span=last&&unique.length>1?last[0]-unique[0][0]:0;\n return {passed:unique.length>=2&&span>=60000&&unique.every(p=>p[1]===wanted),value:last?.[1]??null,timestamp:last?new Date(last[0]).toISOString():null,sample_count:unique.length,stable_seconds:span/1000,reason:unique.length<2||span<60000?\"Need fresh post-job samples spanning at least 60 seconds\":\"Post-job stability evaluated\"};\n}\nconst admin={},oper={};for(const port of [\"ethernet-1/1\",\"ethernet-1/2\",\"ethernet-1/3\"]){const expected=port===\"ethernet-1/2\"?2:1;admin[port]=sample(\"Verify_Interface_Admin\",port,expected);oper[port]=sample(\"Verify_Interface_Oper\",port,expected);}\nconst loss=sample(\"Verify_Forwarding\",null,0),heartbeat=sample(\"Verify_Collector_Freshness\",null,1);\nconst raw=steps.Verify_Recovery_Logs||{},rows=Array.isArray(raw.data)?raw.data:[],entries=[],seen=new Set();let unparsed=0;\nconst windowStart=Date.parse(steps.Build_Recovery_Log_Window?.data?.from);\nconst detect=/^bridgetable\\|\\d+\\|\\d+\\|\\d+\\|N: A duplicate MAC address ([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}) was detected on (sub-interface )?(\\S+)\\.$/;\nconst deleted=/^bridgetable\\|\\d+\\|\\d+\\|\\d+\\|N: A duplicate MAC address ([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}) detected on (sub-interface )?(\\S+) is now deleted\\.$/;\nfor(const row of rows){\n const a=row.attributes||{},tags=a.tags||[],msg=String(a.message||''),ts=Date.parse(a.timestamp),d=detect.exec(msg),clear=deleted.exec(msg),m=d||clear;\n if(!m||!row.id||a.host!=='sw1'||!tags.includes('env:network-aiops')||!tags.includes('service:nokia-srlinux')||(a.service!=='sr_l2_mac_mgr'&&a.attributes?.syslog?.appname!=='sr_l2_mac_mgr')||!Number.isFinite(ts)||!Number.isFinite(windowStart)||ts<windowStart||ts>now){unparsed++;continue;}\n if(m[1].toLowerCase()!=='02:00:00:00:00:aa')continue;\n if(seen.has(row.id))continue;seen.add(row.id);\n entries.push({log_id:row.id,timestamp:new Date(ts).toISOString(),host:a.host,mac:m[1].toLowerCase(),event_action:d?'detected':'deleted',target_type:m[2]?'sub-interface':'mac-vrf',interface:m[2]?m[3]:'',network_instance:m[2]?'':m[3]});\n}\nconst seed=(steps.Report?.data?.evidence?.entries||[]).filter(e=>e.event_action==='detected'&&e.host==='sw1'&&e.mac?.toLowerCase()==='02:00:00:00:00:aa'&&e.log_id&&Number.isFinite(Date.parse(e.timestamp))&&Date.parse(e.timestamp)<=now);\nconst complete=Number.isFinite(windowStart)&&windowStart<=now&&seed.length>0&&seed.every(e=>Date.parse(e.timestamp)>=windowStart)&&raw.meta?.status==='done'&&!raw.meta?.page?.after&&!raw.links?.next&&!raw.meta?.warnings?.length&&unparsed===0&&!vars.verification_read_failed;\nconst key=e=>JSON.stringify([e.host,e.mac.toLowerCase(),e.target_type,e.interface||e.network_instance]);\nconst det=new Map(),clear=new Map(),targets=new Map();\nfor(const e of [...seed,...entries]){const map=e.event_action==='detected'?det:clear,k=key(e),t=Date.parse(e.timestamp);map.set(k,Math.max(map.get(k)||0,t));targets.set(k,e);}\nconst unmatched=[...det].filter(([k,t])=>!(clear.get(k)>t)).map(([k])=>k);\nconst clearanceByTarget=[...det].map(([k,t])=>{\n const e=targets.get(k),clearedAt=clear.get(k),matched=Number.isFinite(clearedAt)&&clearedAt>t;\n const relation=!matched?'UNMATCHED':clearedAt<isoStart?'PRE_ISOLATION':clearedAt<=isoEnd?'DURING_ISOLATION':'POST_ISOLATION';\n return {host:e.host,mac:e.mac,target_type:e.target_type,target:e.interface||e.network_instance,last_detection_at:new Date(t).toISOString(),matching_clear_at:matched?new Date(clearedAt).toISOString():null,timing_relative_to_isolation:relation,aap_caused_clearance:false};\n});\nconst counts={pre_isolation:0,during_isolation:0,post_isolation:0};\nfor(const e of clearanceByTarget){if(e.timing_relative_to_isolation==='PRE_ISOLATION')counts.pre_isolation++;else if(e.timing_relative_to_isolation==='DURING_ISOLATION')counts.during_isolation++;else if(e.timing_relative_to_isolation==='POST_ISOLATION')counts.post_isolation++;}\nconst matchedTimes=clearanceByTarget.filter(e=>e.matching_clear_at).map(e=>Date.parse(e.matching_clear_at));\nconst lastClear=matchedTimes.length?Math.max(...matchedTimes):null;\nconst recentDetections=entries.filter(e=>e.event_action==='detected'&&Date.parse(e.timestamp)>now-300000);\nconst logClear=complete&&det.size>0&&unmatched.length===0&&lastClear!==null;\nconst quiet=logClear&&now-lastClear>=300000&&recentDetections.length===0;\n\r\n\nconst monitor=steps.Verify_Monitor_State?.overall_state||\"Unknown\";\nconst criteria={bounded_observation:Number.isFinite(vars.verification_deadline)&&now<=vars.verification_deadline&&Number(vars.verification_attempt||0)<20,\nauthenticated_approval:steps.Record_Approval_Decision?.data?.approval_status===\"APPROVED\"&&Boolean(steps.Record_Approval_Decision?.data?.responder?.id),\naap_execution_and_verification_succeeded:jobProof,\nno_aap_integration_error:!steps.AAP_Integration_Failed,\nfixed_port_isolated:admin[\"ethernet-1/2\"].passed&&oper[\"ethernet-1/2\"].passed,\ntrusted_ports_up:[\"ethernet-1/1\",\"ethernet-1/3\"].every(p=>admin[p].passed&&oper[p].passed),\nindependent_forwarding_zero_loss:loss.passed,collector_fresh:heartbeat.passed,monitor_ok:monitor===\"OK\",\ncomplete_log_query:complete,matching_incident_log_clearance:logClear,quiet_after_clearance_5m:quiet,\nverification_reads_succeeded:!vars.verification_read_failed};\nconst missing=Object.entries(criteria).filter(([,v])=>v!==true).map(([k])=>k),verified=missing.length===0;\nconst permanent=!jobProof||Boolean(steps.AAP_Integration_Failed)||Boolean(vars.verification_read_failed)||!complete||!criteria.authenticated_approval;\nconst attempt=Number(vars.verification_attempt||0)+1,deadline=Number(vars.verification_deadline||0),expired=now>=deadline||attempt>=20;\nconst keep=!verified&&!permanent&&!expired;\nconst result={stage:\"VERIFY\",status:verified?\"RECOVERY_VERIFIED\":\"RECOVERY_NOT_VERIFIED\",recovery_verified:verified,verification_scope:\"containment_and_forwarding_with_datadog_log_clearance\",physical_loop_confirmed:false,device_mac_table_clearance_confirmed:false,criteria,missing,attempt,observation_complete:!keep,deadline_reached:expired,reason:verified?\"Approved isolation, successful AAP verification jobs, stable fresh post-job telemetry and matching incident clear logs plus five-minute quiet observation passed; log-clear causality is not attributed to AAP.\":permanent?\"Required execution evidence, log completeness or verification reads failed; stop and escalate.\":expired?\"Bounded recovery observation ended with missing criteria.\":\"Waiting for stable post-job telemetry, matched incident clear logs and five-minute quiet observation.\",aap_jobs:jobs,execution,observed:{monitor_state:monitor,admin,oper,loss_pct:loss,collector_heartbeat:heartbeat,log_evidence:{complete,returned_count:rows.length,unparsed,entries,unmatched_targets:unmatched,latest_clear_at:lastClear?new Date(lastClear).toISOString():null,new_detections_in_last_5m:recentDetections.length,query_from:new Date(windowStart).toISOString(),clearance_by_target:clearanceByTarget,clearance_counts:counts,aap_caused_clearance:false}},remediation_executed:execution.remediation_executed===true,automatic_retry:false,checked_at:new Date(now).toISOString()};\n$.Helpers.setVariable(\"verification_attempt\",attempt);$.Helpers.setVariable(\"verification_continue\",keep);$.Helpers.setVariable(\"verification_result\",result);return result;\n"
           }
         ],
         "readinessGate": {
@@ -1110,7 +1110,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
           },
           {
             "name": "requestHeaders",
@@ -1208,7 +1208,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
           },
           {
             "name": "requestHeaders",
@@ -1363,7 +1363,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
           },
           {
             "name": "requestHeaders",
@@ -1471,7 +1471,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
           },
           {
             "name": "requestHeaders",
@@ -1569,7 +1569,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
           },
           {
             "name": "requestHeaders",
@@ -1724,7 +1724,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
           },
           {
             "name": "requestHeaders",
@@ -1832,7 +1832,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
           },
           {
             "name": "requestHeaders",
@@ -1930,7 +1930,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
           },
           {
             "name": "requestHeaders",
@@ -2085,7 +2085,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
           },
           {
             "name": "requestHeaders",
@@ -2193,7 +2193,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/"
           },
           {
             "name": "requestHeaders",
@@ -2291,7 +2291,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
+            "value": "https://192.168.2.66/api/controller/v2/job_templates/{{ Variables.aap_config.id }}/launch/"
           },
           {
             "name": "requestHeaders",
@@ -2446,7 +2446,7 @@
           },
           {
             "name": "url",
-            "value": "https://AAP_CONTROLLER_HOST/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
+            "value": "https://192.168.2.66/api/controller/v2/jobs/{{ Variables.aap_job_id }}/"
           },
           {
             "name": "requestHeaders",
@@ -2643,7 +2643,7 @@
         "parameters": [
           {
             "name": "script",
-            "value": "const end=Date.parse($.Variables.aap_jobs?.isolate?.started);return {from:new Date(Number.isFinite(end)?end:Date.now()-900000).toISOString(),to:new Date().toISOString()};"
+            "value": "const report=$.Steps.Report?.data||{},entries=report.evidence?.entries||[];\nconst detections=entries.filter(e=>e.event_action==='detected'&&e.host==='sw1'&&e.mac?.toLowerCase()==='02:00:00:00:00:aa'&&e.log_id).map(e=>Date.parse(e.timestamp)).filter(Number.isFinite);\nconst startCandidates=[Date.parse(report.window?.from),Date.parse(report.evidence?.window?.from),...detections].filter(Number.isFinite);\nif(!detections.length||!startCandidates.length)throw Error('Validated incident detection timestamps required for the recovery log window');\nconst from=Math.min(...startCandidates),now=Date.now();\nif(from>Math.min(...detections)||from>now)throw Error('Invalid incident log chronology');\nreturn {from:new Date(from).toISOString(),to:new Date(now).toISOString()};\n\r\n"
           }
         ],
         "outboundEdges": [
@@ -2755,7 +2755,7 @@
         "parameters": [
           {
             "name": "script",
-            "value": "\nconst v=$.Steps.Finalize_Recovery_Verification.data,j=v.aap_jobs||{};\nif(v.recovery_verified!==true)throw new Error(\"Verified recovery evidence required\");\nconst safe=s=>String(s??\"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\").replace(/@/g,\"＠\");\nreturn {workflow_result:\"RECOVERY_VERIFIED\",verification_status:\"RECOVERY_VERIFIED\",recovery_verified:true,verification_scope:v.verification_scope,remediation_executed:true,automatic_retry:false,escalation_required:false,slack_text:[\"━━━━━━━━━━━━━━━━━━━━\",\":white_check_mark: *INCIDENT RESPONSE · 05 VERIFY*\",\"*MAC Flapping — Telemetry Recovery Verified*\",\"━━━━━━━━━━━━━━━━━━━━\",\"\",\"*Target:* sw1 · ethernet-1/2 (Host B)\",\"*AAP:* JT39 isolated, JT40 device checks and JT41 forwarding checks successful.\",\"*Jobs:* \"+safe([j.isolate?.id,j.verify_device?.id,j.verify_forwarding?.id].join(\" / \")),\"*Datadog proof:* fresh post-job e1/2 down; e1/1 and e1/3 up; C→A 0% loss; collector fresh; monitor OK.\",\"*Log proof:* matched post-isolation deletions for every observed detection target and five minutes without new duplicate-MAC detection.\",\"\",\"*Verified scope:* containment and forwarding with Datadog log-clearance evidence. This does not confirm a physical loop or a direct read of an empty device duplicate-MAC table.\",\"\",\"No automatic restore or extra remediation. Keep Host B isolated until an operator approves restore.\",\"\",\"<https://app.datadoghq.com/workflow/\"+String($.WorkflowId)+\"?instance=\"+String($.InstanceId)+\"|Verification evidence> · <https://app.datadoghq.com/monitors/340593559|Monitor>\"].join(\"\\n\")};\n"
+            "value": "\nconst v=$.Steps.Finalize_Recovery_Verification.data,j=v.aap_jobs||{},l=v.observed?.log_evidence||{},counts=l.clearance_counts||{};\nif(v.recovery_verified!==true)throw new Error(\"Verified recovery evidence required\");\nconst safe=s=>String(s??\"\").replace(/&/g,\"&amp;\").replace(/</g,\"&lt;\").replace(/>/g,\"&gt;\").replace(/@/g,\"＠\");\nconst pre=Number(counts.pre_isolation||0),during=Number(counts.during_isolation||0),post=Number(counts.post_isolation||0);\nreturn {workflow_result:\"RECOVERY_VERIFIED\",verification_status:\"RECOVERY_VERIFIED\",recovery_verified:true,verification_scope:v.verification_scope,remediation_executed:true,automatic_retry:false,escalation_required:false,log_clearance_attributed_to_aap:false,slack_text:[\n\"━━━━━━━━━━━━━━━━━━━━\",\":white_check_mark: *INCIDENT RESPONSE · 05 VERIFY*\",\"*MAC Flapping — Telemetry Recovery Verified*\",\"━━━━━━━━━━━━━━━━━━━━\",\"\",\n\"*Target:* sw1 · ethernet-1/2 (Host B)\",\n\"*AAP:* JT39 isolated, JT40 device checks and JT41 forwarding checks successful.\",\n\"*Jobs:* \"+safe([j.isolate?.id,j.verify_device?.id,j.verify_forwarding?.id].join(\" / \")),\n\"*Datadog proof:* fresh post-job e1/2 down; e1/1 and e1/3 up; C→A 0% loss; collector fresh; monitor OK.\",\n\"*Log proof:* complete incident chronology; each target has a matching clear after its latest detection, with five minutes of quiet observation.\",\n\"*Clear timing relative to isolation:* \"+pre+\" before · \"+during+\" during · \"+post+\" after.\",\npre>0?\"*Pre-isolation clear:* \"+pre+\" target(s) had cleared before isolation began. These clear events are not attributed to AAP.\":\"Log-clear timing is observed evidence; causality is not attributed to AAP.\",\n\"\",\n\"*Verified scope:* containment and forwarding with Datadog log-clearance evidence. This does not confirm a physical loop or a direct read of an empty device duplicate-MAC table.\",\n\"\",\n\"No automatic restore or extra remediation. Keep Host B isolated until an operator approves restore.\",\"\",\n\"<https://app.datadoghq.com/workflow/\"+String($.WorkflowId)+\"?instance=\"+String($.InstanceId)+\"|Verification evidence> · <https://app.datadoghq.com/monitors/340593559|Monitor>\"\n].join(\"\\n\")};\n"
           }
         ],
         "outboundEdges": [
@@ -2869,7 +2869,5 @@
         }
       ]
     }
-  },
-  "runAsUserMode": "owner",
-  "sensitivePrivileges": false
+  }
 }

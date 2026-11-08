@@ -12,7 +12,7 @@ function context(){
  c.log=(target,action='deleted',time=isoEnd+60000)=>({id:'log-'+target+'-'+time+'-'+action,attributes:{host:'sw1',service:'sr_l2_mac_mgr',timestamp:at(time),tags:['env:network-aiops','service:nokia-srlinux'],message:'bridgetable|2163|2163|00001|N: A duplicate MAC address 02:00:00:00:00:AA '+(action==='detected'?'was detected on ':'detected on ')+(target==='mac-flap'?'':'sub-interface ')+target+(action==='detected'?'.':' is now deleted.')}});
  Steps.Verify_Recovery_Logs.data=[c.log('mac-flap'),c.log('ethernet-1/2.1')];return c;
 }
-const evaluate=c=>script('Evaluate_Recovery')(c);
+const evaluate=c=>{c.Steps.Build_Recovery_Log_Window={data:script('Build_Recovery_Log_Window')(c)};return script('Evaluate_Recovery')(c);};
 test('complete post-job telemetry and matching clears plus quiet window can verify recovery',()=>{
  const c=context(),r=evaluate(c);assert.equal(r.recovery_verified,true);assert.equal(r.status,'RECOVERY_VERIFIED');
  assert.equal(Object.keys(r.criteria).length,13);assert.deepEqual(r.missing,[]);assert.equal(c.Variables.verification_continue,false);
@@ -22,16 +22,41 @@ test('approval, successful exact jobs and post-isolation verification order are 
  for(const mutate of [c=>c.Steps.Record_Approval_Decision.data.approval_status='REJECTED',c=>c.Variables.aap_jobs.isolate.status='failed',c=>c.Variables.aap_jobs.verify_device.template_id=42,c=>c.Variables.aap_jobs.verify_forwarding.valid=false,c=>c.Variables.aap_jobs.verify_forwarding.started=c.Variables.aap_jobs.isolate.started,c=>c.Steps.AAP_Integration_Failed={data:{reason:'failure'}}]){const c=context();mutate(c);assert.equal(evaluate(c).recovery_verified,false);assert.equal(c.Variables.verification_continue,false);}
 });
 test('old clears cannot clear newer detections, and both detection targets must clear',()=>{
- const c=context();c.Steps.Verify_Recovery_Logs.data.pop();assert.equal(evaluate(c).criteria.matching_post_isolation_log_clearance,false);
+ const c=context();c.Steps.Verify_Recovery_Logs.data.pop();assert.equal(evaluate(c).criteria.matching_incident_log_clearance,false);
  const d=context();d.Steps.Verify_Recovery_Logs.data.push(d.log('ethernet-1/2.1','detected',Date.now()-10000));assert.equal(evaluate(d).recovery_verified,false);
 });
-test('a matching clear during the approved isolation job counts, but a pre-start clear does not',()=>{
+test('matching clears during isolation and before isolation count with distinct timing and no AAP attribution',()=>{
  const c=context(),start=Date.parse(c.Variables.aap_jobs.isolate.started);
  c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',start+5000),c.log('ethernet-1/2.1','deleted',start+5000)];
- assert.equal(evaluate(c).recovery_verified,true);
+ const during=evaluate(c);assert.equal(during.recovery_verified,true);assert.equal(during.observed.log_evidence.clearance_counts.during_isolation,2);
  const d=context(),before=Date.parse(d.Variables.aap_jobs.isolate.started)-1;
  d.Steps.Verify_Recovery_Logs.data=[d.log('mac-flap','deleted',before),d.log('ethernet-1/2.1','deleted',before)];
- assert.equal(evaluate(d).recovery_verified,false);
+ const pre=evaluate(d);assert.equal(pre.recovery_verified,true);assert.equal(pre.observed.log_evidence.clearance_counts.pre_isolation,2);assert.equal(pre.observed.log_evidence.aap_caused_clearance,false);
+ assert.ok(pre.observed.log_evidence.clearance_by_target.every(x=>x.timing_relative_to_isolation==='PRE_ISOLATION'&&x.aap_caused_clearance===false));
+ d.Steps.Finalize_Recovery_Verification={data:pre};const message=script('Format_Recovery_Verified')(d);assert.match(message.slack_text,/cleared before isolation began/);assert.match(message.slack_text,/not attributed to AAP/);assert.equal(message.log_clearance_attributed_to_aap,false);
+});
+
+test('pre-isolation clearance still requires fresh telemetry after all verification jobs',()=>{
+ for(const metric of ['Verify_Forwarding','Verify_Collector_Freshness']){const c=context(),start=Date.parse(c.Variables.aap_jobs.isolate.started);c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',start-1),c.log('ethernet-1/2.1','deleted',start-1)];c.Steps[metric].series[0].pointlist=[[start-90000,metric==='Verify_Forwarding'?0:1],[start-30000,metric==='Verify_Forwarding'?0:1]];assert.equal(evaluate(c).recovery_verified,false);}
+});
+
+test('clear before latest detection, or at the same timestamp, cannot clear that target',()=>{
+ for(const offset of [-1,0]){const c=context(),det=Date.parse(c.Steps.Report.data.evidence.entries[0].timestamp);c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',det+offset),c.log('ethernet-1/2.1','deleted',det+offset)];assert.equal(evaluate(c).recovery_verified,false);}
+});
+
+test('a later detection invalidates pre-isolation clearance and needs a newer matching clear',()=>{
+ const c=context(),start=Date.parse(c.Variables.aap_jobs.isolate.started);c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',start-1),c.log('ethernet-1/2.1','deleted',start-1),c.log('mac-flap','detected',start+1000)];assert.equal(evaluate(c).criteria.matching_incident_log_clearance,false);
+ c.Steps.Verify_Recovery_Logs.data.push(c.log('mac-flap','deleted',start+5000));assert.equal(evaluate(c).recovery_verified,true);
+});
+
+test('incident window covers initial detections and rejects missing validated detection timestamps',()=>{
+ const c=context(),seed=Date.parse(c.Steps.Report.data.evidence.entries[0].timestamp);c.Steps.Report.data.window={from:new Date(seed-60000).toISOString()};assert.equal(Date.parse(script('Build_Recovery_Log_Window')(c).from),seed-60000);c.Steps.Report.data.evidence.entries=[];assert.throws(()=>script('Build_Recovery_Log_Window')(c));
+});
+
+test('real 5.053-second pre-isolation clear case passes all criteria in a frozen read-only replay',()=>{
+ const f=JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures/pre-isolation-clear-real-case.json'),'utf8'));
+ const originalNow=Date.now;Date.now=()=>Date.parse(f.checked_at);
+ try{const c={Variables:f.Variables,Steps:f.Steps,Helpers:{setVariable:(k,v)=>f.Variables[k]=v}};const r=evaluate(c);assert.equal(r.recovery_verified,true);assert.deepEqual(r.missing,[]);assert.equal(Object.keys(r.criteria).length,13);assert.equal(r.observed.log_evidence.clearance_counts.pre_isolation,2);assert.equal(r.observed.log_evidence.latest_clear_at,'2026-11-08T09:13:38.645Z');assert.equal(r.observed.log_evidence.aap_caused_clearance,false);}finally{Date.now=originalNow;}
 });
 test('wrong host/MAC/target and malformed logs never establish clearance',()=>{
  for(const mutate of [c=>c.Steps.Verify_Recovery_Logs.data[0].attributes.host='other',c=>c.Steps.Verify_Recovery_Logs.data[0].attributes.message=c.Steps.Verify_Recovery_Logs.data[0].attributes.message.replace('00:AA','00:BB'),c=>c.Steps.Verify_Recovery_Logs.data[1]=c.log('ethernet-1/3.1'),c=>c.Steps.Verify_Recovery_Logs.data[0].attributes.message='DATADOG_SYSLOG_TEST']){const c=context();mutate(c);assert.equal(evaluate(c).recovery_verified,false);}
@@ -40,10 +65,10 @@ test('incomplete, warned or truncated queries fail closed immediately',()=>{
  for(const meta of [{status:'running'},{status:'done',page:{after:'cursor'}},{status:'done',warnings:['partial']}]){const c=context();c.Steps.Verify_Recovery_Logs.meta=meta;assert.equal(evaluate(c).criteria.complete_log_query,false);assert.equal(c.Variables.verification_continue,false);}
 });
 test('quiet window starts after matching deletion, not only after last detection',()=>{
- const c=context();c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',Date.now()-180000),c.log('ethernet-1/2.1','deleted',Date.now()-180000)];const r=evaluate(c);assert.equal(r.criteria.matching_post_isolation_log_clearance,true);assert.equal(r.criteria.quiet_after_clearance_5m,false);assert.equal(c.Variables.verification_continue,true);
+ const c=context();c.Steps.Verify_Recovery_Logs.data=[c.log('mac-flap','deleted',Date.now()-180000),c.log('ethernet-1/2.1','deleted',Date.now()-180000)];const r=evaluate(c);assert.equal(r.criteria.matching_incident_log_clearance,true);assert.equal(r.criteria.quiet_after_clearance_5m,false);assert.equal(c.Variables.verification_continue,true);
 });
 test('new detection resets clearance even if monitor is OK',()=>{
- const c=context();c.Steps.Verify_Recovery_Logs.data.push(c.log('mac-flap','detected',Date.now()-30000));assert.equal(evaluate(c).criteria.matching_post_isolation_log_clearance,false);
+ const c=context();c.Steps.Verify_Recovery_Logs.data.push(c.log('mac-flap','detected',Date.now()-30000));assert.equal(evaluate(c).criteria.matching_incident_log_clearance,false);
 });
 test('zero loss needs multiple fresh post-job samples spanning one minute',()=>{
  for(const points of [[[Date.now()-1000,0]],[[Date.now()-700000,0],[Date.now()-650000,0]],[[Date.now()+1000,0]],[[Date.now()-90000,null],[Date.now()-30000,null]],[[Date.now()-90000,0],[Date.now()-30000,33.3]],[[Date.now()-90000,0],[Date.now()-30000,0],[Date.now()-30000,100]]]){const c=context();c.Steps.Verify_Forwarding.series[0].pointlist=points;assert.equal(evaluate(c).criteria.independent_forwarding_zero_loss,false);}

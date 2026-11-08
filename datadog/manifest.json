@@ -19,7 +19,7 @@
     "all_four_message_variants_parsed": true,
     "device_recovery_verified": false
   },
-  "investigation_workflow_updated_at": "2026-11-08T01:13:53.404378Z",
+  "investigation_workflow_updated_at": "2026-11-08T09:34:30.583643Z",
   "investigation_workflow_features": {
     "custom_bits_agent_only": true,
     "native_bits_investigation_per_monitor_alert": false,
@@ -50,7 +50,9 @@
     "real_approved_aap_sequence_verified": true,
     "corrected_read_only_verifier_replay_verified": true,
     "single_run_end_to_end_recovery_verified": true,
-    "telemetry_log_clearance_verified": true
+    "telemetry_log_clearance_verified": true,
+    "incident_log_chronology_verifier": true,
+    "pre_isolation_clearance_labeled_without_aap_attribution": true
   },
   "latest_real_aap_recovery_evidence": "datadog/workflows/scenario-controller-full-recovery-evidence.json",
   "latest_recovery_result": "RECOVERY_VERIFIED",
@@ -65,5 +67,6 @@
   },
   "scenario_generator_evidence": "datadog/workflows/generator-controller-binding-evidence.json",
   "scenario_controller_to_recovery_verified": true,
-  "latest_scenario_controller_instance_id": "2cec29b5-e4ba-4e07-96f5-f8efe88a9343"
+  "latest_scenario_controller_instance_id": "2cec29b5-e4ba-4e07-96f5-f8efe88a9343",
+  "latest_verifier_fix_evidence": "datadog/workflows/incident-chronology-verifier-evidence.json"
 }

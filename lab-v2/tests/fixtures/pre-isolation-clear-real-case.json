@@ -1,0 +1,815 @@
+{
+  "source_instance": "1fb09113-80fb-4d06-917a-380ed79d4f04",
+  "checked_at": "2026-11-08T09:24:29.055Z",
+  "kind": "OFFLINE_FROZEN_REAL_EVIDENCE_REPLAY_NO_ACTIONS",
+  "Variables": {
+    "aap_jobs": {
+      "collect": {
+        "artifacts": {},
+        "finished": "2026-11-08T09:13:31.641523Z",
+        "id": 390,
+        "started": "2026-11-08T09:13:25.442163Z",
+        "status": "successful",
+        "template_id": 38,
+        "valid": true
+      },
+      "isolate": {
+        "artifacts": {},
+        "finished": "2026-11-08T09:13:52.228073Z",
+        "id": 391,
+        "started": "2026-11-08T09:13:43.698255Z",
+        "status": "successful",
+        "template_id": 39,
+        "valid": true
+      },
+      "verify_device": {
+        "artifacts": {},
+        "finished": "2026-11-08T09:14:10.080338Z",
+        "id": 392,
+        "started": "2026-11-08T09:14:02.803926Z",
+        "status": "successful",
+        "template_id": 40,
+        "valid": true
+      },
+      "verify_forwarding": {
+        "artifacts": {},
+        "finished": "2026-11-08T09:14:28.910034Z",
+        "id": 393,
+        "started": "2026-11-08T09:14:21.406663Z",
+        "status": "successful",
+        "template_id": 41,
+        "valid": true
+      }
+    },
+    "verification_deadline": 1794129876471,
+    "verification_attempt": 15,
+    "verification_read_failed": false
+  },
+  "Steps": {
+    "Verify_Interface_Admin": {
+      "status": "ok",
+      "series": [
+        {
+          "scope": "env:network-aiops,interface:ethernet-1/1,lab_device:sw1,lab_id:macflap-v2",
+          "tag_set": [
+            "interface:ethernet-1/1"
+          ],
+          "pointlist": [
+            [
+              1794129570000,
+              1
+            ],
+            [
+              1794129586000,
+              1
+            ],
+            [
+              1794129600000,
+              1
+            ],
+            [
+              1794129616000,
+              1
+            ],
+            [
+              1794129630000,
+              1
+            ],
+            [
+              1794129646000,
+              1
+            ],
+            [
+              1794129660000,
+              1
+            ],
+            [
+              1794129676000,
+              1
+            ],
+            [
+              1794129690000,
+              1
+            ],
+            [
+              1794129706000,
+              1
+            ],
+            [
+              1794129720000,
+              1
+            ],
+            [
+              1794129736000,
+              1
+            ],
+            [
+              1794129750000,
+              1
+            ],
+            [
+              1794129766000,
+              1
+            ],
+            [
+              1794129780000,
+              1
+            ],
+            [
+              1794129796000,
+              1
+            ],
+            [
+              1794129810000,
+              1
+            ],
+            [
+              1794129826000,
+              1
+            ],
+            [
+              1794129840000,
+              1
+            ]
+          ]
+        },
+        {
+          "scope": "env:network-aiops,interface:ethernet-1/2,lab_device:sw1,lab_id:macflap-v2",
+          "tag_set": [
+            "interface:ethernet-1/2"
+          ],
+          "pointlist": [
+            [
+              1794129570000,
+              2
+            ],
+            [
+              1794129586000,
+              2
+            ],
+            [
+              1794129600000,
+              2
+            ],
+            [
+              1794129616000,
+              2
+            ],
+            [
+              1794129630000,
+              2
+            ],
+            [
+              1794129646000,
+              2
+            ],
+            [
+              1794129660000,
+              2
+            ],
+            [
+              1794129676000,
+              2
+            ],
+            [
+              1794129690000,
+              2
+            ],
+            [
+              1794129706000,
+              2
+            ],
+            [
+              1794129720000,
+              2
+            ],
+            [
+              1794129736000,
+              2
+            ],
+            [
+              1794129750000,
+              2
+            ],
+            [
+              1794129766000,
+              2
+            ],
+            [
+              1794129780000,
+              2
+            ],
+            [
+              1794129796000,
+              2
+            ],
+            [
+              1794129810000,
+              2
+            ],
+            [
+              1794129826000,
+              2
+            ],
+            [
+              1794129840000,
+              2
+            ]
+          ]
+        },
+        {
+          "scope": "env:network-aiops,interface:ethernet-1/3,lab_device:sw1,lab_id:macflap-v2",
+          "tag_set": [
+            "interface:ethernet-1/3"
+          ],
+          "pointlist": [
+            [
+              1794129570000,
+              1
+            ],
+            [
+              1794129586000,
+              1
+            ],
+            [
+              1794129600000,
+              1
+            ],
+            [
+              1794129616000,
+              1
+            ],
+            [
+              1794129630000,
+              1
+            ],
+            [
+              1794129646000,
+              1
+            ],
+            [
+              1794129660000,
+              1
+            ],
+            [
+              1794129676000,
+              1
+            ],
+            [
+              1794129690000,
+              1
+            ],
+            [
+              1794129706000,
+              1
+            ],
+            [
+              1794129720000,
+              1
+            ],
+            [
+              1794129736000,
+              1
+            ],
+            [
+              1794129750000,
+              1
+            ],
+            [
+              1794129766000,
+              1
+            ],
+            [
+              1794129780000,
+              1
+            ],
+            [
+              1794129796000,
+              1
+            ],
+            [
+              1794129810000,
+              1
+            ],
+            [
+              1794129826000,
+              1
+            ],
+            [
+              1794129840000,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "Verify_Interface_Oper": {
+      "status": "ok",
+      "series": [
+        {
+          "scope": "env:network-aiops,interface:ethernet-1/1,lab_device:sw1,lab_id:macflap-v2",
+          "tag_set": [
+            "interface:ethernet-1/1"
+          ],
+          "pointlist": [
+            [
+              1794129570000,
+              1
+            ],
+            [
+              1794129586000,
+              1
+            ],
+            [
+              1794129600000,
+              1
+            ],
+            [
+              1794129616000,
+              1
+            ],
+            [
+              1794129630000,
+              1
+            ],
+            [
+              1794129646000,
+              1
+            ],
+            [
+              1794129660000,
+              1
+            ],
+            [
+              1794129676000,
+              1
+            ],
+            [
+              1794129690000,
+              1
+            ],
+            [
+              1794129706000,
+              1
+            ],
+            [
+              1794129720000,
+              1
+            ],
+            [
+              1794129736000,
+              1
+            ],
+            [
+              1794129750000,
+              1
+            ],
+            [
+              1794129766000,
+              1
+            ],
+            [
+              1794129780000,
+              1
+            ],
+            [
+              1794129796000,
+              1
+            ],
+            [
+              1794129810000,
+              1
+            ],
+            [
+              1794129826000,
+              1
+            ],
+            [
+              1794129840000,
+              1
+            ]
+          ]
+        },
+        {
+          "scope": "env:network-aiops,interface:ethernet-1/2,lab_device:sw1,lab_id:macflap-v2",
+          "tag_set": [
+            "interface:ethernet-1/2"
+          ],
+          "pointlist": [
+            [
+              1794129570000,
+              2
+            ],
+            [
+              1794129586000,
+              2
+            ],
+            [
+              1794129600000,
+              2
+            ],
+            [
+              1794129616000,
+              2
+            ],
+            [
+              1794129630000,
+              2
+            ],
+            [
+              1794129646000,
+              2
+            ],
+            [
+              1794129660000,
+              2
+            ],
+            [
+              1794129676000,
+              2
+            ],
+            [
+              1794129690000,
+              2
+            ],
+            [
+              1794129706000,
+              2
+            ],
+            [
+              1794129720000,
+              2
+            ],
+            [
+              1794129736000,
+              2
+            ],
+            [
+              1794129750000,
+              2
+            ],
+            [
+              1794129766000,
+              2
+            ],
+            [
+              1794129780000,
+              2
+            ],
+            [
+              1794129796000,
+              2
+            ],
+            [
+              1794129810000,
+              2
+            ],
+            [
+              1794129826000,
+              2
+            ],
+            [
+              1794129840000,
+              2
+            ]
+          ]
+        },
+        {
+          "scope": "env:network-aiops,interface:ethernet-1/3,lab_device:sw1,lab_id:macflap-v2",
+          "tag_set": [
+            "interface:ethernet-1/3"
+          ],
+          "pointlist": [
+            [
+              1794129570000,
+              1
+            ],
+            [
+              1794129586000,
+              1
+            ],
+            [
+              1794129600000,
+              1
+            ],
+            [
+              1794129616000,
+              1
+            ],
+            [
+              1794129630000,
+              1
+            ],
+            [
+              1794129646000,
+              1
+            ],
+            [
+              1794129660000,
+              1
+            ],
+            [
+              1794129676000,
+              1
+            ],
+            [
+              1794129690000,
+              1
+            ],
+            [
+              1794129706000,
+              1
+            ],
+            [
+              1794129720000,
+              1
+            ],
+            [
+              1794129736000,
+              1
+            ],
+            [
+              1794129750000,
+              1
+            ],
+            [
+              1794129766000,
+              1
+            ],
+            [
+              1794129780000,
+              1
+            ],
+            [
+              1794129796000,
+              1
+            ],
+            [
+              1794129810000,
+              1
+            ],
+            [
+              1794129826000,
+              1
+            ],
+            [
+              1794129840000,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "Verify_Forwarding": {
+      "status": "ok",
+      "series": [
+        {
+          "scope": "env:network-aiops,lab_id:macflap-v2,probe:host-c-to-host-a",
+          "tag_set": [],
+          "pointlist": [
+            [
+              1794129618000,
+              0
+            ],
+            [
+              1794129678000,
+              0
+            ],
+            [
+              1794129738000,
+              0
+            ],
+            [
+              1794129798000,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Verify_Collector_Freshness": {
+      "status": "ok",
+      "series": [
+        {
+          "scope": "env:network-aiops,lab_id:macflap-v2",
+          "tag_set": [],
+          "pointlist": [
+            [
+              1794129618000,
+              1
+            ],
+            [
+              1794129678000,
+              1
+            ],
+            [
+              1794129738000,
+              1
+            ],
+            [
+              1794129798000,
+              1
+            ]
+          ]
+        }
+      ]
+    },
+    "Verify_Monitor_State": {
+      "overall_state": "OK"
+    },
+    "Record_Approval_Decision": {
+      "data": {
+        "approval_status": "APPROVED",
+        "responder": {
+          "id": "AUTHENTICATED_REPLAY_FIXTURE"
+        }
+      }
+    },
+    "Record_AAP_Execution": {
+      "data": {
+        "aap_job_id": "391",
+        "aap_job_template_id": "39",
+        "execution_backend": "AAP",
+        "execution_succeeded": true,
+        "finished_at": "2026-11-08T09:13:52.228073Z",
+        "job_launched": true,
+        "remediation_executed": true,
+        "stage": "EXECUTE",
+        "status": "AAP_SUCCEEDED",
+        "target_host": "sw1",
+        "target_interface": "ethernet-1/2"
+      }
+    },
+    "Report": {
+      "data": {
+        "window": {
+          "from": "2026-11-08T09:06:19.000Z",
+          "to": "2026-11-08T09:12:30.831Z"
+        },
+        "evidence": {
+          "entries": [
+            {
+              "event_action": "deleted",
+              "host": "sw1",
+              "interface": "",
+              "log_id": "AwAAAaG6aWomOspv7QAAABhBYUc2YVg5ekFBQjZIUlY1XzJaUEFnQUEAAAAkZjFhMWJhNmItOTA2YS00NGIxLWI5NzctMGI0NGZhNDYyNmFjAAAFkQ",
+              "mac": "02:00:00:00:00:aa",
+              "message": "bridgetable|2163|2163|00134|N: A duplicate MAC address 02:00:00:00:00:AA detected on mac-flap is now deleted.",
+              "network_instance": "mac-flap",
+              "service": "sr_l2_mac_mgr",
+              "target_type": "mac-vrf",
+              "timestamp": "2026-11-08T09:07:13.062Z"
+            },
+            {
+              "event_action": "deleted",
+              "host": "sw1",
+              "interface": "ethernet-1/2.1",
+              "log_id": "AwAAAaG6aWomYu3QOgAAABhBYUc2YVczZEFBQi1CQlhuaXcyNWN3QUEAAAAkZjFhMWJhNmItOTA2YS00NGIxLWI5NzctMGI0NGZhNDYyNmFjAAAFkg",
+              "mac": "02:00:00:00:00:aa",
+              "message": "bridgetable|2163|2163|00133|N: A duplicate MAC address 02:00:00:00:00:AA detected on sub-interface ethernet-1/2.1 is now deleted.",
+              "network_instance": "",
+              "service": "sr_l2_mac_mgr",
+              "target_type": "sub-interface",
+              "timestamp": "2026-11-08T09:07:13.062Z"
+            },
+            {
+              "event_action": "detected",
+              "host": "sw1",
+              "interface": "",
+              "log_id": "AwAAAaG6bIz113pSvQAAABhBYUc2YktJTkFBRDZ4QmJESTVCVlpBQUEAAAAkZjFhMWJhNmMtZTIyMC00NDEzLTgxODUtYWIyOTVlZjliNWEwAAABqQ",
+              "mac": "02:00:00:00:00:aa",
+              "message": "bridgetable|2163|2163|00135|N: A duplicate MAC address 02:00:00:00:00:AA was detected on mac-flap.",
+              "network_instance": "mac-flap",
+              "service": "sr_l2_mac_mgr",
+              "target_type": "mac-vrf",
+              "timestamp": "2026-11-08T09:10:38.581Z"
+            },
+            {
+              "event_action": "detected",
+              "host": "sw1",
+              "interface": "ethernet-1/2.1",
+              "log_id": "AwAAAaG6bIz213pSvgAAABhBYUc2YktJTkFBRDZ4QmJESTVCVlpBQUIAAAAkZjFhMWJhNmMtZTIyMC00NDEzLTgxODUtYWIyOTVlZjliNWEwAAABqA",
+              "mac": "02:00:00:00:00:aa",
+              "message": "bridgetable|2163|2163|00136|N: A duplicate MAC address 02:00:00:00:00:AA was detected on sub-interface ethernet-1/2.1.",
+              "network_instance": "",
+              "service": "sr_l2_mac_mgr",
+              "target_type": "sub-interface",
+              "timestamp": "2026-11-08T09:10:38.582Z"
+            }
+          ]
+        }
+      }
+    },
+    "Verify_Recovery_Logs": {
+      "data": [
+        {
+          "attributes": {
+            "host": "sw1",
+            "message": "bridgetable|2163|2163|00134|N: A duplicate MAC address 02:00:00:00:00:AA detected on mac-flap is now deleted.",
+            "service": "sr_l2_mac_mgr",
+            "tags": [
+              "datadog.submission_auth:api_key",
+              "env:network-aiops",
+              "service:nokia-srlinux",
+              "source:syslog",
+              "source_host:172.20.20.2",
+              "usecase:mac-flapping"
+            ],
+            "timestamp": "2026-11-08T09:07:13.062Z"
+          },
+          "id": "AwAAAaG6aWomOspv7QAAABhBYUc2YVg5ekFBQjZIUlY1XzJaUEFnQUEAAAAkZjFhMWJhNmItOTA2YS00NGIxLWI5NzctMGI0NGZhNDYyNmFjAAAFkQ"
+        },
+        {
+          "attributes": {
+            "host": "sw1",
+            "message": "bridgetable|2163|2163|00133|N: A duplicate MAC address 02:00:00:00:00:AA detected on sub-interface ethernet-1/2.1 is now deleted.",
+            "service": "sr_l2_mac_mgr",
+            "tags": [
+              "datadog.submission_auth:api_key",
+              "env:network-aiops",
+              "service:nokia-srlinux",
+              "source:syslog",
+              "source_host:172.20.20.2",
+              "usecase:mac-flapping"
+            ],
+            "timestamp": "2026-11-08T09:07:13.062Z"
+          },
+          "id": "AwAAAaG6aWomYu3QOgAAABhBYUc2YVczZEFBQi1CQlhuaXcyNWN3QUEAAAAkZjFhMWJhNmItOTA2YS00NGIxLWI5NzctMGI0NGZhNDYyNmFjAAAFkg"
+        },
+        {
+          "attributes": {
+            "host": "sw1",
+            "message": "bridgetable|2163|2163|00135|N: A duplicate MAC address 02:00:00:00:00:AA was detected on mac-flap.",
+            "service": "sr_l2_mac_mgr",
+            "tags": [
+              "datadog.submission_auth:api_key",
+              "env:network-aiops",
+              "service:nokia-srlinux",
+              "source:syslog",
+              "source_host:172.20.20.2",
+              "usecase:mac-flapping"
+            ],
+            "timestamp": "2026-11-08T09:10:38.581Z"
+          },
+          "id": "AwAAAaG6bIz113pSvQAAABhBYUc2YktJTkFBRDZ4QmJESTVCVlpBQUEAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFfQ"
+        },
+        {
+          "attributes": {
+            "host": "sw1",
+            "message": "bridgetable|2163|2163|00136|N: A duplicate MAC address 02:00:00:00:00:AA was detected on sub-interface ethernet-1/2.1.",
+            "service": "sr_l2_mac_mgr",
+            "tags": [
+              "datadog.submission_auth:api_key",
+              "env:network-aiops",
+              "service:nokia-srlinux",
+              "source:syslog",
+              "source_host:172.20.20.2",
+              "usecase:mac-flapping"
+            ],
+            "timestamp": "2026-11-08T09:10:38.582Z"
+          },
+          "id": "AwAAAaG6bIz213pSvgAAABhBYUc2YktJTkFBRDZ4QmJESTVCVlpBQUIAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFfA"
+        },
+        {
+          "attributes": {
+            "host": "sw1",
+            "message": "bridgetable|2163|2163|00137|N: A duplicate MAC address 02:00:00:00:00:AA detected on sub-interface ethernet-1/2.1 is now deleted.",
+            "service": "sr_l2_mac_mgr",
+            "tags": [
+              "datadog.submission_auth:api_key",
+              "env:network-aiops",
+              "service:nokia-srlinux",
+              "source:syslog",
+              "source_host:172.20.20.2",
+              "usecase:mac-flapping"
+            ],
+            "timestamp": "2026-11-08T09:13:38.645Z"
+          },
+          "id": "AwAAAaG6b0xVr2p9ggAAABhBYUc2YjJGVkFBRFNWeHFiMmptRWFRQUEAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFeg"
+        },
+        {
+          "attributes": {
+            "host": "sw1",
+            "message": "bridgetable|2163|2163|00138|N: A duplicate MAC address 02:00:00:00:00:AA detected on mac-flap is now deleted.",
+            "service": "sr_l2_mac_mgr",
+            "tags": [
+              "datadog.submission_auth:api_key",
+              "env:network-aiops",
+              "service:nokia-srlinux",
+              "source:syslog",
+              "source_host:172.20.20.2",
+              "usecase:mac-flapping"
+            ],
+            "timestamp": "2026-11-08T09:13:38.645Z"
+          },
+          "id": "AwAAAaG6b0xVr2p9gwAAABhBYUc2YjJGVkFBRFNWeHFiMmptRWFRQUIAAAAkZjFhMWJhNmYtYjhkMS00NWRkLWI1ZjItZWIyYzUyYjE4ZWY1AAAFew"
+        }
+      ],
+      "meta": {
+        "elapsed": 23,
+        "requestId": "pddv1ChZrU2haZlpxRlEyS0lPTjZ1RkNjM3FnIi0KHVYbiyZcyH_L_NuMGXywhxOAqS7r6LM4QUE0GHqvEgzVb-0iUHQx8ZSOh1M",
+        "status": "done"
+      }
+    }
+  }
+}

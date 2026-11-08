@@ -42,6 +42,11 @@ These tests execute the scripts from the exported workflow JSON, with fixture lo
 
 Telemetry verifier fixtures (positive proof and failure cases):
 
+These include a frozen real-run replay of a clear 5.053 seconds before isolation,
+explicit PRE_ISOLATION labeling with no AAP attribution, later-detection invalidation,
+and unchanged fresh post-job metric requirements. The fixture is historical data;
+it launches no AAP jobs and sends no Slack messages.
+
 ```bash
 node --test lab-v2/tests/test_workflow_recovery.cjs
 ```

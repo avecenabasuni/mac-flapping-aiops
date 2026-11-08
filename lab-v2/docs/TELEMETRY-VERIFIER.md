@@ -21,13 +21,19 @@ All criteria must pass:
    Conflicting equal-time samples, ambiguous series, missing/null/future or stale
    samples cannot satisfy the check. Queries disable gauge interpolation with fill(null).
 6. The MAC-flapping monitor is currently OK.
-7. The log query starts at the approved isolation job's start time, and is complete:
+7. The log query covers the incident window and all initial validated detection
+   timestamps, rather than beginning at isolation. It is complete:
    no pagination, partial status, warnings,
    or unparsed scoped messages. Up to 1000 logs are accepted; overflow fails closed.
-8. Every initial or subsequent detection target has a strictly later matching deletion
-   at or after the isolation job starts, including deletions emitted during the job.
+8. Every initial or subsequent detection target has a strictly later matching deletion.
+   The clear can occur before, during or after isolation, but must be later than
+   that target's latest detection. Any newer detection invalidates an older clear.
    Matching uses host, normalized MAC, target type and exact target.
-   One target's deletion cannot clear another interface or MAC-VRF target.
+   One target's deletion cannot clear another interface or MAC-VRF target. Evidence
+   classifies each matched clear as PRE_ISOLATION, DURING_ISOLATION or POST_ISOLATION.
+   Log-clear causality is not attributed to AAP; pre-isolation clears explicitly
+   remain pre-existing evidence. Isolation/forwarding proof still requires actual
+   approved successful jobs and fresh stable metrics after verification jobs finish.
 9. At least five minutes have elapsed after the latest matching clear, with no new
    duplicate-MAC detection in that quiet window.
 10. Observation stays within its deadline and no verification read fails.
@@ -38,7 +44,7 @@ stop immediately. On success, Slack announces Telemetry Recovery Verified with t
 scope and AAP IDs. Otherwise automation stops and escalates RECOVERY_NOT_VERIFIED.
 JT42 restore is never automatic. Slack delivery failures remain explicit in output.
 
-39 local fixtures exercise positive evidence, new detections, wrong targets, incomplete
+52 workflow fixtures (20 recovery fixtures) exercise positive evidence, new detections, wrong targets, incomplete
 queries, stale/ambiguous/pre-job samples, deadline expiry, approval/job failures and
 notification failure. Controlled runtime routing tests override AAP/Slack and the
 final gate: they are not proof of real device recovery. A separate live read-only
@@ -53,11 +59,38 @@ matching deletions were emitted during that job at 01:08:08.723Z. The corrected
 window begins at JT39 start, 01:08:01.875730Z, while all metric samples still must
 follow completion of the verification jobs. Pre-start deletions remain rejected.
 
+The paragraph above records the first cutoff correction's historical policy.
+It is superseded by the incident-chronology correction below; the original run
+and replay results are retained as historical evidence.
+
 Read-only replay bbcfaa49-543c-405c-8c0c-f7665d8faeed reused the original authenticated
 approval and successful job records, queried current real Datadog telemetry, and
 passed all 13 criteria at 01:14:31.645Z. It did not rerun AAP jobs or send Slack
 messages. This is a corrected verification replay, not a rewritten result for the
 original workflow instance. Exact evidence is in first-live-aap-recovery-evidence.json.
+
+## Incident chronology correction: clear just before isolation
+
+Published 2026-11-08 after run 1fb09113-80fb-4d06-917a-380ed79d4f04. All actual
+jobs 390–393 succeeded, but both clear logs at 09:13:38.645Z preceded JT39 start
+09:13:43.698255Z by 5.053255 seconds. The isolation-start query excluded them and
+the old verifier expired with RECOVERY_NOT_VERIFIED. The original result is not
+rewritten.
+
+The query now includes the incident's initial evidence window and detection
+timestamps. Pairing remains strict per host/MAC/target and strictly after its
+latest detection. Pre-isolation clearance can satisfy chronological log evidence,
+but its timing is explicit in the result and Slack message; it is not attributed
+to AAP. All fresh post-job metric, approved job, complete-query, monitor and
+quiet-window requirements remain mandatory. The criterion is now named
+`matching_incident_log_clearance`; the total remains 13 criteria.
+
+Frozen offline replay at 09:24:29.055Z combines the original run's successful jobs,
+approval and metric samples with a complete incident log query. It passes 13/13,
+with 2 PRE_ISOLATION targets and no AAP attribution. This replay executed no jobs
+and sent no Slack message. No new live recovery run was triggered for this fix.
+See [correction evidence](../../datadog/workflows/incident-chronology-verifier-evidence.json)
+and [real-case fixture](../tests/fixtures/pre-isolation-clear-real-case.json).
 
 The original instance finished at 01:20:56Z with runtime SUCCEEDED but business result RECOVERY_NOT_VERIFIED. Its old cutoff excluded the matching clears; the ten-minute bound expired and Slack escalation succeeded. At that point, only the corrected replay had passed; the later fresh full test is recorded below.
 

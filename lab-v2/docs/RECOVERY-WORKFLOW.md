@@ -22,12 +22,18 @@ Execute access before dispatch. Polls check both job and template identity. At m
 AAP job: inspect its status before any manual retry.
 
 Datadog verification now observes fresh post-job SNMP/probe/collector data and complete,
-strictly parsed post-isolation logs. Every detection target must have a later matching
+strictly parsed incident logs. Every detection target must have a later matching
 deletion; at least five minutes must elapse after the latest clear without new detection.
 Observation polls every 30 seconds, with a ten-minute deadline and at most 20 attempts.
 All passing proof yields RECOVERY_VERIFIED in the containment/forwarding + log-clearance
 scope. Missing proof or read failure stops and escalates; no direct empty-MAC-table or
 physical-loop claim is made. See [exact policy](TELEMETRY-VERIFIER.md).
+
+Clear chronology includes events before, during and after isolation. A clear before
+the latest target detection never counts; a pre-isolation clear after that detection
+can count as pre-existing evidence. The result and success Slack message explicitly
+classify its timing and do not attribute log-clear causality to AAP. This does not
+relax any post-job metric, successful-job or authenticated-approval requirement.
 
 39 offline fixtures passed. Controlled routing tests mocked AAP/Slack and the final
 gate; a live read-only verifier test rejected recovery with no job proof. The first real alert/approval/AAP sequence succeeded; its clear logs exposed a cutoff

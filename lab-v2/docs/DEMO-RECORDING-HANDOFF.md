@@ -1,6 +1,8 @@
 # Handoff rekaman demo MAC Flapping AIOps
 
 Disiapkan 8 November 2026 dari konfigurasi published dan bukti eksekusi nyata.
+Update verifier 8 November 09:34Z: kronologi clear kini mencakup awal insiden;
+clear sebelum isolasi dicatat sebagai bukti yang sudah ada, bukan hasil AAP.
 Semua jam lokal di dokumen ini memakai **UTC+7 / Asia/Bangkok**; timestamp JSON
 berakhiran `Z` memakai UTC.
 
@@ -225,8 +227,10 @@ tag service lab yang benar.
 
 Verifier memerlukan minimal 2 sampel numerik per seri dengan rentang≥60 detik,
 sesudah verification jobs selesai, umur≤180 detik, dan tidak ambigu. Pasangan clear
-dicari sejak **isolation job mulai**, sehingga clear yang terjadi selama job
-tetap diterima. Setiap target harus punya clear sesudah deteksi terbarunya.
+dicari sejak **awal insiden**, dengan target yang sama dan clear sesudah deteksi
+terbarunya. Clear sebelum isolasi boleh memenuhi bukti kronologis, tetapi hasil
+verifier dan pesan Slack menandainya sebagai PRE_ISOLATION serta tidak
+mengatribusikannya ke AAP. Telemetry tetap wajib sesudah verification jobs.
 Selanjutnya perlu 5 menit setelah clear terakhir tanpa deteksi baru. Verifier
 polling 30 detik, maksimum 20 attempt atau deadline10 menit plus request in-flight;
 kegagalan bukti/akses berhenti dan eskalasi ke Slack tanpa relaunch otomatis.
