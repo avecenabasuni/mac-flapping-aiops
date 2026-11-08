@@ -1,0 +1,34 @@
+---
+- name: Stop managed duplicate MAC traffic before restoring the lab port
+  hosts: lab_linux
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install managed generator unit if this is the first reset
+      ansible.builtin.import_tasks: tasks/generator-install.yml
+
+    - name: Stop only the managed lab generator
+      ansible.builtin.systemd_service:
+        name: network-aiops-mac-flapping.service
+        state: stopped
+
+    - name: Read actual stopped generator state
+      ansible.builtin.systemd_service:
+        name: network-aiops-mac-flapping.service
+      register: generator
+
+    - name: Require no managed generator process
+      ansible.builtin.assert:
+        that:
+          - generator.status.ActiveState == 'inactive'
+          - generator.status.MainPID | int == 0
+
+    - name: Record generator stop evidence for Scenario Controller
+      ansible.builtin.set_stats:
+        per_host: false
+        aggregate: false
+        data:
+          macflap_generator_state: stopped
+          macflap_lab_id: macflap-v2
+          macflap_generator_service: network-aiops-mac-flapping.service
+          macflap_generator_main_pid: 0

@@ -1,0 +1,36 @@
+---
+- name: Start bounded duplicate MAC traffic in the approved lab
+  hosts: lab_linux
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Install managed generator
+      ansible.builtin.import_tasks: tasks/generator-install.yml
+
+    - name: Start generator without restarting an active run
+      ansible.builtin.systemd_service:
+        name: network-aiops-mac-flapping.service
+        state: started
+
+    - name: Read actual generator service state
+      ansible.builtin.systemd_service:
+        name: network-aiops-mac-flapping.service
+      register: generator
+
+    - name: Require a running managed generator
+      ansible.builtin.assert:
+        that:
+          - generator.status.ActiveState == 'active'
+          - generator.status.MainPID | int > 0
+
+    - name: Record generator execution evidence for Scenario Controller
+      ansible.builtin.set_stats:
+        per_host: false
+        aggregate: false
+        data:
+          macflap_generator_state: running
+          macflap_lab_id: macflap-v2
+          macflap_generator_service: network-aiops-mac-flapping.service
+          macflap_generator_main_pid: '{{ generator.status.MainPID | int }}'
+          macflap_generator_max_seconds: 600
+          macflap_generator_mac: '02:00:00:00:00:aa'

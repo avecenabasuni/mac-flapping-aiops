@@ -1,0 +1,19 @@
+[Unit]
+Description=Bounded MAC flapping generator for macflap-v2
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=notify
+NotifyAccess=main
+TimeoutStartSec=40
+ExecStart=/usr/bin/python3 /usr/local/libexec/network-aiops/mac_flapping_generator.py --duration 600
+Restart=no
+RuntimeMaxSec=610
+TimeoutStopSec=10
+KillMode=control-group
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

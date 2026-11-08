@@ -1,5 +1,8 @@
 # Verification regression checks
 
+`test_generator.py` covers the fixed endpoint generator, bounded duration,
+startup readiness, stop and command timeout without contacting Docker or AAP.
+
 These offline tests load the conditions from the Ansible playbooks and evaluate
 them against fixtures using Jinja2 and Python regex matching. They do not contact
 Datadog, AAP, Docker, or SR Linux.

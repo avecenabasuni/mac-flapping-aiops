@@ -1,0 +1,38 @@
+---
+- name: Require the approved fixed lab and a single Linux target
+  ansible.builtin.assert:
+    that:
+      - (lab_id | default('')) == 'macflap-v2'
+      - (scenario_approved | default(false) | bool)
+      - ansible_play_hosts_all | length == 1
+    fail_msg: Refused generator operation outside the explicitly approved single-host lab
+
+- name: Create managed generator directory
+  ansible.builtin.file:
+    path: /usr/local/libexec/network-aiops
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install fixed endpoint generator
+  ansible.builtin.copy:
+    src: mac_flapping_generator.py
+    dest: /usr/local/libexec/network-aiops/mac_flapping_generator.py
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install bounded generator service
+  ansible.builtin.copy:
+    src: network-aiops-mac-flapping.service
+    dest: /etc/systemd/system/network-aiops-mac-flapping.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Load generator unit without enabling boot startup
+  ansible.builtin.systemd_service:
+    name: network-aiops-mac-flapping.service
+    daemon_reload: true
+    enabled: false

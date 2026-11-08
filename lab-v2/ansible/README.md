@@ -1,5 +1,10 @@
 # Ansible AAP integration
 
+For the new controller-managed traffic jobs, use the exact
+[Start/Stop Generator template settings](../docs/AAP-GENERATOR-SETUP.md).
+The playbooks are ready; their AAP template IDs and live controller wiring are
+pending creation and validation.
+
 These playbooks use the official `nokia.srlinux` collection over `ansible.netcommon.httpapi` (JSON-RPC). This is **different from** Ansible's SSH shell execution.
 
 ## Setup
