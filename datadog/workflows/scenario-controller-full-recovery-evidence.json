@@ -1,0 +1,310 @@
+{
+  "scenario_controller": {
+    "workflow_id": "45ac61cf-8a35-4e2d-bed3-370ffc6a8506",
+    "instance_id": "2cec29b5-e4ba-4e07-96f5-f8efe88a9343",
+    "scenario": "mac-flapping",
+    "result": "ACTION_SUCCEEDED",
+    "jobs": [
+      {
+        "artifacts": {
+          "macflap_generator_main_pid": 0,
+          "macflap_generator_service": "network-aiops-mac-flapping.service",
+          "macflap_generator_state": "stopped",
+          "macflap_lab_id": "macflap-v2"
+        },
+        "finished": "2026-11-08T05:27:23.966032Z",
+        "id": 355,
+        "started": "2026-11-08T05:27:14.118686Z",
+        "status": "successful",
+        "template_id": 46
+      },
+      {
+        "artifacts": {},
+        "finished": "2026-11-08T05:28:15.319620Z",
+        "id": 357,
+        "started": "2026-11-08T05:28:09.041047Z",
+        "status": "successful",
+        "template_id": 42
+      },
+      {
+        "artifacts": {
+          "macflap_generator_mac": "02:00:00:00:00:aa",
+          "macflap_generator_main_pid": "1323933",
+          "macflap_generator_max_seconds": 600,
+          "macflap_generator_service": "network-aiops-mac-flapping.service",
+          "macflap_generator_state": "running",
+          "macflap_lab_id": "macflap-v2"
+        },
+        "finished": "2026-11-08T05:29:04.253495Z",
+        "id": 359,
+        "started": "2026-11-08T05:28:53.241364Z",
+        "status": "successful",
+        "template_id": 45
+      }
+    ],
+    "success_slack": {
+      "channel": "#datadog-workflow",
+      "ts": "1794115761.006369",
+      "mocked": false
+    }
+  },
+  "detection": {
+    "monitor_id": 340593559,
+    "classification": "MAC_FLAPPING_EVIDENCE",
+    "counts": {
+      "deletions": 0,
+      "detections": 2,
+      "ignored": 0,
+      "unparsed": 0
+    },
+    "entries": [
+      {
+        "event_action": "detected",
+        "host": "sw1",
+        "interface": "ethernet-1/2.1",
+        "log_id": "AwAAAaG5odQh8v7J-AAAABhBYUc1b2VtdEFBQmN1bm45TTRQMEN3QUEAAAAkZjFhMWI5YTEtZDQyMS00MDIwLWE4ZjctMzJmMjI5N2RjMjYwAAAAAQ",
+        "mac": "02:00:00:00:00:aa",
+        "message": "bridgetable|2163|2163|00124|N: A duplicate MAC address 02:00:00:00:00:AA was detected on sub-interface ethernet-1/2.1.",
+        "network_instance": "",
+        "service": "sr_l2_mac_mgr",
+        "target_type": "sub-interface",
+        "timestamp": "2026-11-08T05:29:12.993Z"
+      },
+      {
+        "event_action": "detected",
+        "host": "sw1",
+        "interface": "",
+        "log_id": "AwAAAaG5odQhiOrqwwAAABhBYUc1b2RnWkFBQzZkY0xhTFo5bVRRQUEAAAAkZjFhMWI5YTEtZDQyMS00MDIwLWE4ZjctMzJmMjI5N2RjMjYwAAAAAA",
+        "mac": "02:00:00:00:00:aa",
+        "message": "bridgetable|2163|2163|00123|N: A duplicate MAC address 02:00:00:00:00:AA was detected on mac-flap.",
+        "network_instance": "mac-flap",
+        "service": "sr_l2_mac_mgr",
+        "target_type": "mac-vrf",
+        "timestamp": "2026-11-08T05:29:12.993Z"
+      }
+    ],
+    "incident_key": "340593559:8889457456196859129"
+  },
+  "recovery_workflow": {
+    "workflow_id": "beb71b61-bff9-460d-ad37-853ae9cc778e",
+    "instance_id": "07dec5e0-d403-4d0e-ba7c-e6d7db4d30b6",
+    "runtime_status": "SUCCEEDED",
+    "workflow_result": "RECOVERY_VERIFIED",
+    "completed_at": "2026-11-08T05:39:36.013866Z",
+    "approval": {
+      "status": "APPROVED",
+      "recorded_at": "2026-11-08T05:31:06.380Z",
+      "authenticated_responder": true
+    },
+    "verification": {
+      "aap_jobs": {
+        "collect": {
+          "artifacts": {},
+          "finished": "2026-11-08T05:31:51.876943Z",
+          "id": 361,
+          "started": "2026-11-08T05:31:45.880091Z",
+          "status": "successful",
+          "template_id": 38,
+          "valid": true
+        },
+        "isolate": {
+          "artifacts": {},
+          "finished": "2026-11-08T05:32:49.197039Z",
+          "id": 363,
+          "started": "2026-11-08T05:32:40.391797Z",
+          "status": "successful",
+          "template_id": 39,
+          "valid": true
+        },
+        "verify_device": {
+          "artifacts": {},
+          "finished": "2026-11-08T05:33:43.253285Z",
+          "id": 365,
+          "started": "2026-11-08T05:33:36.233571Z",
+          "status": "successful",
+          "template_id": 40,
+          "valid": true
+        },
+        "verify_forwarding": {
+          "artifacts": {},
+          "finished": "2026-11-08T05:34:27.138970Z",
+          "id": 367,
+          "started": "2026-11-08T05:34:19.558354Z",
+          "status": "successful",
+          "template_id": 41,
+          "valid": true
+        }
+      },
+      "attempt": 8,
+      "automatic_retry": false,
+      "checked_at": "2026-11-08T05:39:31.505Z",
+      "criteria": {
+        "aap_execution_and_verification_succeeded": true,
+        "authenticated_approval": true,
+        "bounded_observation": true,
+        "collector_fresh": true,
+        "complete_log_query": true,
+        "fixed_port_isolated": true,
+        "independent_forwarding_zero_loss": true,
+        "matching_post_isolation_log_clearance": true,
+        "monitor_ok": true,
+        "no_aap_integration_error": true,
+        "quiet_after_clearance_5m": true,
+        "trusted_ports_up": true,
+        "verification_reads_succeeded": true
+      },
+      "deadline_reached": false,
+      "device_mac_table_clearance_confirmed": false,
+      "execution": {
+        "aap_job_id": "363",
+        "aap_job_template_id": "39",
+        "execution_backend": "AAP",
+        "execution_succeeded": true,
+        "finished_at": "2026-11-08T05:32:49.197039Z",
+        "job_launched": true,
+        "remediation_executed": true,
+        "stage": "EXECUTE",
+        "status": "AAP_SUCCEEDED",
+        "target_host": "sw1",
+        "target_interface": "ethernet-1/2"
+      },
+      "missing": [],
+      "observation_complete": true,
+      "observed": {
+        "admin": {
+          "ethernet-1/1": {
+            "passed": true,
+            "reason": "Post-job stability evaluated",
+            "sample_count": 11,
+            "stable_seconds": 150,
+            "timestamp": "2026-11-08T05:39:16.000Z",
+            "value": 1
+          },
+          "ethernet-1/2": {
+            "passed": true,
+            "reason": "Post-job stability evaluated",
+            "sample_count": 11,
+            "stable_seconds": 150,
+            "timestamp": "2026-11-08T05:39:16.000Z",
+            "value": 2
+          },
+          "ethernet-1/3": {
+            "passed": true,
+            "reason": "Post-job stability evaluated",
+            "sample_count": 11,
+            "stable_seconds": 150,
+            "timestamp": "2026-11-08T05:39:16.000Z",
+            "value": 1
+          }
+        },
+        "collector_heartbeat": {
+          "passed": true,
+          "reason": "Post-job stability evaluated",
+          "sample_count": 3,
+          "stable_seconds": 120,
+          "timestamp": "2026-11-08T05:39:18.000Z",
+          "value": 1
+        },
+        "log_evidence": {
+          "complete": true,
+          "entries": [
+            {
+              "event_action": "deleted",
+              "host": "sw1",
+              "interface": "ethernet-1/2.1",
+              "log_id": "AwAAAaG5pRlzKT_PQgAAABhBYUc1cFI0RUFBRGt1NlFxZkdQSzRBQUEAAAAkZjFhMWI5YTUtMTk3My00NmEwLWFkNzQtNzg1ZGQyODk4NmE3AAAAAA",
+              "mac": "02:00:00:00:00:aa",
+              "network_instance": "",
+              "target_type": "sub-interface",
+              "timestamp": "2026-11-08T05:32:47.347Z"
+            },
+            {
+              "event_action": "deleted",
+              "host": "sw1",
+              "interface": "",
+              "log_id": "AwAAAaG5pRlzKT_PQwAAABhBYUc1cFI0RUFBRGt1NlFxZkdQSzRBQUIAAAAkZjFhMWI5YTUtMTk3My00NmEwLWFkNzQtNzg1ZGQyODk4NmE3AAAAAQ",
+              "mac": "02:00:00:00:00:aa",
+              "network_instance": "mac-flap",
+              "target_type": "mac-vrf",
+              "timestamp": "2026-11-08T05:32:47.347Z"
+            }
+          ],
+          "latest_clear_at": "2026-11-08T05:32:47.347Z",
+          "new_detections_in_last_5m": 0,
+          "returned_count": 2,
+          "unmatched_targets": [],
+          "unparsed": 0
+        },
+        "loss_pct": {
+          "passed": true,
+          "reason": "Post-job stability evaluated",
+          "sample_count": 3,
+          "stable_seconds": 120,
+          "timestamp": "2026-11-08T05:39:18.000Z",
+          "value": 0
+        },
+        "monitor_state": "OK",
+        "oper": {
+          "ethernet-1/1": {
+            "passed": true,
+            "reason": "Post-job stability evaluated",
+            "sample_count": 11,
+            "stable_seconds": 150,
+            "timestamp": "2026-11-08T05:39:16.000Z",
+            "value": 1
+          },
+          "ethernet-1/2": {
+            "passed": true,
+            "reason": "Post-job stability evaluated",
+            "sample_count": 11,
+            "stable_seconds": 150,
+            "timestamp": "2026-11-08T05:39:16.000Z",
+            "value": 2
+          },
+          "ethernet-1/3": {
+            "passed": true,
+            "reason": "Post-job stability evaluated",
+            "sample_count": 11,
+            "stable_seconds": 150,
+            "timestamp": "2026-11-08T05:39:16.000Z",
+            "value": 1
+          }
+        }
+      },
+      "physical_loop_confirmed": false,
+      "reason": "Approved isolation, successful AAP verification jobs, stable fresh post-job telemetry and matching clear logs plus five-minute quiet observation passed.",
+      "recovery_verified": true,
+      "remediation_executed": true,
+      "stage": "VERIFY",
+      "status": "RECOVERY_VERIFIED",
+      "verification_scope": "containment_and_forwarding_with_datadog_log_clearance"
+    },
+    "success_slack": {
+      "channel": "#datadog-automation",
+      "ts": "1794116374.741359",
+      "status": "SUCCEEDED",
+      "mocked": false
+    },
+    "success_notification_sent": true,
+    "escalation_sent": false
+  },
+  "current_state": {
+    "monitor": "OK",
+    "now": "2026-11-08T07:18:02.748Z",
+    "port": [
+      {
+        "latest": [
+          {
+            "at": "2026-11-08T07:17:46.000Z",
+            "value": 2
+          }
+        ],
+        "scope": "env:network-aiops,interface:ethernet-1/2,lab_device:sw1,lab_id:macflap-v2"
+      }
+    ]
+  },
+  "no_action_overrides": true,
+  "no_replay": true,
+  "automatic_restore": false,
+  "scope": "containment_and_forwarding_with_datadog_log_clearance"
+}

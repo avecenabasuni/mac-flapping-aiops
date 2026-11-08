@@ -44,3 +44,11 @@ The original instance finished at 01:20:56Z with runtime SUCCEEDED but business 
 Actual monitor-triggered run 15951b0a-c1e1-45b8-9604-5c1dae1462e1 completed at 02:34:35Z with runtime SUCCEEDED and result RECOVERY_VERIFIED. Real Slack approval led to successful jobs 332/JT38, 334/JT39, 336/JT40 and 338/JT41. All 13 telemetry criteria passed at 02:34:31.249Z, including matching clears emitted during isolation, stable isolated/trusted port states, zero forwarding loss, fresh collector, monitor OK and five-minute quiet observation. Slack_Recovery_Verified succeeded in #datadog-automation with ts1794105274.450979. This run used no action overrides or mocked notifications.
 
 JT42/job330 restored e1/2 before this test under explicit user authorization. The successful test left e1/2 isolated; no automatic restore followed. Verified scope remains containment and forwarding with Datadog log clearance; a direct empty device MAC table or physical loop clearance is not claimed. Exact evidence: datadog/workflows/live-end-to-end-recovery-evidence.json. The earlier false-negative run remains historical evidence of the cutoff defect.
+
+## Full test from Scenario Controller through verified recovery — Nov 8
+
+Controller instance2cec29b5-e4ba-4e07-96f5-f8efe88a9343 ran successful jobs355/JT46 →357/JT42 →359/JT45. Real duplicate-MAC logs from sw1 at05:29:12.993Z triggered monitor340593559 and recovery instance07dec5e0-d403-4d0e-ba7c-e6d7db4d30b6. Parsing returned2detections,0unparsed. Authenticated Slack approval was recorded at05:31:06.380Z.
+
+Actual recovery jobs361/JT38,363/JT39,365/JT40 and367/JT41 all succeeded. All13criteria passed at05:39:31.505Z, attempt8; the workflow completed RECOVERY_VERIFIED at05:39:36.013866Z. Actual recovery Slack delivery succeeded to #datadog-automation at05:39:34.901964Z, ts1794116374.741359. No mocked actions, replay, escalation or automatic restore. Verified scope remains containment/forwarding with matching Datadog log clearance, not a physical-loop or directly empty-device-table claim.
+
+At final recheck07:18:02Z, the monitor was OK and the latest e1/2 SNMP oper value was2/down (07:17:46Z). The port remained isolated; a reset/restore requires a separate user request. Exact evidence is in datadog/workflows/scenario-controller-full-recovery-evidence.json.

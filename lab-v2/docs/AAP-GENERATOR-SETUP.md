@@ -119,3 +119,11 @@ and systemd unit verification in Linux. These are not a live AAP/lab execution.
 
 The readiness handshake follows the official
 [systemd service contract](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html).
+
+## Full test from Scenario Controller through verified recovery — Nov 8
+
+Controller instance2cec29b5-e4ba-4e07-96f5-f8efe88a9343 ran successful jobs355/JT46 →357/JT42 →359/JT45. Real duplicate-MAC logs from sw1 at05:29:12.993Z triggered monitor340593559 and recovery instance07dec5e0-d403-4d0e-ba7c-e6d7db4d30b6. Parsing returned2detections,0unparsed. Authenticated Slack approval was recorded at05:31:06.380Z.
+
+Actual recovery jobs361/JT38,363/JT39,365/JT40 and367/JT41 all succeeded. All13criteria passed at05:39:31.505Z, attempt8; the workflow completed RECOVERY_VERIFIED at05:39:36.013866Z. Actual recovery Slack delivery succeeded to #datadog-automation at05:39:34.901964Z, ts1794116374.741359. No mocked actions, replay, escalation or automatic restore. Verified scope remains containment/forwarding with matching Datadog log clearance, not a physical-loop or directly empty-device-table claim.
+
+At final recheck07:18:02Z, the monitor was OK and the latest e1/2 SNMP oper value was2/down (07:17:46Z). The port remained isolated; a reset/restore requires a separate user request. Exact evidence is in datadog/workflows/scenario-controller-full-recovery-evidence.json.

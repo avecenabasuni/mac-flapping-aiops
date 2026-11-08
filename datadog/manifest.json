@@ -52,9 +52,9 @@
     "single_run_end_to_end_recovery_verified": true,
     "telemetry_log_clearance_verified": true
   },
-  "latest_real_aap_recovery_evidence": "datadog/workflows/live-end-to-end-recovery-evidence.json",
+  "latest_real_aap_recovery_evidence": "datadog/workflows/scenario-controller-full-recovery-evidence.json",
   "latest_recovery_result": "RECOVERY_VERIFIED",
-  "latest_recovery_instance_id": "15951b0a-c1e1-45b8-9604-5c1dae1462e1",
+  "latest_recovery_instance_id": "07dec5e0-d403-4d0e-ba7c-e6d7db4d30b6",
   "latest_recovery_slack_delivery_verified": true,
   "scenario_controller_updated_at": "2026-11-08T04:52:16.465256Z",
   "scenario_generator_templates": {
@@ -63,5 +63,7 @@
     "restore": 42,
     "verify_forwarding": 41
   },
-  "scenario_generator_evidence": "datadog/workflows/generator-controller-binding-evidence.json"
+  "scenario_generator_evidence": "datadog/workflows/generator-controller-binding-evidence.json",
+  "scenario_controller_to_recovery_verified": true,
+  "latest_scenario_controller_instance_id": "2cec29b5-e4ba-4e07-96f5-f8efe88a9343"
 }

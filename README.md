@@ -13,8 +13,8 @@ This repository combines a **working Datadog detection and investigation configu
 | Nokia SR Linux MAC duplication demo (v1) | Validated | MAC movement detected in the prior lab. |
 | Datadog log parsing, monitor and read-only investigation | Validated | Real Nokia log samples triggered the workflow, Bits AI summary and Slack notification on Nov 4, 2026. |
 | Lab v2 with independent Host C probe | Validated | Real v2 detection, SNMP and independent forwarding telemetry observed Nov 8. |
-| AAP collect/isolate/device/forwarding jobs | Validated execution | Latest full test: Slack-approved jobs 332/JT38, 334/JT39, 336/JT40 and 338/JT41 all succeeded Nov 8. |
-| Recovery verifier and Slack success notification | Validated in a fresh full run | Real alert → Slack approval → JT38–41 → 13/13 telemetry criteria → RECOVERY_VERIFIED → actual Slack delivery, Nov 8 at 02:34:35Z. |
+| AAP collect/isolate/device/forwarding jobs | Validated execution | Latest controller-driven full test: Slack-approved jobs 361/JT38, 363/JT39, 365/JT40 and 367/JT41 all succeeded Nov 8. |
+| Recovery verifier and Slack success notification | Validated in a fresh full run | Scenario Controller → real detection → Slack approval → JT38–41 → 13/13 criteria → RECOVERY_VERIFIED → actual Slack delivery, Nov 8 at 05:39:36Z. |
 
 ## 1. Network architecture: Containerlab v2
 
@@ -198,3 +198,5 @@ Actual monitor-triggered run 15951b0a-c1e1-45b8-9604-5c1dae1462e1 completed at 0
 JT42/job330 restored e1/2 before this test under explicit user authorization. The successful test left e1/2 isolated; no automatic restore followed. Verified scope remains containment and forwarding with Datadog log clearance; a direct empty device MAC table or physical loop clearance is not claimed. Exact evidence: datadog/workflows/live-end-to-end-recovery-evidence.json. The earlier false-negative run remains historical evidence of the cutoff defect.
 
 [Fresh full recovery evidence](datadog/workflows/live-end-to-end-recovery-evidence.json).
+
+Latest complete controller-to-recovery evidence: [Nov 8 full scenario test](datadog/workflows/scenario-controller-full-recovery-evidence.json).
